@@ -11,6 +11,8 @@ dt <- read_sav("../Coronavirus Pandemic_Merge_AllData.SAV") #should have all the
 dt <- as.data.frame(dt)
 glimpse(dt)
 str(dt)
+n <- nrow(dt)
+
 
 net <- read_sav("../Social Networks_ Substance Use and COVID Prevention.sav")
 net <- as.data.frame(net)
@@ -85,5 +87,88 @@ table(dt$DEMO3_3, exclude = NULL) #SEE ABOVE QTS FOR RACE
 table(dt$Screen4, exclude = NULL)
 table(dt$Screen4, exclude = NULL)/(sum(table(dt$Screen4, exclude = NULL)))
 
+## income
+  # o	Less than $25,000  (4) 
+  # o	$25,000 - $34,999  (5) 
+  # o	$35,000 - $49,999  (6) 
+  # o	$50,000 - $74,999  (7) 
+  # o	$75,000 - $99,999  (8) 
+  # o	$100,000 - $149,999  (9) 
+  # o	$150,000 - $199,999  (10) 
+  # o	$200,000 and above  (11) 
+table(dt$DEMO20, exclude=NULL)
+table(dt$DEMO20, exclude=NULL)/nrow(dt)
 
-# Table 1  (Monnig et al, 2021) ---------------------------
+## essential worker
+  # o	Yes  (1) 
+  # o	No  (2) 
+  # o	Not Sure  (3) 
+table(dt$LSQ3, exclude = NULL)
+table(dt$LSQ3, exclude = NULL)/n
+
+## substance use in past 7 days
+## QT FOR ALL: How did we find the daily vs non-daily categorization?
+
+## cigarettes (1) 
+table(dt$USED7SUB_1, exclude = NULL)
+table(dt$USED7SUB_1, exclude = NULL)/sum(table(dt$USED7SUB_1, exclude = NULL))
+
+## E-cigarettes (1) ## QT: How did we find the daily vs non-daily categorization?
+table(dt$USED7SUB_6, exclude = NULL)
+table(dt$USED7SUB_6, exclude = NULL)/sum(table(dt$USED7SUB_1, exclude = NULL))
+
+## cannabis (QT: Is this #10 in the questionnaire, -alone vs w/tobacco?)
+table(dt$USED7SUB_10, exclude = NULL)
+table(dt$USED7SUB_10, exclude = NULL)/sum(table(dt$USED7SUB_1, exclude = NULL))
+
+## alcohol
+table(dt$USED7SUB_9, exclude = NULL)
+table(dt$USED7SUB_9, exclude = NULL)/sum(table(dt$USED7SUB_1, exclude = NULL))
+
+## opioids
+opi_cats_all <- cbind(dt$USED7OPI_1, dt$USED7OPI_2, dt$USED7OPI_3,
+                      dt$USED7OPI_4, dt$USED7OPI_5, dt$USED7OPI_6,
+                      dt$USED7OPI_7)
+
+opi_cats_colsums <- colSums(opi_cats_all, na.rm = T)
+sum(opi_cats_colsums)
+sum(opi_cats_colsums)/nrow(dt)
+
+## stimulants
+table(dt$USED7STIM, exclude = NULL)
+table(dt$USED7STIM, exclude = NULL)/sum(table(dt$USED7STIM, exclude = NULL))
+
+
+## covid19 testing history: 
+## LSQ12 Have you been tested for the novel coronavirus, or COVID-19?
+   # Yes  (1) 
+   #No (2) 
+   #Unsure (3) 
+
+table(dt$LSQ12, exclude = NULL)
+table(dt$LSQ12, exclude = NULL)/sum(table(dt$LSQ12, exclude = NULL))
+
+## COVID test result
+table(dt$LSQ12a1, exclude = NULL)
+table(dt$LSQ12b1, exclude = NULL)
+
+nasal_pos <- which(dt$LSQ12a1 == 1)
+blood_pos <- which(dt$LSQ12b1 == 1)
+
+pos_covid_test <- unique(c(nasal_pos,  blood_pos))
+length(pos_covid_test)
+
+
+# TAB 2: Characteristics of the participants ---------------------------
+# See above
+
+
+# TAB 3: GLM, outcome: substance use, COVs: CDC guideline adherence ---------------------------
+
+
+# TAB 4: Logistic regression of SU vs any COVID-19 testing ---------------------------
+
+
+# TAB 5: LR, outcome stimulant use w/ +COVID-19 test, ---------------------------
+## accounting for covariates, in the subset of participants
+## reporting a COVID-19 test (n=279). 
