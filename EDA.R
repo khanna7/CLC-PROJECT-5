@@ -13,7 +13,9 @@ glimpse(dt)
 str(dt)
 n <- nrow(dt)
 
-
+missing_id_dt <- read_sav("../20210519_merge_USETOSELECT_N=1101.sav")
+View(missing_id_dt)
+  
 net <- read_sav("../Social Networks_ Substance Use and COVID Prevention.sav")
 net <- as.data.frame(net)
 dim(net)
@@ -236,6 +238,7 @@ cov_dt_na.omit <- na.omit(cov_dt)
 dim(cov_dt_na.omit)
 
 # Primary Outcome (Table 3) ---------------------------
+
 
 # TAB 3: GLM, outcome: substance use, COVs: CDC guideline adherence ---------------------------
 
