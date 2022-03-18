@@ -151,6 +151,20 @@ table(dt$DEMO20, exclude=NULL)
 table(dt$DEMO20, exclude=NULL)/nrow(dt)
 income=dt$DEMO20
 
+## education
+table(dt$DEMO12, exclude = NULL)
+dt$DEMO12 <- haven::as_factor(dt$DEMO12)
+class(dt$DEMO12)
+
+education <- 
+  dt %>%
+  pull(DEMO12) %>%
+  recode_factor("8th grade or below" = "High School or Less",
+                "Some High School" = "High School or Less",
+                "High School Graduate/Equivalent" = "High School or Less" 
+         )
+table(education, exclude=NULL)
+
 ## essential worker
   # o	Yes  (1) 
   # o	No  (2) 
@@ -188,6 +202,13 @@ table(dt$USED7SUB_10, exclude = NULL)/sum(table(dt$USED7SUB_1, exclude = NULL))
 table(dt$USED7SUB_9, exclude = NULL)
 table(dt$USED7SUB_9, exclude = NULL)/sum(table(dt$USED7SUB_1, exclude = NULL))
 
+table(dt$NDAYSDRK, exclude = NULL)
+daily_drinking <-
+  dt %>% 
+  pull(NDAYSDRK) %>% 
+  recode_factor("0" = "none", "7" = "daily", .default = "1-6 days")
+table(daily_drinking)
+
 ## opioids
 opi_cats_all <- cbind(dt$USED7OPI_1, dt$USED7OPI_2, dt$USED7OPI_3,
                       dt$USED7OPI_4, dt$USED7OPI_5, dt$USED7OPI_6,
@@ -197,10 +218,24 @@ opi_cats_colsums <- colSums(opi_cats_all, na.rm = T)
 sum(opi_cats_colsums)
 sum(opi_cats_colsums)/nrow(dt)
 
+table(dt$NDAYSANYOPI)
+
+daily_opioid <-
+  dt %>% 
+  pull(NDAYSANYOPI) %>% 
+  recode_factor("0" = "none", "7" = "daily", .default = "1-6 days")
+table(daily_opioid)
+
 ## stimulants
 table(dt$USED7STIM, exclude = NULL)
 table(dt$USED7STIM, exclude = NULL)/sum(table(dt$USED7STIM, exclude = NULL))
+table(dt$NDAYSSTIM, exclude = NULL)
 
+daily_stimulant <-
+  dt %>% 
+  pull(NDAYSSTIM) %>% 
+  recode_factor("0" = "none", "7" = "daily", .default = "1-6 days")
+table(daily_stimulant)
 
 ## covid19 testing history: 
 ## LSQ12 Have you been tested for the novel coronavirus, or COVID-19?
@@ -232,14 +267,18 @@ table(covid_test, exclude = NULL) #dichotomize
 # TAB 2: Characteristics of the participants ---------------------------
 # See above
 
-# Collect covariates for Tables 3-5 ---------------------------
+# Collect all covariates for Tables 3-5 ---------------------------
 
 cov_dt <- cbind.data.frame(
   gender,
   ethnicity,
   essential_worker,
   income,
-  covid_test
+  education,
+  covid_test,
+  daily_drinking,
+  daily_opioid,
+  daily_stimulant
 )
 dim(cov_dt)
 
