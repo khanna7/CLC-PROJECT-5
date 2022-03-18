@@ -286,7 +286,28 @@ cov_dt_na.omit <- na.omit(cov_dt)
 dim(cov_dt_na.omit)
 
 # Primary Outcome (Table 3) ---------------------------
+summary(dt$CDCGAQ)
 
+## any missing values in the 13 criteria
+cdc <- cbind(dt$CDC1, dt$CDC2, dt$CDC3, dt$CDC4,
+             dt$CDC5, dt$CDC6, dt$CDC7, dt$CDC8,
+             dt$CDC9, dt$CDC10, dt$CDC11, dt$CDC12,
+             dt$CDC13)
+dim(cdc)
+which(is.na(cdc))
+
+cdc_avg_out <- apply(cdc, 1, mean)
+
+head(dt$CDCGAQ)
+head(cdc_avg_out)
+
+sum.to.avg.ratio <- dt$CDCGAQ/cdc_avg_out 
+
+summary(sum.to.avg.ratio)
+na.val <- which(is.na(sum.to.avg.ratio))
+
+dt$CDCGAQ[na.val]
+cdc_avg_out[na.val]
 
 # TAB 3: GLM, outcome: substance use, COVs: CDC guideline adherence ---------------------------
 
