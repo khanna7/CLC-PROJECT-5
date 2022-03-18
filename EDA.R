@@ -42,6 +42,7 @@ n <- nrow(dt)
 ## age
 summary(dt$DEMO2); sd(dt$DEMO2, na.rm = TRUE) #age
 table(dt$Screen1, exclude = NULL) # see CADRE CLC Data Project5/Qualtrics Codebooks/Coronavirus_Pandemic_A_Community_Survey.docx
+age <- dt$DEMO2
 
 ## sex and gender identity
 table(dt$Screen2) #sex assigned at birth, 1=male, 2=female
@@ -93,6 +94,36 @@ table(gender, exclude = NULL)
 table(dt$DEMO4_1, exclude = NULL)
 table(dt$DEMO4_2, exclude = NULL)
 table(dt$DEMO4_3, exclude = NULL) 
+
+table(dt$DEMO4SUM, exclude = NULL) #validity check - not relevant for analysis
+
+race_4cat <- rep(NA, n)
+race_4cat[which(dt$DEMO4_1 == 1)] <- "White"
+race_4cat[which(dt$DEMO4_2 == 1)] <- "Black"
+
+race <- cbind.data.frame(dt$DEMO4_1, dt$DEMO4_2, dt$DEMO4_3, dt$DEMO4_4, dt$DEMO4_5, 
+                         dt$DEMO4_6, dt$DEMO4_7, dt$DEMO4_8, dt$DEMO4_9, dt$DEMO4_10,
+                         dt$DEMO4_11, dt$DEMO4_12, dt$DEMO4_13, dt$DEMO4_14)
+
+
+race_row_sum <- rowSums(race, na.rm = TRUE)
+multi_race <- which(race_row_sum > 1)
+race_4cat[multi_race] <- "Other/Multiple Race"
+
+asian <- c(
+  which(dt$DEMO4_4 == 1),
+  which(dt$DEMO4_5 == 1),
+  which(dt$DEMO4_6 == 1),
+  which(dt$DEMO4_7 == 1),
+  which(dt$DEMO4_8 == 1),
+  which(dt$DEMO4_9 == 1),
+  which(dt$DEMO4_10 == 1)
+)
+asian <- sort(unique(asian))
+race_4cat[asian] <- "Asian"
+
+
+(table(race_4cat, exclude = NULL))
 
 # QTS: 
  #- these numbers are different from the published estimates
@@ -270,10 +301,14 @@ table(covid_test, exclude = NULL) #dichotomize
 # Collect all covariates for Tables 3-5 ---------------------------
 
 cov_dt <- cbind.data.frame(
+  #add race
+  household_size = dt$RDEMO8,
+  #dwelling ownership
+  age,
   gender,
   ethnicity,
   essential_worker,
-  income,
+  income, 
   education,
   covid_test,
   daily_drinking,
@@ -304,18 +339,43 @@ head(cdc_avg_out)
 sum.to.avg.ratio <- dt$CDCGAQ/cdc_avg_out 
 
 summary(sum.to.avg.ratio)
-na.val <- which(is.na(sum.to.avg.ratio))
+na.val <- which(is.na(sum.to.avg.ratio)) #na is because one person reported 0s on all criteria
 
 dt$CDCGAQ[na.val]
 cdc_avg_out[na.val]
 
+
 # TAB 3: GLM, outcome: substance use, COVs: CDC guideline adherence ---------------------------
 
+tab3_covs <-cov_dt %>%
+  select(age, gender, ethnicity, essential_worker, covid_test, daily_drinking,
+       daily_opioid
+  )
 
 
 # TAB 4: Logistic regression of SU vs any COVID-19 testing ---------------------------
 
+tab4_covs <-cov_dt %>%
+  select(age, education, ethnicity,
+         # add race
+         essential_worker,
+         income,
+         #add household size
+         daily_opioid
+  )
 
 # TAB 5: LR, outcome stimulant use w/ +COVID-19 test, ---------------------------
 ## accounting for covariates, in the subset of participants
 ## reporting a COVID-19 test (n=279). 
+
+tab5_covs <-cov_dt %>%
+  select(ethnicity,
+         # add household size
+         # dwelling ownership
+         essential_worker,
+         income,
+         #add household size
+         daily_opioid
+  )
+
+
