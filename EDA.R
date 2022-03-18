@@ -1,38 +1,47 @@
 rm(list=ls())
 
 
+# Set working directory ---------------------------
+
+setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+
+
 # Load libraries ---------------------------
 
 library(haven)
 library(dplyr)
 
-setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
-dt <- read_sav("../Coronavirus Pandemic_Merge_AllData.SAV") #should have all the network components, "wide dataset"
-dt <- as.data.frame(dt)
-glimpse(dt)
-str(dt)
+
+# Read full data ---------------------------
+
+full_dt <- read_sav("../Coronavirus Pandemic_Merge_AllData.SAV") #should have all the network components, "wide dataset"
+full_dt <- as.data.frame(full_dt)
+glimpse(full_dt)
+str(full_dt)
+
+
+
+# Correct for missing data ---------------------------
+
+## Read data
+use_to_select_dt <- read_sav("../20210519_merge_USETOSELECT_N=1101.sav")
+View(use_to_select_dt)
+
+## Filter for IDs used to select
+dt <- 
+full_dt %>% 
+  filter(StartDate %in% use_to_select_dt$startdate) %>%
+  filter(REMOVE == 0)
+
+dim(dt)
+#View(dt)
 n <- nrow(dt)
-
-missing_id_dt <- read_sav("../20210519_merge_USETOSELECT_N=1101.sav")
-View(missing_id_dt)
-  
-net <- read_sav("../Social Networks_ Substance Use and COVID Prevention.sav")
-net <- as.data.frame(net)
-dim(net)
-sort(colnames(net))
-
-class(dt$FUVH_MEAN) # main outcome
-summary(dt$FUVH_MEAN)
-table(dt$FUVH_MEAN, exclude = NULL) #vaccine hesitancy for alters? 
-                                    #for egos, only for unvaccinated persons 
-                                    #(for alters, only vaccination status is measured
-                                    # we don't know about vaccine hesitancy scores for the alters per se)
 
 # Sample Descriptives ---------------------------
 
 ## age
 summary(dt$DEMO2); sd(dt$DEMO2, na.rm = TRUE) #age
-table(dt$Screen1) # see CADRE CLC Data Project5/Qualtrics Codebooks/Coronavirus_Pandemic_A_Community_Survey.docx
+table(dt$Screen1, exclude = NULL) # see CADRE CLC Data Project5/Qualtrics Codebooks/Coronavirus_Pandemic_A_Community_Survey.docx
 
 ## sex and gender identity
 table(dt$Screen2) #sex assigned at birth, 1=male, 2=female
@@ -223,7 +232,7 @@ table(covid_test, exclude = NULL) #dichotomize
 # TAB 2: Characteristics of the participants ---------------------------
 # See above
 
-# Covariates for Tables 3-5 ---------------------------
+# Collect covariates for Tables 3-5 ---------------------------
 
 cov_dt <- cbind.data.frame(
   gender,
