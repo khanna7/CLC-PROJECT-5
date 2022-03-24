@@ -20,7 +20,6 @@ glimpse(full_dt)
 str(full_dt)
 
 
-
 # Correct for missing data ---------------------------
 
 ## Read data
@@ -36,6 +35,7 @@ full_dt %>%
 dim(dt)
 #View(dt)
 n <- nrow(dt)
+
 
 # Sample Descriptives ---------------------------
 
@@ -73,6 +73,14 @@ gender[missing_gender] <- 7
 
 table(gender, exclude = NULL)
 
+gender_3cat <- recode_factor(gender, 
+                             .default = "non-binary/other/prefer not to answer",
+                             "2" = "cisgender_female",
+                             "1" = "cisgender_male"
+)
+table(gender_3cat, exclude = NULL)                             
+class(gender_3cat)
+gender_3cat <- relevel(gender_3cat, ref = "cisgender_female")
 
 ## race 
   # DEMO4 What is your race? [Choose all that apply]:
@@ -168,6 +176,10 @@ ethnicity[not_hispanic] <- 0
 ethnicity[hispanic] <- 1 #binary classification
 
 table(ethnicity, exclude = NULL)
+ethnicity <- recode_factor(ethnicity, 
+                    "0" = "non-hispanic",
+                    "1" = "hispanic")
+ethnicity <- relevel(ethnicity, ref = "non-hispanic")
 
 ## income
   # o	Less than $25,000  (4) 
@@ -213,6 +225,12 @@ essential_worker[no2_essential_worker] <- 0 #dichotomize
 essential_worker[no3_essential_worker] <- 0
 
 table(essential_worker, exclude = NULL)
+
+essential_worker <- recode_factor(essential_worker,
+                                  "0" = "no",
+                                  "1" = "yes")
+essential_worker <- relevel(essential_worker,
+                            ref = "no")
 
 ## substance use in past 7 days
 ## QT FOR ALL: How did we find the daily vs non-daily categorization?
@@ -281,7 +299,19 @@ table(dt$LSQ12, exclude = NULL)/sum(table(dt$LSQ12, exclude = NULL))
 table(dt$LSQ12a1, exclude = NULL)
 table(dt$LSQ12b1, exclude = NULL)
 
-nasal_pos <- which(dt$LSQ12a1 == 1)
+
+nasal_neg <- which(dt$LSQ12a1 == 2) #negative tests
+blood_neg <- which(dt$LSQ12b1 == 2)
+
+length(nasal_neg)
+length(blood_neg)
+identical(nasal_neg, blood_neg)
+
+neg_covid_test <- unique(c(nasal_neg,  blood_neg))
+length(neg_covid_test)
+
+
+nasal_pos <- which(dt$LSQ12a1 == 1) #positive tests
 blood_pos <- which(dt$LSQ12b1 == 1)
 
 length(nasal_pos)
@@ -291,9 +321,14 @@ identical(nasal_pos, blood_pos)
 pos_covid_test <- unique(c(nasal_pos,  blood_pos))
 length(pos_covid_test)
 
-covid_test <- rep(0, n)
-covid_test[pos_covid_test] <- 1
+
+covid_test <- rep("no_test_or_unsure", n)
+covid_test[neg_covid_test] <- "negative"
+covid_test[pos_covid_test] <- "positive"
+covid_test <- as.factor(covid_test)
+
 table(covid_test, exclude = NULL) #dichotomize
+covid_test <- relevel(covid_test, ref = "no_test_or_unsure")
 
 # TAB 2: Characteristics of the participants ---------------------------
 # See above
@@ -305,7 +340,7 @@ cov_dt <- cbind.data.frame(
   household_size = dt$RDEMO8,
   #dwelling ownership
   age,
-  gender,
+  gender_3cat,
   ethnicity,
   essential_worker,
   income, 
@@ -320,7 +355,9 @@ dim(cov_dt)
 cov_dt_na.omit <- na.omit(cov_dt)
 dim(cov_dt_na.omit)
 
+
 # Primary Outcome (Table 3) ---------------------------
+
 summary(dt$CDCGAQ)
 
 ## any missing values in the 13 criteria
@@ -345,37 +382,7 @@ dt$CDCGAQ[na.val]
 cdc_avg_out[na.val]
 
 
-# TAB 3: GLM, outcome: substance use, COVs: CDC guideline adherence ---------------------------
+# Save image ---------------------------
 
-tab3_covs <-cov_dt %>%
-  select(age, gender, ethnicity, essential_worker, covid_test, daily_drinking,
-       daily_opioid
-  )
-
-
-# TAB 4: Logistic regression of SU vs any COVID-19 testing ---------------------------
-
-tab4_covs <-cov_dt %>%
-  select(age, education, ethnicity,
-         # add race
-         essential_worker,
-         income,
-         #add household size
-         daily_opioid
-  )
-
-# TAB 5: LR, outcome stimulant use w/ +COVID-19 test, ---------------------------
-## accounting for covariates, in the subset of participants
-## reporting a COVID-19 test (n=279). 
-
-tab5_covs <-cov_dt %>%
-  select(ethnicity,
-         # add household size
-         # dwelling ownership
-         essential_worker,
-         income,
-         #add household size
-         daily_opioid
-  )
-
+save.image(file="eda.RData")
 
