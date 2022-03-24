@@ -38,9 +38,17 @@ tab4_covs <-cov_dt %>%
          # add race
          essential_worker,
          income,
-         #add household size
+         household_size,
          daily_opioid
   )
+dim(tab4_covs)
+tab4_lm <- glm(data=tab4_covs, tested_for_covid ~ .,
+               family = binomial(link = "logit")
+)
+tab4_summary <- summary(tab4_lm)
+
+as.matrix(tab4_summary$coefficients)
+exp(as.matrix(tab4_summary$coefficients[,1:2]))
 
 # TAB 5: LR, outcome stimulant use w/ +COVID-19 test, ---------------------------
 ## accounting for covariates, in the subset of participants
@@ -48,11 +56,10 @@ tab4_covs <-cov_dt %>%
 
 tab5_covs <-cov_dt %>%
   select(ethnicity,
-         # add household size
          # dwelling ownership
          essential_worker,
          income,
-         #add household size
+         household_size,
          daily_opioid
   )
 

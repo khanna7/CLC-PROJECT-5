@@ -382,6 +382,16 @@ dt$CDCGAQ[na.val]
 cdc_avg_out[na.val]
 
 
+# Secondary Outcome (Table 4) ---------------------------
+dt$LSQ12 <- haven::as_factor(dt$LSQ12)
+table(dt$LSQ12, exclude = NULL)
+tested_for_covid <- recode(dt$LSQ12, 
+                                  "Yes" = 1,
+                                  "No" = 0,
+                                  "Unsure" = 0) 
+table(tested_for_covid, exclude = NULL)
+
+
 # Save image ---------------------------
 
 save.image(file="eda.RData")
