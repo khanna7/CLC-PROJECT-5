@@ -51,16 +51,20 @@ as.matrix(tab4_summary$coefficients)
 exp(as.matrix(tab4_summary$coefficients[,1:2]))
 
 # TAB 5: LR, outcome stimulant use w/ +COVID-19 test, ---------------------------
-## accounting for covariates, in the subset of participants
-## reporting a COVID-19 test (n=279). 
 
-tab5_covs <-cov_dt %>%
+tab5_covs <-
+  tested_for_covid_dt %>%
   select(ethnicity,
          # dwelling ownership
-         essential_worker,
-         income,
          household_size,
-         daily_opioid
+         daily_stimulant
   )
 
+tab5_lm <- glm(data=tab5_covs, tab5_outcome ~ .,
+               family = binomial(link = "logit")
+               )
+tab5_summary <- summary(tab5_lm)
+
+as.matrix(tab5_summary$coefficients)
+exp(as.matrix(tab5_summary$coefficients[,1:2]))
 

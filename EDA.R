@@ -333,7 +333,7 @@ covid_test <- relevel(covid_test, ref = "no_test_or_unsure")
 # TAB 2: Characteristics of the participants ---------------------------
 # See above
 
-# Collect all covariates for Tables 3-5 ---------------------------
+# Collect all covariates for Tables 3-4 ---------------------------
 
 cov_dt <- cbind.data.frame(
   #add race
@@ -355,6 +355,8 @@ dim(cov_dt)
 cov_dt_na.omit <- na.omit(cov_dt)
 dim(cov_dt_na.omit)
 
+dt <- cbind.data.frame(dt, cov_dt)
+dim(dt)
 
 # Primary Outcome (Table 3) ---------------------------
 
@@ -383,6 +385,7 @@ cdc_avg_out[na.val]
 
 
 # Secondary Outcome (Table 4) ---------------------------
+
 dt$LSQ12 <- haven::as_factor(dt$LSQ12)
 table(dt$LSQ12, exclude = NULL)
 tested_for_covid <- recode(dt$LSQ12, 
@@ -391,6 +394,50 @@ tested_for_covid <- recode(dt$LSQ12,
                                   "Unsure" = 0) 
 table(tested_for_covid, exclude = NULL)
 
+
+# Secondary Outcome and Covariates (Table 5) ---------------------------
+## (accounting for covariates, in the subset of participants
+## reporting a COVID-19 test (n=279).) 
+
+## dataset
+tested_for_covid_dt <- 
+  dt %>% 
+  filter(tested_for_covid == 1)
+
+dim(tested_for_covid_dt)
+
+## covariates
+cov_tested_for_covid_dt <- 
+ tested_for_covid_dt %>%
+  select( 
+    #add race
+    household_size,
+    #dwelling ownership
+    age,
+    gender_3cat,
+    ethnicity,
+    essential_worker,
+    income, 
+    education,
+    covid_test,
+    daily_drinking,
+    daily_opioid,
+    daily_stimulant
+    )
+  
+dim(cov_tested_for_covid_dt)
+
+## outcome
+table(cov_tested_for_covid_dt$covid_test, exclude = NULL)
+
+tab5_outcome <- 
+  recode(cov_tested_for_covid_dt$covid_test,
+        "positive" = 1,
+        "negative" = 0,
+        "no_test_or_unsure" = 0
+        )
+class(tab5_outcome)
+table(tab5_outcome)
 
 # Save image ---------------------------
 
