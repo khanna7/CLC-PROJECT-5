@@ -346,7 +346,7 @@ covid_test <- relevel(covid_test, ref = "no_test_or_unsure")
 # Collect all covariates for Tables 3-4 ---------------------------
 
 cov_dt <- cbind.data.frame(
-  #add race
+  race_4cat,
   household_size = dt$RDEMO8,
   dwelling_ownership,
   age,
@@ -420,7 +420,7 @@ dim(tested_for_covid_dt)
 cov_tested_for_covid_dt <- 
  tested_for_covid_dt %>%
   select( 
-    #add race
+    race_4cat,
     household_size,
     dwelling_ownership,
     age,

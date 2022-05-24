@@ -35,7 +35,7 @@ summary(tab3_lm)
 
 tab4_covs <-cov_dt %>%
   select(age, education, ethnicity,
-         # add race
+         race_4cat,
          essential_worker,
          income,
          household_size,
@@ -49,6 +49,7 @@ tab4_summary <- summary(tab4_lm)
 
 as.matrix(tab4_summary$coefficients)
 exp(as.matrix(tab4_summary$coefficients[,1:2]))
+
 
 # TAB 5: LR, outcome stimulant use w/ +COVID-19 test, ---------------------------
 
