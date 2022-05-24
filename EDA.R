@@ -232,6 +232,16 @@ essential_worker <- recode_factor(essential_worker,
 essential_worker <- relevel(essential_worker,
                             ref = "no")
 
+## dwelling ownership
+dt$DEMO6 <- haven::as_factor(dt$DEMO6)
+dwelling_ownership <- 
+  dt %>%
+  pull(DEMO6) %>%
+  recode("Own a home or condo" = "1",
+         .default = "0",
+  )
+table(dwelling_ownership, exclude=NULL)
+
 ## substance use in past 7 days
 ## QT FOR ALL: How did we find the daily vs non-daily categorization?
 
@@ -338,7 +348,7 @@ covid_test <- relevel(covid_test, ref = "no_test_or_unsure")
 cov_dt <- cbind.data.frame(
   #add race
   household_size = dt$RDEMO8,
-  #dwelling ownership
+  dwelling_ownership,
   age,
   gender_3cat,
   ethnicity,
@@ -412,7 +422,7 @@ cov_tested_for_covid_dt <-
   select( 
     #add race
     household_size,
-    #dwelling ownership
+    dwelling_ownership,
     age,
     gender_3cat,
     ethnicity,
