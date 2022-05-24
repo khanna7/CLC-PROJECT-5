@@ -55,7 +55,7 @@ exp(as.matrix(tab4_summary$coefficients[,1:2]))
 tab5_covs <-
   tested_for_covid_dt %>%
   select(ethnicity,
-         # dwelling ownership
+         dwelling_ownership,
          household_size,
          daily_stimulant
   )
