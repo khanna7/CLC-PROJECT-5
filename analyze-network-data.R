@@ -1,33 +1,61 @@
 rm(list=ls())
 
 
-# Set working directory ---------------------------
-
-setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
-
-
 # Load libraries ---------------------------
 
 library(haven)
 library(dplyr)
 
 
-# Load individual data analysis ---------------------------
+# Set working directory ---------------------------
 
-load("eda.RData")
-
-
-# Read network data ---------------------------
-network_dt <- read_sav("../Social Networks_ Substance Use and COVID Prevention.sav")
+setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
 
 
-# Correct for missing data ---------------------------
+# Load complete (individual+network) data ---------------------------
 
-## Do we need to do something similar here to what we did for the individual data? 
-# See https://github.com/khanna7/CLC-PROJECT-5/blob/3cffa997dbaf166c57f4cae832f4dcf68db84c5d/EDA.R#L25
+load(file="eda.RData") #from "../Coronavirus Pandemic_Merge_AllData.SAV") 
+dim(dt)
 
 
+# SN20 Does ${lm://Field/1} smoke tobacco, like cigarettes or cigars?
+#FUA4...FUA8 are the 5 network members
 
-# Compute network statistics ---------------------------
+cig_net_dt <- 
+  dt %>% select(comp_code_Text_Set,
+                FUA4_SN20,
+                FUA5_SN20,
+                FUA6_SN20,
+                FUA7_SN20,
+                FUA8_SN20
+  )
 
-## 
+View(cig_net_dt)
+
+table(dt$FUSNCONSENT, exclude = NULL)
+
+# Above data shows MTURK participants recruited in the survey
+# Many didn't take the survey, only about n=200 did.
+# Is there an easy way to identify those that can be taken out?
+table(dt$FUSNCONSENT, exclude = NULL)
+
+# Once we do that, then:
+
+  # - we can take the proportions of network members for each person 
+      # reporting a behavior
+
+  # fit a logistic regression model that regresses teh outcome on the behaviors 
+        # + any relevant individual attributes
+        # model is limited because we are assuming independence across observations.
+  
+   # fit a regressoin model that accounts for the dependency in obs. 
+        # e.g.: spatial autocorrelation etc. 
+        # or other techniques of repeated measures analysis.
+
+
+table(dt$FUA4_SN20, exclude = NULL)
+table(dt$FUA5_SN20, exclude = NULL)
+table(dt$FUA6_SN20, exclude = NULL)
+table(dt$FUA7_SN20, exclude = NULL)      
+table(dt$FUA8_SN20, exclude = NULL)      
+
