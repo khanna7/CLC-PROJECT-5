@@ -199,26 +199,170 @@ where 1 = Rents a place to live, like a house or apartment,
 7 = Don't know
 
 political party/affiliation (SN9), 
+```{r}
+political_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN9,
+                FUA5_SN9,
+                FUA6_SN9,
+                FUA7_SN9,
+                FUA8_SN9
+  )
+apply(political_net_dt, 2, function (x) table(x, exclude = NULL))
+```
 
 mode(s) of communication (SN10), 
 
+```{r}
+comm_modes_net_dt <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                unlist(lapply(1:5, function (x) paste0("FUA4_SN10_",x))),
+                unlist(lapply(1:5, function (x) paste0("FUA5_SN10_",x))),
+                unlist(lapply(1:5, function (x) paste0("FUA6_SN10_",x))),
+                unlist(lapply(1:5, function (x) paste0("FUA7_SN10_",x))),
+                unlist(lapply(1:5, function (x) paste0("FUA8_SN10_",x)))
+  )
+   
+apply(comm_modes_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 1=in-person, 2=social media, 3=text/messaging, 4 = phone call, 5=video conference/vide chat.
+
 most frequently used mode of communication (SN11),
 
+```{r}
+freq_comm_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN11,
+                FUA5_SN11,
+                FUA6_SN11,
+                FUA7_SN11,
+                FUA8_SN11
+  )
+apply(freq_comm_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 6=in-person, 7=social media, 8=text/messaging, 9=phone call,
+10 = video conference/video chat.
+
+
 length of friendship (SN12),
+```{r}
+rel_leng_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN12,
+                FUA5_SN12,
+                FUA6_SN12,
+                FUA7_SN12,
+                FUA8_SN12
+  )
+apply(rel_leng_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where:
+1:   Less than a year,
+2:          1-2 years,
+3: 2-5 years,
+4:         5-10 years
+5: More than 10 years
 
 frequency of communication (SN13),
+```{r}
+freq_comm_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN13,
+                FUA5_SN13,
+                FUA6_SN13,
+                FUA7_SN13,
+                FUA8_SN13
+  )
+apply(freq_comm_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where:
+    1:             Daily,
+     2:    Every few days,
+     3:            Weekly,
+     4:           Monthly,
+     5: Less than monthly
+
 
 whether the participant discusses personal matters with the network member (SN14),
+
+```{r}
+personal_matts_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN14,
+                FUA5_SN14,
+                FUA6_SN14,
+                FUA7_SN14,
+                FUA8_SN14
+  )
+apply(personal_matts_net_dt, 2, function (x) table(x, exclude = NULL))
+```
 
 whether the participant asks the network member for advice on personal matters (SN15),
 
 whether the network member is a spouse or intimate partner (SN16),
 
+```{r}
+intimate_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN16,
+                FUA5_SN16,
+                FUA6_SN16,
+                FUA7_SN16,
+                FUA8_SN16 
+  )
+apply(intimate_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where:
+    1:   Yes,
+     2:    No
+     
 whether the network member is a close relative (parent/grandparent/sibling) (SN17),
+
+```{r}
+bloodrel_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN17,
+                FUA5_SN17,
+                FUA6_SN17,
+                FUA7_SN17,
+                FUA8_SN17 
+  )
+apply(bloodrel_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where:
+     1:   Yes
+     2:    No
 
 whether there participant has a sexual relationship with the network member (SN18),
 
+```{r}
+sexpt_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN18,
+                FUA5_SN18,
+                FUA6_SN18,
+                FUA7_SN18,
+                FUA8_SN18 
+  )
+apply(sexpt_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 
+     1: Yes,
+     2: No
+     
 whether the participant lives with the network member (SN19),
+
+```{r}
+cohab_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN19,
+                FUA5_SN19,
+                FUA6_SN19,
+                FUA7_SN19,
+                FUA8_SN19 
+  )
+apply(cohab_net_dt, 2, function (x) table(x, exclude = NULL))
+```
 
 whether the network member smokes tobacco (cigarettes or cigars) (SN20),
 if so, how often (SN20a),
