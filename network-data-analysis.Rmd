@@ -1,0 +1,381 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook containing 
+results
+from the social network data from CLC Project 5.
+
+```{r, echo=FALSE, message=FALSE}
+
+library(haven)
+library(dplyr)
+
+# Set working directory ---------------------------
+setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+
+# Load complete (individual+network) data ---------------------------
+load(file="eda.RData") #from "../Coronavirus Pandemic_Merge_AllData.SAV") 
+dim(dt)
+
+```
+
+
+```{r}
+sns_consenting_dt <- dt %>% 
+  filter(FUSNCONSENT == 7)
+```
+
+```{r, echo=FALSE, results='hide'}
+vars <- colnames(sns_consenting_dt)
+sns_vars <- which(substr(vars, 6, 7) == "SN")
+```
+
+We start by filtering out the survey participants who did not consent to 
+participate with an affirmative response to the statement:
+"Yes, I agree that I have read this document, that I am 18 years of age or older, 
+and I would like to participate in this study.'' We have a dataset of
+`r nrow(sns_consenting_dt)` participants, reporting on a number of 
+attributes of their network members, structured in `r length(sns_vars)` columns, 
+with names such as `r vars[sns_vars[1]]`, `r vars[sns_vars[2]]`, ...,
+`r vars[sns_vars[length(sns_vars)]]`.
+
+For example, the variables "FUAX_SN20"report 
+cigarette smoking in the network, tabulated as follows:
+```{r, echo=FALSE, message=FALSE, results='hide'}
+cig_net_dt <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN20,
+                FUA5_SN20,
+                FUA6_SN20,
+                FUA7_SN20,
+                FUA8_SN20
+  )
+
+```
+
+```{r}
+(apply(cig_net_dt, 2, function (x) table(x, exclude = NULL)))
+```
+
+
+The variables `r colnames(cig_net_dt)[[1]]` through `r colnames(cig_net_dt)[[5]]` 
+report smoking in the 5 reported  network members, 
+where 1 represents "yes", and 2 represents "no". 
+Restricting ourselves to the confirmed yes and no reports, the proportion of
+smoking persons in the social network of our MTurk sample is:  
+
+```{r}
+round(apply(cig_net_dt, 2, function (x) length(which(x==1))/sum(table(x))), 3)
+```
+
+Other reported characteristics of the social network members include: 
+age (SN2), 
+
+```{r}
+age_net_dt <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN2,
+                FUA5_SN2,
+                FUA6_SN2,
+                FUA7_SN2,
+                FUA8_SN2
+  )
+round(apply(age_net_dt, 2, function (x) summary(x)), 2)
+```
+(Looks like we have reports on some children; these might have to be deleted
+since the survey was meant to interview adults?)
+
+race (SN3),
+
+```{r}
+race_net_dt_white <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN3_1,
+                FUA5_SN3_1,
+                FUA6_SN3_1,
+                FUA7_SN3_1,
+                FUA8_SN3_1
+  )
+
+race_net_dt_black <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN3_2,
+                FUA5_SN3_2,
+                FUA6_SN3_2,
+                FUA7_SN3_2,
+                FUA8_SN3_2
+  )
+
+apply(race_net_dt_white, 2, function (x) table(x))
+apply(race_net_dt_black, 2, function (x) table(x))
+```
+(I will need to recode the other race categories since each is reported in a 
+separated column);
+
+gender (SN4), 
+
+```{r}
+gender_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN4,
+                FUA5_SN4,
+                FUA6_SN4,
+                FUA7_SN4,
+                FUA8_SN4
+  )
+apply(gender_net_dt, 2, table)
+```
+where 1=male, 2=female, 3=nonbinary, 4=transgender, 5 = don't know,
+
+ethnicity (SN5), 
+
+```{r}
+ethnicity_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN5,
+                FUA5_SN5,
+                FUA6_SN5,
+                FUA7_SN5,
+                FUA8_SN5
+  )
+apply(ethnicity_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 1 is Non-Hispanic, 2 is Hispanic,
+
+education (SN6),
+
+```{r}
+education_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN6,
+                FUA5_SN6,
+                FUA6_SN6,
+                FUA7_SN6,
+                FUA8_SN6
+  )
+apply(education_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 1, 2, 3 are HS or below, 4 is some college, 5 is college degree,
+6 is beyond, and 7 is don't know,
+
+employment (SN7), 
+```{r}
+employment_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN7,
+                FUA5_SN7,
+                FUA6_SN7,
+                FUA7_SN7,
+                FUA8_SN7
+  )
+apply(employment_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 1 =	Employed works remotely; 2= Employed, works in person;  
+3 = Not employed; 5=Retired;  6 = Full time student;  7 = Don't Know, 
+
+housing (SN8),
+```{r}
+housing_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN8,
+                FUA5_SN8,
+                FUA6_SN8,
+                FUA7_SN8,
+                FUA8_SN8
+  )
+apply(housing_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 1 = Rents a place to live, like a house or apartment,
+2 = Owns a place to live, like a home or condo,
+3 = A relative or friend's home or apartment,
+4 = Group home, boarding house, or half-way house, 
+5 = In a dorm or other campus housing  (5),
+6 = someplace else (----),
+7 = Don't know
+
+political party/affiliation (SN9), 
+
+mode(s) of communication (SN10), 
+
+most frequently used mode of communication (SN11),
+
+length of friendship (SN12),
+
+frequency of communication (SN13),
+
+whether the participant discusses personal matters with the network member (SN14),
+
+whether the participant asks the network member for advice on personal matters (SN15),
+
+whether the network member is a spouse or intimate partner (SN16),
+
+whether the network member is a close relative (parent/grandparent/sibling) (SN17),
+
+whether there participant has a sexual relationship with the network member (SN18),
+
+whether the participant lives with the network member (SN19),
+
+whether the network member smokes tobacco (cigarettes or cigars) (SN20),
+if so, how often (SN20a),
+
+if the network member has encouraged the participant to smoke tobacco with them since the start of COVID-19 (SN21),
+if so, how often (SN 21a),
+
+whether the network member drinks alcohol (wine, beer or liquor) (SN22),
+if so, how often (SN22a),
+
+if the network member has encouraged the participant to drink alcohol with them since the start of COVID-19 (SN23),
+if so, how often (SN23a),
+
+and, if in a bar, restaurant, or other public place (SN24),
+
+if the network member uses non-prescription drugs (cocaine, painkiller pills, heroin, fentanyl, methamphetamine, or marijuana) (SN25),
+if so, which drugs the network member uses (SN25a), how often (SN25b),
+
+and if the network member has encouraged the participant to use drugs with them (SN26), 
+and how often (SN26b);
+
+if the network member has been tested for COVID-19 (SN27),
+
+if the network member has tested positive for COVID-19 (SN27a),
+if the network member has been hospitalized for COVID-19 (SN27a1),
+
+if the network member knows anyone who has been hospitalized for COVID-19 (SN28),
+
+```{r}
+any_hospitalized <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN28,
+                FUA5_SN28,
+                FUA6_SN28,
+                FUA7_SN28,
+                FUA8_SN28
+  )
+apply(any_hospitalized, 2, function (x) table(x, exclude = NULL))
+```
+
+if the network member knows anyone who has died of COVID-19 (SN29),
+
+```{r}
+any_died <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN29,
+                FUA5_SN29,
+                FUA6_SN29,
+                FUA7_SN29,
+                FUA8_SN29
+  )
+apply(any_died, 2, function (x) table(x, exclude = NULL))
+```
+
+if the network member has any of the listed conditions (SN30),
+
+if the network member's clinic, doctor's office or dental practice has closed or cancelled an appointment (SN31),
+
+if the network member has ever encouraged the participant to get tested for COVID-19 (SN32),
+
+```{r}
+encd_covid_testing <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN32,
+                FUA5_SN32,
+                FUA6_SN32,
+                FUA7_SN32,
+                FUA8_SN32
+  )
+apply(encd_covid_testing, 2, function (x) table(x, exclude = NULL))
+```
+
+if the network member follows social distancing guidelines (SN33),
+```{r}
+SD_guidelines <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN33,
+                FUA5_SN33,
+                FUA6_SN33,
+                FUA7_SN33,
+                FUA8_SN33
+  )
+apply(SD_guidelines, 2, function (x) table(x, exclude = NULL))
+```
+
+if the network member has encouraged the participant to follow social distancing guidelines (SN34),
+
+```{r}
+encd_SD_guidelines <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN34,
+                FUA5_SN34,
+                FUA6_SN34,
+                FUA7_SN34,
+                FUA8_SN34
+  )
+apply(encd_SD_guidelines, 2, function (x) table(x, exclude = NULL))
+```
+
+how often the network member wears a mask in public (SN35),
+
+if the network member has encouraged the participant to wear a mask in public (SN36),
+
+if the network member has received at least one dose of the COVID-19 vaccine (SN37),
+if the network member had a negative reaction or bad side effects after the COVID-19 vaccine (SN37a),
+if the network member is open to receiving a vaccine (SN37b),
+
+```{r}
+recd_one_dose_net_dt<- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN37,
+                FUA5_SN37,
+                FUA6_SN37,
+                FUA7_SN37,
+                FUA8_SN37
+  )
+apply(recd_one_dose_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 1=Yes, 2=No.
+
+if the network member has encouraged the participant to get the COVID-19 vaccine (SN38),
+
+```{r}
+encd_vaccine_net_dt <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN38,
+                FUA5_SN38,
+                FUA6_SN38,
+                FUA7_SN38,
+                FUA8_SN38
+  )
+apply(encd_vaccine_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+where 1=Yes, 2=No.
+
+if the network member has discouraged the participant from getting the COVID-19 vaccine (SN39).
+
+```{r}
+discd_vaccine_net_dt <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN39,
+                FUA5_SN39,
+                FUA6_SN39,
+                FUA7_SN39,
+                FUA8_SN39
+  )
+apply(discd_vaccine_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+
+
+
+
+
+
+
+
+
+
+
+
