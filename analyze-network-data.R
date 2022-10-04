@@ -33,6 +33,7 @@ cig_net_dt <-
 View(cig_net_dt)
 
 table(dt$FUSNCONSENT, exclude = NULL)
+apply(cig_net_dt, 2, table)
 
 # Above data shows MTURK participants recruited in the survey
 # Many didn't take the survey, only about n=200 did.
