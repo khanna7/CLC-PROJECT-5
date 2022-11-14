@@ -4,13 +4,15 @@ output:
   html_document:
     df_print: paged
   pdf_document: default
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook containing 
-results
-from the social network data from CLC Project 5.
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook
+containing results from the social network data from CLC Project 5.
 
-##  Background
+## Background
 
 We start by describing the origial dataset. Load the needed data:
 
@@ -32,10 +34,10 @@ library(data.table)
 load(file="/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/eda.RData") 
 ```
 
-We know that the `dt` dataset contains the sample of `r paste("n =", nrow(dt))` 
-used for the original paper (Monnig 2021, JMIR). Of these `r nrow(dt)`, we 
-focused our analysis on the participants who consented
-to providing social network data.  
+We know that the `dt` dataset contains the sample of
+`r paste("n =", nrow(dt))` used for the original paper (Monnig 2021,
+JMIR). Of these `r nrow(dt)`, we focused our analysis on the
+participants who consented to providing social network data.
 
 ```{r}
 dim(dt)
@@ -53,21 +55,21 @@ length(sns_vars)
 head(colnames(sns_consenting_dt[sns_vars]))
 ```
 
-We thus filterered out the survey participants who did not consent to 
-participate with an affirmative response to the statement:
-"Yes, I agree that I have read this document, that I am 18 years of age or older, 
-and I would like to participate in this study.'' We have a dataset of
-`r nrow(sns_consenting_dt)` participants, reporting on a number of 
-attributes of their network members, structured in `r length(sns_vars)` columns, 
-with names such as `r vars[sns_vars[1]]`, `r vars[sns_vars[2]]`, ...,
-`r vars[sns_vars[length(sns_vars)]]`.
+We thus filterered out the survey participants who did not consent to
+participate with an affirmative response to the statement: "Yes, I agree
+that I have read this document, that I am 18 years of age or older, and
+I would like to participate in this study.'' We have a dataset of
+`r nrow(sns_consenting_dt)` participants, reporting on a number of
+attributes of their network members, structured in `r length(sns_vars)`
+columns, with names such as `r vars[sns_vars[1]]`,
+`r vars[sns_vars[2]]`, ..., `r vars[sns_vars[length(sns_vars)]]`.
 
 ## Network Descriptives
 
 How many friends are reported on?
 
-We look at the reported ages of the network members, and count any non-missing 
-ages as friends we have reports on. 
+We look at the reported ages of the network members, and count any
+non-missing ages as friends we have reports on.
 
 ```{r}
 age_net_dt <- 
@@ -81,23 +83,25 @@ age_net_dt <-
 round(apply(age_net_dt, 2, function (x) summary(x)), 2)
 apply(age_net_dt, 2, function (x) which(is.na(x)))
 ```
-Since there are no missing age reports, we have 
-`r nrow(age_net_dt)*ncol(age_net_dt)` social network members on whom data have 
-been collected.
 
+Since there are no missing age reports, we have
+`r nrow(age_net_dt)*ncol(age_net_dt)` social network members on whom
+data have been collected.
 
-There seem to be some reports on minors (age < 18 years). We will count how many and remove them
-from the analysis:
+There seem to be some reports on minors (age \< 18 years). We will count
+how many and remove them from the analysis:
 
 ```{r}
 dim(age_net_dt)
 minors_reported <- apply(age_net_dt, 2, function (x) which(x < 18))
 minors_reported
 unlist(minors_reported) 
+length(unlist(minors_reported))
 ```
-Thus there are `r length(unlist(minors_reported))` minors in the dataset who 
-will need to be removed. But, to remove them from the dataset, we will
-first have to convert the wide dataset to long.  
+
+Thus there are `r length(unlist(minors_reported))` minors in the dataset
+who will need to be removed. But, to remove them from the dataset, we
+will first have to convert the wide dataset to long.
 
 We first extract the social network columns of interest:
 
@@ -115,11 +119,10 @@ sns_dt_only <- as.data.table(sns_dt_only)
 class(sns_dt_only)
 ```
 
-Extract the network data columns that are necessary, and combine them into
-a long-wide format: 
- - Each network member ID is presented top to bottom (i.e., long) for each study participant
- - The attributes of each person are added to each network member from left to right (i.e., wide) 
-
+Extract the network data columns that are necessary, and combine them
+into a long-wide format: - Each network member ID is presented top to
+bottom (i.e., long) for each study participant - The attributes of each
+person are added to each network member from left to right (i.e., wide)
 
 ```{r}
 colnames(sns_consenting_dt)
@@ -140,15 +143,15 @@ net_A5 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
 dim(net_A5)
 colnames(net_A5) <- colnames_net_dt
 
-net_A6 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
+net_A6 <- sns_consenting_dt %>% select(starts_with("FUA6_"))
 dim(net_A6)
 colnames(net_A6) <- colnames_net_dt
 
-net_A7 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
+net_A7 <- sns_consenting_dt %>% select(starts_with("FUA7_"))
 dim(net_A7)
 colnames(net_A7) <- colnames_net_dt
 
-net_A8 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
+net_A8 <- sns_consenting_dt %>% select(starts_with("FUA8_"))
 dim(net_A8)
 colnames(net_A8) <- colnames_net_dt
 
@@ -178,14 +181,17 @@ dim(sns_dt_long_wide)
 dim(sns_dt_long_wide_no_minors)
 ```
 
+```{r}
+setDT(sns_dt_long_wide_no_minors)
+```
 
-
-##  Network Analysis
+## Network Analysis
 
 ### Sample Substance Use Variable of Interest
 
-For example, the variables "FUAX_SN20"report 
-cigarette smoking in the network, tabulated as follows:
+For example, the variables "FUAX_SN20"report cigarette smoking in the
+network, tabulated as follows:
+
 ```{r, echo=FALSE, message=FALSE, results='hide'}
 cig_net_dt <- 
   sns_consenting_dt %>% select(#comp_code_Text_Set,
@@ -202,21 +208,32 @@ cig_net_dt <-
 (apply(cig_net_dt, 2, function (x) table(x, exclude = NULL)))
 ```
 
-
-The variables `r colnames(cig_net_dt)[[1]]` through `r colnames(cig_net_dt)[[5]]` 
-report smoking in the 5 reported  network members, 
-where 1 represents "yes", and 2 represents "no". 
-Restricting ourselves to the confirmed yes and no reports, the proportion of
-smoking persons in the social network of our MTurk sample is:  
+The variables `r colnames(cig_net_dt)[[1]]` through
+`r colnames(cig_net_dt)[[5]]` report smoking in the 5 reported network
+members, where 1 represents "yes", and 2 represents "no". Restricting
+ourselves to the confirmed yes and no reports, the proportion of smoking
+persons in the social network of our MTurk sample is:
 
 ```{r}
 round(apply(cig_net_dt, 2, function (x) length(which(x==1))/sum(table(x))), 3)
 ```
 
+```{r smoking_data.table}
+sns_dt_long_wide_no_minors[, .N, by = c("SN20")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+```{r smoking_nominors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN20")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
 ### Analysis of Full Network Dataset
 
-Other reported characteristics of the social network members include: 
-age (SN2), 
+Other reported characteristics of the social network members include:
+age (SN2),
 
 ```{r}
 age_net_dt <- 
@@ -229,8 +246,20 @@ age_net_dt <-
   )
 round(apply(age_net_dt, 2, function (x) summary(x)), 2)
 ```
-(Looks like we have reports on some children; these might have to be deleted
-since the survey was meant to interview adults?)
+
+(Looks like we have reports on some children; these might have to be
+deleted since the survey was meant to interview adults?)
+
+```{r age_nominors_dt}
+sns_dt_long_wide_no_minors[, 
+   .(
+     "mean"= mean(SN2),
+     "median" = median(SN2),
+     "min" = min(SN2),
+     "max" = max(SN2),
+     .N), 
+  ]
+```
 
 race (SN3),
 
@@ -256,10 +285,21 @@ race_net_dt_black <-
 apply(race_net_dt_white, 2, function (x) table(x))
 apply(race_net_dt_black, 2, function (x) table(x))
 ```
-(I will need to recode the other race categories since each is reported in a 
-separated column);
 
-gender (SN4), 
+(I will need to recode the other race categories since each is reported
+in a separated column);
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN3_1")][, 
+  "%white" := round(N /sum(N) * 100, 0)] [
+  ]
+
+sns_dt_long_wide_no_minors[, .N, by = c("SN3_2")][, 
+  "%black" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+gender (SN4),
 
 ```{r}
 gender_net_dt<- 
@@ -272,9 +312,16 @@ gender_net_dt<-
   )
 apply(gender_net_dt, 2, table)
 ```
+
 where 1=male, 2=female, 3=nonbinary, 4=transgender, 5 = don't know,
 
-ethnicity (SN5), 
+```{r gender_nominors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN4")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+ethnicity (SN5),
 
 ```{r}
 ethnicity_net_dt<- 
@@ -287,7 +334,14 @@ ethnicity_net_dt<-
   )
 apply(ethnicity_net_dt, 2, function (x) table(x, exclude = NULL))
 ```
+
 where 1 is Non-Hispanic, 2 is Hispanic,
+
+```{r ethnicity_nominors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN5")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
 
 education (SN6),
 
@@ -302,10 +356,18 @@ education_net_dt<-
   )
 apply(education_net_dt, 2, function (x) table(x, exclude = NULL))
 ```
-where 1, 2, 3 are HS or below, 4 is some college, 5 is college degree,
-6 is beyond, and 7 is don't know,
 
-employment (SN7), 
+where 1, 2, 3 are HS or below, 4 is some college, 5 is college degree, 6
+is beyond, and 7 is don't know,
+
+```{r education_nominors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN6")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+employment (SN7),
+
 ```{r}
 employment_net_dt<- 
   sns_consenting_dt %>% select(#comp_code_Text_Set,
@@ -317,10 +379,18 @@ employment_net_dt<-
   )
 apply(employment_net_dt, 2, function (x) table(x, exclude = NULL))
 ```
-where 1 =	Employed works remotely; 2= Employed, works in person;  
-3 = Not employed; 5=Retired;  6 = Full time student;  7 = Don't Know, 
+
+where 1 = Employed works remotely; 2= Employed, works in person;\
+3 = Not employed; 5=Retired; 6 = Full time student; 7 = Don't Know,
+
+```{r employment_nominors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN7")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
 
 housing (SN8),
+
 ```{r}
 housing_net_dt<- 
   sns_consenting_dt %>% select(#comp_code_Text_Set,
@@ -332,62 +402,118 @@ housing_net_dt<-
   )
 apply(housing_net_dt, 2, function (x) table(x, exclude = NULL))
 ```
-where 1 = Rents a place to live, like a house or apartment,
-2 = Owns a place to live, like a home or condo,
-3 = A relative or friend's home or apartment,
-4 = Group home, boarding house, or half-way house, 
-5 = In a dorm or other campus housing  (5),
-6 = someplace else (----),
-7 = Don't know
 
-political party/affiliation (SN9), 
+where 1 = Rents a place to live, like a house or apartment, 2 = Owns a
+place to live, like a home or condo, 3 = A relative or friend's home or
+apartment, 4 = Group home, boarding house, or half-way house, 5 = In a
+dorm or other campus housing (5), 6 = someplace else (----), 7 = Don't
+know
 
-mode(s) of communication (SN10), 
+```{r housing_nominors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN7")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+political party/affiliation (SN9),
+
+```{r politics_party_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN9")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+mode(s) of communication (SN10),
+
+```{r politics_party_nonminors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN10_1", "SN10_2", "SN10_3", "SN10_4", "SN10_5")][
+  ]
+```
 
 most frequently used mode of communication (SN11),
 
+```{r}
+table(sns_dt_long_wide_no_minors$SN11, exclude = NULL)
+```
+
+```{r mode_nonminors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN11")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
 length of friendship (SN12),
+
+```{r lengthfrn_nonminors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN12")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
 
 frequency of communication (SN13),
 
-whether the participant discusses personal matters with the network member (SN14),
+```{r freqcomm_nonminors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN13")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
 
-whether the participant asks the network member for advice on personal matters (SN15),
+whether the participant discusses personal matters with the network
+member (SN14),
+
+```{r personalmatters_nonminors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN14")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+whether the participant asks the network member for advice on personal
+matters (SN15),
+
+```{r personaladvice_nonminors_dt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN15")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
 
 whether the network member is a spouse or intimate partner (SN16),
 
-whether the network member is a close relative (parent/grandparent/sibling) (SN17),
+whether the network member is a close relative
+(parent/grandparent/sibling) (SN17),
 
-whether there participant has a sexual relationship with the network member (SN18),
+whether there participant has a sexual relationship with the network
+member (SN18),
 
 whether the participant lives with the network member (SN19),
 
 whether the network member smokes tobacco (cigarettes or cigars) (SN20),
 if so, how often (SN20a),
 
-if the network member has encouraged the participant to smoke tobacco with them since the start of COVID-19 (SN21),
-if so, how often (SN 21a),
+if the network member has encouraged the participant to smoke tobacco
+with them since the start of COVID-19 (SN21), if so, how often (SN 21a),
 
 whether the network member drinks alcohol (wine, beer or liquor) (SN22),
 if so, how often (SN22a),
 
-if the network member has encouraged the participant to drink alcohol with them since the start of COVID-19 (SN23),
-if so, how often (SN23a),
+if the network member has encouraged the participant to drink alcohol
+with them since the start of COVID-19 (SN23), if so, how often (SN23a),
 
 and, if in a bar, restaurant, or other public place (SN24),
 
-if the network member uses non-prescription drugs (cocaine, painkiller pills, heroin, fentanyl, methamphetamine, or marijuana) (SN25),
-if so, which drugs the network member uses (SN25a), how often (SN25b),
+if the network member uses non-prescription drugs (cocaine, painkiller
+pills, heroin, fentanyl, methamphetamine, or marijuana) (SN25), if so,
+which drugs the network member uses (SN25a), how often (SN25b),
 
-and if the network member has encouraged the participant to use drugs with them (SN26), 
-and how often (SN26b);
+and if the network member has encouraged the participant to use drugs
+with them (SN26), and how often (SN26b);
 
 if the network member has been tested for COVID-19 (SN27),
 
-if the network member has tested positive for COVID-19 (SN27a),
-if the network member has been hospitalized for COVID-19 (SN27a1),
+if the network member has tested positive for COVID-19 (SN27a), if the
+network member has been hospitalized for COVID-19 (SN27a1),
 
-if the network member knows anyone who has been hospitalized for COVID-19 (SN28),
+if the network member knows anyone who has been hospitalized for
+COVID-19 (SN28),
 
 ```{r}
 any_hospitalized <- 
@@ -417,9 +543,11 @@ apply(any_died, 2, function (x) table(x, exclude = NULL))
 
 if the network member has any of the listed conditions (SN30),
 
-if the network member's clinic, doctor's office or dental practice has closed or cancelled an appointment (SN31),
+if the network member's clinic, doctor's office or dental practice has
+closed or cancelled an appointment (SN31),
 
-if the network member has ever encouraged the participant to get tested for COVID-19 (SN32),
+if the network member has ever encouraged the participant to get tested
+for COVID-19 (SN32),
 
 ```{r}
 encd_covid_testing <- 
@@ -434,6 +562,7 @@ apply(encd_covid_testing, 2, function (x) table(x, exclude = NULL))
 ```
 
 if the network member follows social distancing guidelines (SN33),
+
 ```{r}
 SD_guidelines <- 
   sns_consenting_dt %>% select(#comp_code_Text_Set,
@@ -446,7 +575,8 @@ SD_guidelines <-
 apply(SD_guidelines, 2, function (x) table(x, exclude = NULL))
 ```
 
-if the network member has encouraged the participant to follow social distancing guidelines (SN34),
+if the network member has encouraged the participant to follow social
+distancing guidelines (SN34),
 
 ```{r}
 encd_SD_guidelines <- 
@@ -462,11 +592,13 @@ apply(encd_SD_guidelines, 2, function (x) table(x, exclude = NULL))
 
 how often the network member wears a mask in public (SN35),
 
-if the network member has encouraged the participant to wear a mask in public (SN36),
+if the network member has encouraged the participant to wear a mask in
+public (SN36),
 
-if the network member has received at least one dose of the COVID-19 vaccine (SN37),
-if the network member had a negative reaction or bad side effects after the COVID-19 vaccine (SN37a),
-if the network member is open to receiving a vaccine (SN37b),
+if the network member has received at least one dose of the COVID-19
+vaccine (SN37), if the network member had a negative reaction or bad
+side effects after the COVID-19 vaccine (SN37a), if the network member
+is open to receiving a vaccine (SN37b),
 
 ```{r}
 recd_one_dose_net_dt<- 
@@ -479,9 +611,11 @@ recd_one_dose_net_dt<-
   )
 apply(recd_one_dose_net_dt, 2, function (x) table(x, exclude = NULL))
 ```
+
 where 1=Yes, 2=No.
 
-if the network member has encouraged the participant to get the COVID-19 vaccine (SN38),
+if the network member has encouraged the participant to get the COVID-19
+vaccine (SN38),
 
 ```{r}
 encd_vaccine_net_dt <- 
@@ -494,9 +628,11 @@ encd_vaccine_net_dt <-
   )
 apply(encd_vaccine_net_dt, 2, function (x) table(x, exclude = NULL))
 ```
+
 where 1=Yes, 2=No.
 
-if the network member has discouraged the participant from getting the COVID-19 vaccine (SN39).
+if the network member has discouraged the participant from getting the
+COVID-19 vaccine (SN39).
 
 ```{r}
 discd_vaccine_net_dt <- 
@@ -509,15 +645,3 @@ discd_vaccine_net_dt <-
   )
 apply(discd_vaccine_net_dt, 2, function (x) table(x, exclude = NULL))
 ```
-
-
-
-
-
-
-
-
-
-
-
-
