@@ -10,6 +10,10 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook containing
 results
 from the social network data from CLC Project 5.
 
+##  Background
+
+We start by describing the origial dataset. Load the needed data:
+
 ```{r, echo=FALSE, message=FALSE}
 
 library(haven)
@@ -20,14 +24,21 @@ setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
 
 # Load complete (individual+network) data ---------------------------
 load(file="eda.RData") #from "../Coronavirus Pandemic_Merge_AllData.SAV") 
-dim(dt)
 
 ```
 
+We know that the `dt` dataset contains the sample of `r paste("n =", nrow(dt))` 
+used for the original paper (Monnig 2021, JMIR). Of these `r nrow(dt)`, we 
+focused our analysis on the participants who consented
+to providing social network data.  
 
 ```{r}
+dim(dt)
 sns_consenting_dt <- dt %>% 
   filter(FUSNCONSENT == 7)
+dim(sns_consenting_dt)
+
+table(dt$FUSNCONSENT, exclude = NULL)
 ```
 
 ```{r, echo=FALSE, results='hide'}
@@ -35,7 +46,7 @@ vars <- colnames(sns_consenting_dt)
 sns_vars <- which(substr(vars, 6, 7) == "SN")
 ```
 
-We start by filtering out the survey participants who did not consent to 
+We thus filterered out the survey participants who did not consent to 
 participate with an affirmative response to the statement:
 "Yes, I agree that I have read this document, that I am 18 years of age or older, 
 and I would like to participate in this study.'' We have a dataset of
@@ -199,477 +210,51 @@ where 1 = Rents a place to live, like a house or apartment,
 7 = Don't know
 
 political party/affiliation (SN9), 
-```{r}
-political_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN9,
-                FUA5_SN9,
-                FUA6_SN9,
-                FUA7_SN9,
-                FUA8_SN9
-  )
-apply(political_net_dt, 2, function (x) table(x, exclude = NULL))
-```
 
 mode(s) of communication (SN10), 
 
-```{r}
-comm_modes_net_dt <- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                unlist(lapply(1:5, function (x) paste0("FUA4_SN10_",x))),
-                unlist(lapply(1:5, function (x) paste0("FUA5_SN10_",x))),
-                unlist(lapply(1:5, function (x) paste0("FUA6_SN10_",x))),
-                unlist(lapply(1:5, function (x) paste0("FUA7_SN10_",x))),
-                unlist(lapply(1:5, function (x) paste0("FUA8_SN10_",x)))
-  )
-   
-apply(comm_modes_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where 1=in-person, 2=social media, 3=text/messaging, 4 = phone call, 5=video conference/vide chat.
-
 most frequently used mode of communication (SN11),
 
-```{r}
-freq_comm_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN11,
-                FUA5_SN11,
-                FUA6_SN11,
-                FUA7_SN11,
-                FUA8_SN11
-  )
-apply(freq_comm_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where 6=in-person, 7=social media, 8=text/messaging, 9=phone call,
-10 = video conference/video chat.
-
-
 length of friendship (SN12),
-```{r}
-rel_leng_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN12,
-                FUA5_SN12,
-                FUA6_SN12,
-                FUA7_SN12,
-                FUA8_SN12
-  )
-apply(rel_leng_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where:
-1:   Less than a year,
-2:          1-2 years,
-3: 2-5 years,
-4:         5-10 years
-5: More than 10 years
 
 frequency of communication (SN13),
-```{r}
-freq_comm_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN13,
-                FUA5_SN13,
-                FUA6_SN13,
-                FUA7_SN13,
-                FUA8_SN13
-  )
-apply(freq_comm_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where:
-    1:             Daily,
-     2:    Every few days,
-     3:            Weekly,
-     4:           Monthly,
-     5: Less than monthly
-
 
 whether the participant discusses personal matters with the network member (SN14),
-
-```{r}
-personal_matts_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN14,
-                FUA5_SN14,
-                FUA6_SN14,
-                FUA7_SN14,
-                FUA8_SN14
-  )
-apply(personal_matts_net_dt, 2, function (x) table(x, exclude = NULL))
-```
 
 whether the participant asks the network member for advice on personal matters (SN15),
 
 whether the network member is a spouse or intimate partner (SN16),
 
-```{r}
-intimate_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN16,
-                FUA5_SN16,
-                FUA6_SN16,
-                FUA7_SN16,
-                FUA8_SN16 
-  )
-apply(intimate_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where:
-    1:   Yes,
-     2:    No
-     
 whether the network member is a close relative (parent/grandparent/sibling) (SN17),
-
-```{r}
-bloodrel_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN17,
-                FUA5_SN17,
-                FUA6_SN17,
-                FUA7_SN17,
-                FUA8_SN17 
-  )
-apply(bloodrel_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where:
-     1:   Yes
-     2:    No
 
 whether there participant has a sexual relationship with the network member (SN18),
 
-```{r}
-sexpt_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN18,
-                FUA5_SN18,
-                FUA6_SN18,
-                FUA7_SN18,
-                FUA8_SN18 
-  )
-apply(sexpt_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where 
-     1: Yes,
-     2: No
-     
 whether the participant lives with the network member (SN19),
 
-```{r}
-cohab_net_dt<- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN19,
-                FUA5_SN19,
-                FUA6_SN19,
-                FUA7_SN19,
-                FUA8_SN19 
-  )
-apply(cohab_net_dt, 2, function (x) table(x, exclude = NULL))
-```
+whether the network member smokes tobacco (cigarettes or cigars) (SN20),
+if so, how often (SN20a),
 
-whether the network member smokes tobacco (cigarettes or cigars) (SN20, ),
-
-
-```{r}
-(apply(cig_net_dt, 2, function (x) table(x, exclude = NULL)))
-```
-where 
-     1: Yes,
-     2: No
-
-and, if so, how often (SN20a),
-
-
-```{r}
-freq_tobacco_smkg <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN20a,
-                FUA5_SN20a,
-                FUA6_SN20a,
-                FUA7_SN20a,
-                FUA8_SN20a 
-  )
-apply(freq_tobacco_smkg, 2, function (x) table(x, exclude = NULL))
-
-```
-where 
-1: Daily,
-2: Less than Daily
-
-If the network member has encouraged the participant to smoke tobacco with them 
-since the start of COVID-19 (SN21),
-
-```{r}
-enc_tobacco_smkg <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN21,
-                FUA5_SN21,
-                FUA6_SN21,
-                FUA7_SN21,
-                FUA8_SN21 
-  )
-apply(enc_tobacco_smkg, 2, function (x) table(x, exclude = NULL))
-
-```
-
+if the network member has encouraged the participant to smoke tobacco with them since the start of COVID-19 (SN21),
 if so, how often (SN 21a),
 
-```{r}
-freq_enc_tobacco_smkg <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN21a,
-                FUA5_SN21a,
-                FUA6_SN21a,
-                FUA7_SN21a,
-                FUA8_SN21a 
-  )
-apply(freq_enc_tobacco_smkg, 2, function (x) table(x, exclude = NULL))
-
-```
-where:
-  1=daily,
-  2=every few days,
-  3=weekly,
-  4=monthly
-  5=less than monthly
-  
-Whether the network member drinks alcohol (wine, beer or liquor) (SN22),
+whether the network member drinks alcohol (wine, beer or liquor) (SN22),
 if so, how often (SN22a),
 
-```{r}
-alc_use_net_dt <- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN22,
-                FUA5_SN22,
-                FUA6_SN22,
-                FUA7_SN22,
-                FUA8_SN22 
-  )
-apply(alc_use_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where 
-  1=yes,
-  2=no
+if the network member has encouraged the participant to drink alcohol with them since the start of COVID-19 (SN23),
+if so, how often (SN23a),
 
-```{r}
-freq_alc_use_net_dt <- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN22a,
-                FUA5_SN22a,
-                FUA6_SN22a,
-                FUA7_SN22a,
-                FUA8_SN22a 
-  )
-apply(freq_alc_use_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where:
-  1=Daily,
-  2=Few Times/week,
-  3=Few Times/month,
-  4=Monthly or Less,
-  5=Don't Know
-
-Whether the network member has encouraged the participant to drink alcohol with them since the start of COVID-19 (SN23),
-if so, how often (SN23a):
-
-```{r}
-enc_alc_use_net_dt <- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN23,
-                FUA5_SN23,
-                FUA6_SN23,
-                FUA7_SN23,
-                FUA8_SN23 
-  )
-apply(enc_alc_use_net_dt, 2, function (x) table(x, exclude = NULL))
-```
-where:
-  1 = Yes,
-  2 = No
-  
-```{r}
-freq_enc_alc_use_net_dt <- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN23a,
-                FUA5_SN23a,
-                FUA6_SN23a,
-                FUA7_SN23a,
-                FUA8_SN23a 
-  )
-apply(freq_enc_alc_use_net_dt, 
-      2, function (x) table(x, exclude = NULL))
-```
-
-where:
-  1 =	Daily   
-  2 = Every few days
-  3 = Weekly
-  4 = Monthly
-  5 = Less than monthly  
-  
 and, if in a bar, restaurant, or other public place (SN24),
 
-```{r}
-public_enc_alc_use_net_dt <- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN24,
-                FUA5_SN24,
-                FUA6_SN24,
-                FUA7_SN24,
-                FUA8_SN24 
-  )
-apply(public_enc_alc_use_net_dt, 
-      2, function (x) table(x, exclude = NULL))
-```
-where:
-  1 = Yes
-  2 = No
-  
 if the network member uses non-prescription drugs (cocaine, painkiller pills, heroin, fentanyl, methamphetamine, or marijuana) (SN25),
-
-```{r}
-np_drugs_net <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN25,
-                FUA5_SN25,
-                FUA6_SN25,
-                FUA7_SN25,
-                FUA8_SN25 
-  )
-apply(np_drugs_net, 
-      2, function (x) table(x, exclude = NULL))
-```
-where:
-  1=Yes,
-  2=No
-  
 if so, which drugs the network member uses (SN25a), how often (SN25b),
-
-```{r}
-np_which_drugs_net <- 
-  sns_consenting_dt %>% select(
-                unlist(lapply(1:7, function (x) paste0("FUA4_SN25a_",x))),
-                unlist(lapply(1:7, function (x) paste0("FUA5_SN25a_",x))),
-                unlist(lapply(1:7, function (x) paste0("FUA6_SN25a_",x))),
-                unlist(lapply(1:7, function (x) paste0("FUA7_SN25a_",x))),
-                unlist(lapply(1:7, function (x) paste0("FUA8_SN25a_",x)))
-  )
-apply(np_which_drugs_net, 
-      2, function (x) table(x, exclude = NULL))
-```
-where:
-▢	Cocaine  (1) 
-▢	Methamphetamine  (2) 
-▢	Other stimulants or uppers  (3) 
-▢	Painkiller pills, such as oxycodone or hydrocodone  (4) 
-▢	Heroin  (5) 
-▢	Fentanyl  (6) 
-▢	Marijuana  (7) 
-▢	Other:  (8) ________________________________________________
-▢	Don't know  (9) 
-
-
-```{r}
-np_drugs_net_cat8 <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN25a_8,
-                FUA5_SN25a_8,
-                FUA6_SN25a_8,
-                FUA7_SN25a_8,
-                FUA8_SN25a_8 
-  )
-apply(np_drugs_net_cat8, 
-      2, function (x) table(x, exclude = NULL))
-
-np_drugs_net_text <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN25a_8_TEXT,
-                FUA5_SN25a_8_TEXT,
-                FUA6_SN25a_8_TEXT,
-                FUA7_SN25a_8_TEXT,
-                FUA8_SN25a_8_TEXT 
-  )
-apply(np_drugs_net_text, 
-      2, function (x) table(x, exclude = NULL))
-```
 
 and if the network member has encouraged the participant to use drugs with them (SN26), 
 and how often (SN26b);
 
-```{r}
-enc_np_drugs_net <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN26,
-                FUA5_SN26,
-                FUA6_SN26,
-                FUA7_SN26,
-                FUA8_SN26 
-  )
-apply(enc_np_drugs_net, 
-      2, function (x) table(x, exclude = NULL))
-
-freq_enc_np_drugs_net <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN26b,
-                FUA5_SN26b,
-                FUA6_SN26b,
-                FUA7_SN26b,
-                FUA8_SN26b 
-  )
-apply(freq_enc_np_drugs_net, 
-      2, function (x) table(x, exclude = NULL))
-```
-where for 26 1=Yes and 2=No
-and for 26b:
-
-o	Daily  (1) 
-o	Every few days  (2) 
-o	Weekly  (3) 
-o	Monthly  (4) 
-o	Less than monthly  (5) 
-
-
 if the network member has been tested for COVID-19 (SN27),
 
-```{r}
-covidtest_net <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN27,
-                FUA5_SN27,
-                FUA6_SN27,
-                FUA7_SN27,
-                FUA8_SN27 
-  )
-apply(covidtest_net, 
-      2, function (x) table(x, exclude = NULL))
-```
-
 if the network member has tested positive for COVID-19 (SN27a),
-
-```{r}
-covidtestpos_net <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN27a,
-                FUA5_SN27a,
-                FUA6_SN27a,
-                FUA7_SN27a,
-                FUA8_SN27a 
-  )
-apply(covidtestpos_net, 
-      2, function (x) table(x, exclude = NULL))
-```
-
 if the network member has been hospitalized for COVID-19 (SN27a1),
-
-```{r}
-covidtesthosp_net <- 
-  sns_consenting_dt %>% select(
-                FUA4_SN27a1,
-                FUA5_SN27a1,
-                FUA6_SN27a1,
-                FUA7_SN27a1,
-                FUA8_SN27a1 
-  )
-apply(covidtesthosp_net, 
-      2, function (x) table(x, exclude = NULL))
-```
 
 if the network member knows anyone who has been hospitalized for COVID-19 (SN28),
 
@@ -701,49 +286,7 @@ apply(any_died, 2, function (x) table(x, exclude = NULL))
 
 if the network member has any of the listed conditions (SN30),
 
-```{r}
-
-vals <- 1:9
-
-listedconditions_net <- 
-  sns_consenting_dt %>% select(
-    unlist(lapply(vals, function (x) paste0("FUA4_SN30_",x))),
-    unlist(lapply(vals, function (x) paste0("FUA5_SN30_",x))),
-    unlist(lapply(vals, function (x) paste0("FUA6_SN30_",x))),
-    unlist(lapply(vals, function (x) paste0("FUA7_SN30_",x))),
-    unlist(lapply(vals, function (x) paste0("FUA8_SN30_",x)))
-  )
-apply(listedconditions_net, 
-      2, function (x) table(x, exclude = NULL))
-```
-
-where 
-▢	Autoimmune disease  (1) 
-▢	Cardiovascular disease, such as hypertension (high blood pressure), coronary artery disease, heart attack, or heart failure  (2) 
-▢	Cerebrovascular disease, such as stroke or transient ischemic attack  (3) 
-▢	Chronic lung disease, such as asthma, chronic obstructive pulmonary disease (COPD), emphysema, or pulmonary hypertension  (4) 
-▢	Diabetes  (5) 
-▢	Immunocompromised or immune suppressed  (6) 
-▢	Kidney disease  (7) 
-▢	Mental health condition (depression, anxiety, bipolar disorder, schizophrenia, PTSD, etc.)  (8) 
-▢	Substance use problem  (9) 
-▢	None of the above  (10) 
-▢	Don't know  (11) 
-
 if the network member's clinic, doctor's office or dental practice has closed or cancelled an appointment (SN31),
-
-```{r}
-close_medp <- 
-  sns_consenting_dt %>% select(#comp_code_Text_Set,
-                FUA4_SN31,
-                FUA5_SN31,
-                FUA6_SN31,
-                FUA7_SN31,
-                FUA8_SN31
-  )
-apply(close_medp, 2, function (x) table(x, exclude = NULL))
-```
-where 1=Yes, 2=No, 3=Don't Know.
 
 if the network member has ever encouraged the participant to get tested for COVID-19 (SN32),
 
