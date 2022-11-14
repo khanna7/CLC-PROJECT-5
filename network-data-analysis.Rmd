@@ -14,17 +14,22 @@ from the social network data from CLC Project 5.
 
 We start by describing the origial dataset. Load the needed data:
 
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+```
+
 ```{r, echo=FALSE, message=FALSE}
+rm(list=ls())
 
 library(haven)
 library(dplyr)
+library(data.table)
 
 # Set working directory ---------------------------
-setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+#setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
 
 # Load complete (individual+network) data ---------------------------
-load(file="eda.RData") #from "../Coronavirus Pandemic_Merge_AllData.SAV") 
-
+load(file="/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/eda.RData") 
 ```
 
 We know that the `dt` dataset contains the sample of `r paste("n =", nrow(dt))` 
@@ -44,6 +49,8 @@ table(dt$FUSNCONSENT, exclude = NULL)
 ```{r, echo=FALSE, results='hide'}
 vars <- colnames(sns_consenting_dt)
 sns_vars <- which(substr(vars, 6, 7) == "SN")
+length(sns_vars)
+head(colnames(sns_consenting_dt[sns_vars]))
 ```
 
 We thus filterered out the survey participants who did not consent to 
@@ -54,6 +61,128 @@ and I would like to participate in this study.'' We have a dataset of
 attributes of their network members, structured in `r length(sns_vars)` columns, 
 with names such as `r vars[sns_vars[1]]`, `r vars[sns_vars[2]]`, ...,
 `r vars[sns_vars[length(sns_vars)]]`.
+
+## Network Descriptives
+
+How many friends are reported on?
+
+We look at the reported ages of the network members, and count any non-missing 
+ages as friends we have reports on. 
+
+```{r}
+age_net_dt <- 
+  sns_consenting_dt %>% select(#comp_code_Text_Set,
+                FUA4_SN2,
+                FUA5_SN2,
+                FUA6_SN2,
+                FUA7_SN2,
+                FUA8_SN2
+  )
+round(apply(age_net_dt, 2, function (x) summary(x)), 2)
+apply(age_net_dt, 2, function (x) which(is.na(x)))
+```
+Since there are no missing age reports, we have 
+`r nrow(age_net_dt)*ncol(age_net_dt)` social network members on whom data have 
+been collected.
+
+
+There seem to be some reports on minors (age < 18 years). We will count how many and remove them
+from the analysis:
+
+```{r}
+dim(age_net_dt)
+minors_reported <- apply(age_net_dt, 2, function (x) which(x < 18))
+minors_reported
+unlist(minors_reported) 
+```
+Thus there are `r length(unlist(minors_reported))` minors in the dataset who 
+will need to be removed. But, to remove them from the dataset, we will
+first have to convert the wide dataset to long.  
+
+We first extract the social network columns of interest:
+
+```{r}
+
+head(colnames(sns_consenting_dt))
+
+sns_dt_only <- (sns_consenting_dt[,sns_vars])
+sns_dt_only$MTURK1 <- sns_consenting_dt$MTURK1 #MTURK ID
+sns_dt_only$comp_code_Text_Set <-sns_consenting_dt$comp_code_Text_Set #STUDYID
+
+dim(sns_dt_only)
+
+sns_dt_only <- as.data.table(sns_dt_only)
+class(sns_dt_only)
+```
+
+Extract the network data columns that are necessary, and combine them into
+a long-wide format: 
+ - Each network member ID is presented top to bottom (i.e., long) for each study participant
+ - The attributes of each person are added to each network member from left to right (i.e., wide) 
+
+
+```{r}
+colnames(sns_consenting_dt)
+dim(sns_consenting_dt)
+
+
+extr_cols <- 
+  sns_consenting_dt %>% select(starts_with("FUA4_"))
+colnames(extr_cols)
+
+colnames_net_dt <- lapply(colnames(extr_cols), function(x) substr(x, 6, nchar(x)))
+
+net_A4 <- sns_consenting_dt %>% select(starts_with("FUA4_"))
+dim(net_A4)
+colnames(net_A4) <- colnames_net_dt
+
+net_A5 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
+dim(net_A5)
+colnames(net_A5) <- colnames_net_dt
+
+net_A6 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
+dim(net_A6)
+colnames(net_A6) <- colnames_net_dt
+
+net_A7 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
+dim(net_A7)
+colnames(net_A7) <- colnames_net_dt
+
+net_A8 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
+dim(net_A8)
+colnames(net_A8) <- colnames_net_dt
+
+sns_dt_long_wide <- rbind(net_A4, net_A5, net_A6, net_A7, net_A8)
+dim(sns_dt_long_wide)
+colnames(sns_dt_long_wide)
+
+
+sns_dt_long_wide$MTURKID <- sns_consenting_dt$MTURK1
+sns_dt_long_wide$comp_code_Text_Set <- sns_consenting_dt$comp_code_Text_Set
+
+dim(sns_dt_long_wide)
+colnames(sns_dt_long_wide)
+```
+
+Now delete the rows containing minor age network members:
+
+```{r}
+minor_age_rows <- which(sns_dt_long_wide$SN2 < 18)
+length(minor_age_rows)
+
+sns_dt_long_wide_no_minors <-
+  sns_dt_long_wide %>%
+  filter(SN2 >= 18)
+
+dim(sns_dt_long_wide)
+dim(sns_dt_long_wide_no_minors)
+```
+
+
+
+##  Network Analysis
+
+### Sample Substance Use Variable of Interest
 
 For example, the variables "FUAX_SN20"report 
 cigarette smoking in the network, tabulated as follows:
@@ -83,6 +212,8 @@ smoking persons in the social network of our MTurk sample is:
 ```{r}
 round(apply(cig_net_dt, 2, function (x) length(which(x==1))/sum(table(x))), 3)
 ```
+
+### Analysis of Full Network Dataset
 
 Other reported characteristics of the social network members include: 
 age (SN2), 
