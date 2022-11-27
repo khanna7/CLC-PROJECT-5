@@ -167,7 +167,7 @@ dim(sns_dt_long_wide)
 colnames(sns_dt_long_wide)
 ```
 
-Now delete the rows containing minor age network members:
+Now filter out the rows containing minor age network members:
 
 ```{r}
 minor_age_rows <- which(sns_dt_long_wide$SN2 < 18)
@@ -478,39 +478,184 @@ sns_dt_long_wide_no_minors[, .N, by = c("SN15")][,
 
 whether the network member is a spouse or intimate partner (SN16),
 
+```{r spouse_int_pt}
+sns_dt_long_wide_no_minors[, .N, by = c("SN16")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+
 whether the network member is a close relative
 (parent/grandparent/sibling) (SN17),
+
+```{r close_relative}
+sns_dt_long_wide_no_minors[, .N, by = c("SN17")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
 
 whether there participant has a sexual relationship with the network
 member (SN18),
 
+```{r sex_rel}
+sns_dt_long_wide_no_minors[, .N, by = c("SN18")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
 whether the participant lives with the network member (SN19),
+
+```{r cohabit}
+sns_dt_long_wide_no_minors[, .N, by = c("SN19")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
 
 whether the network member smokes tobacco (cigarettes or cigars) (SN20),
 if so, how often (SN20a),
 
+```{r smkg}
+sns_dt_long_wide_no_minors[, .N, by = c("SN20")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+```{r }
+sns_dt_long_wide_no_minors[SN20==1, .N, by = c("SN20a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
 if the network member has encouraged the participant to smoke tobacco
 with them since the start of COVID-19 (SN21), if so, how often (SN 21a),
+
+```{r}
+sns_dt_long_wide_no_minors[, .N, by = c("SN21")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+```{r smkg_freq}
+sns_dt_long_wide_no_minors[SN21 == 1, .N, by = c("SN21a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+```{r }
+sns_dt_long_wide_no_minors[SN20 == 1 & SN21 == 1, .N, by = c("SN21a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
 
 whether the network member drinks alcohol (wine, beer or liquor) (SN22),
 if so, how often (SN22a),
 
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN22")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+```{r }
+sns_dt_long_wide_no_minors[SN22==1, .N, by = c("SN22a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
 if the network member has encouraged the participant to drink alcohol
 with them since the start of COVID-19 (SN23), if so, how often (SN23a),
 
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN23")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+```
+
+
+
+
 and, if in a bar, restaurant, or other public place (SN24),
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN24")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+#colSums(.Last.value)
+```
+
+```{r }
+sns_dt_long_wide_no_minors[!is.na(SN24), .N, by = c("SN24")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+#colSums(.Last.value)
+```
 
 if the network member uses non-prescription drugs (cocaine, painkiller
 pills, heroin, fentanyl, methamphetamine, or marijuana) (SN25), if so,
 which drugs the network member uses (SN25a), how often (SN25b),
 
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN25")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+#colSums(.Last.value)
+```
+```{r }
+npd_dt <- sns_dt_long_wide_no_minors[, .SD, .SDcols=grep("SN25a",colnames(sns_dt_long_wide_no_minors),
+                                                         value =FALSE)]
+dim(npd_dt)
+
+sum(as.double(npd_dt$SN25a_1), na.rm = TRUE)
+
+suppressWarnings(apply(npd_dt, 2, function (x) sum(as.double(x), na.rm=TRUE)))
+
+
+levels(haven::as_factor(npd_dt$SN25a_1))
+levels(haven::as_factor(npd_dt$SN25a_2))
+levels(haven::as_factor(npd_dt$SN25a_3))
+levels(haven::as_factor(npd_dt$SN25a_4))
+levels(haven::as_factor(npd_dt$SN25a_5))
+levels(haven::as_factor(npd_dt$SN25a_6))
+levels(haven::as_factor(npd_dt$SN25a_7))
+```
+
 and if the network member has encouraged the participant to use drugs
 with them (SN26), and how often (SN26b);
 
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN26")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+```
+
+```{r }
+sns_dt_long_wide_no_minors[SN26==1, .N, by = c("SN26b")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+```
+
 if the network member has been tested for COVID-19 (SN27),
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN27")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+```
 
 if the network member has tested positive for COVID-19 (SN27a), if the
 network member has been hospitalized for COVID-19 (SN27a1),
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN27a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+```
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN27a1")][, 
+  "%" := round(N /sum(N) * 100, 0)] [,
+  ]
+```
 
 if the network member knows anyone who has been hospitalized for
 COVID-19 (SN28),
