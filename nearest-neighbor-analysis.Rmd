@@ -1,0 +1,26 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+We present the nearest neighbor analysis in this document. 
+
+Set working directory:
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+```
+
+Read social network data with minors removed:
+
+```{r}
+rm(list=ls())
+sns_dt_read <- readRDS("sns_dt_long_wide_no_minors.RDS")
+dim(sns_dt_read)
+```
