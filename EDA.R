@@ -340,8 +340,8 @@ covid_test <- as.factor(covid_test)
 table(covid_test, exclude = NULL) #dichotomize
 covid_test <- relevel(covid_test, ref = "no_test_or_unsure")
 
-# TAB 2: Characteristics of the participants ---------------------------
-# See above
+
+
 
 # Collect all covariates for Tables 3-4 ---------------------------
 
@@ -368,7 +368,7 @@ dim(cov_dt_na.omit)
 dt <- cbind.data.frame(dt, cov_dt)
 dim(dt)
 
-# Primary Outcome (Table 3) ---------------------------
+# Compute Primary Outcome Variable statistics (for Table 3) ---------------------------
 
 summary(dt$CDCGAQ)
 
@@ -394,7 +394,7 @@ dt$CDCGAQ[na.val]
 cdc_avg_out[na.val]
 
 
-# Secondary Outcome (Table 4) ---------------------------
+# Compute Secondary Outcome Variable statistics (for Table 4) ---------------------------
 
 dt$LSQ12 <- haven::as_factor(dt$LSQ12)
 table(dt$LSQ12, exclude = NULL)
@@ -405,7 +405,7 @@ tested_for_covid <- recode(dt$LSQ12,
 table(tested_for_covid, exclude = NULL)
 
 
-# Secondary Outcome and Covariates (Table 5) ---------------------------
+# Compute Secondary Outcome Variable statistics and Covariates (for Table 5) ---------------------------
 ## (accounting for covariates, in the subset of participants
 ## reporting a COVID-19 test (n=279).) 
 
@@ -448,6 +448,28 @@ tab5_outcome <-
         )
 class(tab5_outcome)
 table(tab5_outcome)
+
+
+# Table 2: Final Data (to be compared to Monnig 2021)---------------------------
+
+summary(age); sd(age)
+summary(gender_3cat)
+table(race_4cat, exclude = NULL); table(race_4cat, exclude = NULL)/sum(table(race_4cat, exclude = NULL)) 
+table(ethnicity, exclude=NULL); table(ethnicity, exclude=NULL)/sum(table(ethnicity, exclude=NULL))
+table(education, exclude = NULL); table(education, exclude = NULL)/sum(table(education, exclude = NULL))
+table(income)
+summary(dt$RDEMO8); sd(dt$RDEMO8, na.rm = TRUE) #household size
+table(dwelling_ownership, exclude=NULL); table(dwelling_ownership, exclude=NULL)/sum(table(dwelling_ownership, exclude=NULL))
+table(essential_worker, exclude = NULL); table(essential_worker, exclude = NULL)/sum(table(essential_worker, exclude = NULL))
+summary(cdc_avg_out)
+table(covid_test, exclude=NULL); table(covid_test, exclude=NULL)/sum(table(covid_test, exclude=NULL))
+length(pos_covid_test)
+table(dt$USED7SUB_1, exclude = NULL)/sum(table(dt$USED7SUB_1, exclude = NULL)) #cigarette use 
+  ## DAILY SMOKING CATEGORIZATION NOT CLEAR
+table(daily_drinking)/sum(table(daily_drinking))
+table(daily_opioid); table(daily_opioid)/sum(table(daily_opioid))
+table(daily_stimulant); table(daily_stimulant)/sum(table(daily_stimulant))
+
 
 # Save image ---------------------------
 
