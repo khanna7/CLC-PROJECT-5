@@ -28,7 +28,7 @@ library(dplyr)
 library(data.table)
 
 # Load complete (individual+network) data ---------------------------
-load(file="/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/eda.RData") 
+base::load(file="/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/eda.RData") 
 ```
 
 We know that the `dt` dataset contains the sample of
