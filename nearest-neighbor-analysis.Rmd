@@ -17,10 +17,54 @@ Set working directory:
 knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
 ```
 
-Read social network data with minors removed:
+```{r}
+library(igraph)
+```
+
+Read social network data with minors removed, including MTURK IDs for participants 
+and faux-IDs for alters:
 
 ```{r}
 rm(list=ls())
 sns_dt_read <- readRDS("sns_dt_long_wide_no_minors.RDS")
 dim(sns_dt_read)
+class(sns_dt_read)
 ```
+
+We follow ideas from [Kolaczyk](https://paperpile.com/app/p/c70e3441-d39c-0d0c-9f1f-f476139d2e86), 
+Chapter 8, to conduct this analysis.
+
+Initialize data as an `igraph` object:
+
+```{r}
+ig <- graph_from_data_frame(d = sns_dt_read, directed = TRUE)
+ig
+```
+
+Number of edges and vertices respectively:
+
+```{r}
+gorder(ig) #num nodes
+gsize(ig) #num edges
+```
+
+We know that there are 
+
+```{r}
+length(unique(sns_dt_read$MTURKID))
+``` 
+participants who reported data on 
+
+```{r}
+length(unique(sns_dt_read$alterID))
+```
+adult network members.
+
+We can verify that the sum of the above two quantities is the total number of 
+nodes in the network:
+
+```{r}
+length(unique(sns_dt_read$MTURKID)) + length(unique(sns_dt_read$alterID)) ==
+  gorder(ig)
+```
+
