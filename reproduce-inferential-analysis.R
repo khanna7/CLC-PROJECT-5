@@ -105,8 +105,14 @@ participant_dt_wide$CDC11 <- dt$CDC11
 participant_dt_wide$CDC12 <- dt$CDC12
 participant_dt_wide$CDC13 <- dt$CDC13
 
+participant_dt_wide$FUSNCONSENT <- dt$FUSNCONSENT
+
 dim(participant_dt_wide)
 colnames(participant_dt_wide)
+
+participant_dt_wide <- 
+  participant_dt_wide %>%
+  relocate(MTURK1, FUSNCONSENT)
 
 
 # Save RDS --------

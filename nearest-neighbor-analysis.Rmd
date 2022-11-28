@@ -81,7 +81,7 @@ provided data on their social networks:
 
 ```{r}
 consenting_network_participant_dt <- readRDS("sns_consenting_dt.RDS")
-dim(participant_dt)
+dim(consenting_network_participant_dt)
 ```
 
 Dataset on other individual-level variables for all participants who completed
