@@ -16,7 +16,7 @@ library(dplyr)
 
 # Load  data ---------------------------
 
-load("eda.RData")
+base::load("eda.RData")
 
 
 # TAB 3: GLM, outcome: substance use, COVs: CDC guideline adherence ---------------------------
@@ -69,3 +69,45 @@ tab5_summary <- summary(tab5_lm)
 as.matrix(tab5_summary$coefficients)
 exp(as.matrix(tab5_summary$coefficients[,1:2]))
 
+
+# Create dataset of participant attributes needed for later network analysis
+
+
+participant_dt_wide <- 
+  cov_dt %>%
+  select(age,
+         race_4cat,
+         gender_3cat,
+         education,
+         ethnicity, 
+         essential_worker, 
+         income,
+         covid_test, 
+         daily_drinking, 
+         daily_opioid,
+         daily_stimulant
+         
+  )
+
+participant_dt_wide$MTURK1 <- dt$MTURK1
+participant_dt_wide$cdc_avg_out <- cdc_avg_out
+participant_dt_wide$CDC1 <- dt$CDC1
+participant_dt_wide$CDC2 <- dt$CDC2
+participant_dt_wide$CDC3 <- dt$CDC3
+participant_dt_wide$CDC4 <- dt$CDC4
+participant_dt_wide$CDC5 <- dt$CDC5
+participant_dt_wide$CDC6 <- dt$CDC6
+participant_dt_wide$CDC7 <- dt$CDC7
+participant_dt_wide$CDC8 <- dt$CDC8
+participant_dt_wide$CDC9 <- dt$CDC9
+participant_dt_wide$CDC10 <- dt$CDC10
+participant_dt_wide$CDC11 <- dt$CDC11
+participant_dt_wide$CDC12 <- dt$CDC12
+participant_dt_wide$CDC13 <- dt$CDC13
+
+dim(participant_dt_wide)
+colnames(participant_dt_wide)
+
+
+# Save RDS --------
+saveRDS(participant_dt_wide, file="participant_dt_wide.RDS")
