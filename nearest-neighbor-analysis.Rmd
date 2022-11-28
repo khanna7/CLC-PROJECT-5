@@ -67,4 +67,27 @@ nodes in the network:
 length(unique(sns_dt_read$MTURKID)) + length(unique(sns_dt_read$alterID)) ==
   gorder(ig)
 ```
+Add vertex attributes to `ig`. To do this, we first want to pull out the 
+alter IDs and the attributes in the `sns_dt_read` dataset above, and convert it 
+to long format. 
+
+```{r}
+net_dt_wide <- sns_dt_read[, !c("MTURKID", "comp_code_Text_Set")]
+dim(net_dt_wide)
+```
+
+The next steps is to extract the relevant individual attributes of the 173 participants who
+provided data on their social networks:
+
+```{r}
+consenting_network_participant_dt <- readRDS("sns_consenting_dt.RDS")
+dim(participant_dt)
+```
+
+Dataset on other individual-level variables for all participants who completed
+the baseline survey:
+
+```{r}
+all_participant_dt <- readRDS("participant_dt_wide.RDS")
+```
 
