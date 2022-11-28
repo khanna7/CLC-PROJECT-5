@@ -116,6 +116,17 @@ sns_dt_only <- as.data.table(sns_dt_only)
 class(sns_dt_only)
 ```
 
+
+Save the `sns_consenting_dt` dataset for IDs and individual attributes of the
+`r nrow(sns_consenting_dt)` participants who provided social network data. This will
+allow us to populate the vertex attributes in the individual dataset.
+
+```{r}
+saveRDS(sns_consenting_dt, file="sns_consenting_dt.RDS")
+```
+
+
+
 Extract the network data columns that are necessary, and combine them
 into a long-wide format: - Each network member ID is presented top to
 bottom (i.e., long) for each study participant - The attributes of each
