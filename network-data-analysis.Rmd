@@ -14,7 +14,7 @@ containing results from the social network data from CLC Project 5.
 
 ## Background
 
-We start by describing the origial dataset. Load the needed data:
+We start by describing the original dataset. Load the needed data:
 
 ```{r, setup, include=FALSE}
 knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
@@ -26,9 +26,6 @@ rm(list=ls())
 library(haven)
 library(dplyr)
 library(data.table)
-
-# Set working directory ---------------------------
-#setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
 
 # Load complete (individual+network) data ---------------------------
 load(file="/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/eda.RData") 
@@ -125,13 +122,13 @@ bottom (i.e., long) for each study participant - The attributes of each
 person are added to each network member from left to right (i.e., wide)
 
 ```{r}
-colnames(sns_consenting_dt)
+#colnames(sns_consenting_dt)
 dim(sns_consenting_dt)
 
 
 extr_cols <- 
   sns_consenting_dt %>% select(starts_with("FUA4_"))
-colnames(extr_cols)
+#colnames(extr_cols)
 
 colnames_net_dt <- lapply(colnames(extr_cols), function(x) substr(x, 6, nchar(x)))
 
@@ -157,15 +154,83 @@ colnames(net_A8) <- colnames_net_dt
 
 sns_dt_long_wide <- rbind(net_A4, net_A5, net_A6, net_A7, net_A8)
 dim(sns_dt_long_wide)
-colnames(sns_dt_long_wide)
+#colnames(sns_dt_long_wide)
 
 
 sns_dt_long_wide$MTURKID <- sns_consenting_dt$MTURK1
 sns_dt_long_wide$comp_code_Text_Set <- sns_consenting_dt$comp_code_Text_Set
 
 dim(sns_dt_long_wide)
-colnames(sns_dt_long_wide)
+#colnames(sns_dt_long_wide)
 ```
+Order by MTURKID, so network data reported by each study participant is
+grouped together:
+
+```{r}
+sns_dt_long_wide <- arrange(sns_dt_long_wide, MTURKID)
+```
+
+Move the `MTURKID` and `comp_code_Text_Set` columns to the beginning of
+the data table:
+
+```{r}
+sns_dt_long_wide <- relocate(sns_dt_long_wide) %>%
+  relocate(MTURKID, comp_code_Text_Set)
+```
+
+The above dataset `sns_dt_long_wide` has structure similar to an edgelist, 
+with MTURKID appearing first, as the label of the study participant's ID. There are no default
+IDs assigned to the participtants. We will create IDs for the network participants below.
+
+Compute the number of alters reported on by each of the `length(unique(sns_consenting_dt$MTURK1))` study participants.
+
+```{r}
+n_alters_dt <- 
+  sns_dt_long_wide %>% group_by(MTURKID) %>% summarise(n_alters = n())
+head(n_alters_dt)
+
+summary(n_alters_dt$n_alters)
+```
+We see that each network participant has reported on 5 alters. 
+Let us assign IDs to these alters, where a participant with `MTURKID=m` will 
+have alters: `m_1, ..., m_5.`
+
+```{r}
+alterID <- rep(NA, length(sns_dt_long_wide$MTURKID))
+for (i in 1:length(sns_dt_long_wide$MTURKID)){
+  if (i %% 5 == 1){
+    alterID[i] <- paste0(sns_dt_long_wide$MTURKID[i], "_", "1")
+  }
+  else if (i %% 5 == 2){
+    alterID[i] <- paste0(sns_dt_long_wide$MTURKID[i], "_", "2")
+  }
+  else if (i %% 5 == 3){
+    alterID[i] <- paste0(sns_dt_long_wide$MTURKID[i], "_", "3")
+  }
+   else if (i %% 5 == 4){
+    alterID[i] <- paste0(sns_dt_long_wide$MTURKID[i], "_", "4")
+   }
+   else if (i %% 5 == 0){
+    alterID[i] <- paste0(sns_dt_long_wide$MTURKID[i], "_", "5")
+  }
+}
+
+sns_dt_long_wide$alterID <- alterID
+```
+
+
+We have attach these `alterID`s to the `sns_dt_long_wide` dataset above. We
+`relocate` them below so they appear immediately after the `MTURKID`s:
+
+```{r}
+sns_dt_long_wide <- 
+  sns_dt_long_wide %>%
+  relocate(alterID, .after = MTURKID)
+```
+
+
+
+
 
 Now filter out the rows containing minor age network members:
 
@@ -181,9 +246,20 @@ dim(sns_dt_long_wide)
 dim(sns_dt_long_wide_no_minors)
 ```
 
+
+
+
 ```{r}
 setDT(sns_dt_long_wide_no_minors)
 ```
+
+ 
+## Save data file 
+
+```{r}
+saveRDS(sns_dt_long_wide_no_minors, file="sns_dt_long_wide_no_minors.RDS")
+```
+
 
 ## Network Analysis
 
