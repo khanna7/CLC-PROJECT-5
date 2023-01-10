@@ -9,7 +9,7 @@ editor_options:
     wrap: 72
 ---
 
-We present the nearest neighbor analysis in this document. 
+We present the nearest neighbor analysis below. 
 
 Set working directory:
 
@@ -19,6 +19,8 @@ knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Dat
 
 ```{r}
 library(igraph)
+library(dplyr)
+library(data.table)
 ```
 
 Read social network data with minors removed, including MTURK IDs for participants 
@@ -87,7 +89,93 @@ dim(consenting_network_participant_dt)
 Dataset on other individual-level variables for all participants who completed
 the baseline survey:
 
+<!-- ```{r} -->
+<!-- all_participant_dt <- readRDS("participant_dt_wide.RDS") -->
+<!-- ``` -->
+
+# Nearest Neighbor Analysis
+
+## Compiling alter data in igraph data structure
+
+First, we need to see what vertex attributes our graph object has:
+
 ```{r}
-all_participant_dt <- readRDS("participant_dt_wide.RDS")
+vertex_attr_names(ig)
 ```
+
+Currently, `ig` only has the `r vertex_attr_names(ig)`vertex attribute. Other vertex attributes need to be added. 
+
+```{r}
+summary(sns_dt_read$SN37)
+length(sns_dt_read$SN37)
+```
+
+Let's add alter attributes to the graph,
+from the `sns_dt_read` dataset. Use the
+Stack Overflow ideas here: https://stackoverflow.com/questions/49728990/how-can-i-add-a-data-frame-as-vertex-attributes-with-matching-ids-in-igraph. 
+
+Start by converting the `ig` object to a dataframe, so we
+can perform a `join` operation later. The `both` argument ensures
+that the vertices and edges are converted to a data frame and 
+appended sequentially in a list. 
+
+```{r}
+ig_df <- igraph::as_data_frame(ig, 'both')
+```
+
+
+
+```{r}
+summary(ig_df)
+class(ig_df)
+length(ig_df)
+names(ig_df)
+```
+
+Now query the `ig_df$vertices` data frame:
+
+```{r}
+colnames(ig_df$vertices)
+dim(ig_df$vertices)
+str(ig_df$vertices)
+```
+
+Append the column data for alter IDs from `sns_dt_read` to the
+`ig_df$vertices` datafame.
+
+```{r}
+ig_df$vertices <- ig_df$vertices %>% 
+  left_join(sns_dt_read, c('name'='alterID'))
+
+class(ig_df$vertices)
+dim(ig_df$vertices)
+colnames(ig_df$vertices)
+```
+
+
+The `ig_df$vertices` data frame does not have
+any ego attribute data yet. 
+
+Convert the data frame back to a graph object: 
+
+```{r}
+updated_alterdt_ig <- graph_from_data_frame(ig_df$edges,
+                                   directed = TRUE,
+                                   vertices = ig_df$vertices)
+
+summary(updated_alterdt_ig)
+```
+
+Check the vertex attributes:
+
+```{r}
+vertex_attr_names(updated_alterdt_ig)
+```
+
+```{r}
+table(V(updated_alterdt_ig)$SN37, exclude = NULL)
+```
+
+
+
 
