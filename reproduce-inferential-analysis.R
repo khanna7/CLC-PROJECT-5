@@ -114,6 +114,12 @@ participant_dt_wide <-
   participant_dt_wide %>%
   relocate(MTURK1, FUSNCONSENT)
 
+sns_consenting_particiant_outcome <- 
+  participant_dt_wide %>%
+    filter(FUSNCONSENT == 7) %>%
+    pull(cdc_avg_out)
+summary(sns_consenting_particiant_outcome)
+hist(sns_consenting_particiant_outcome)
 
 # Save RDS --------
 saveRDS(participant_dt_wide, file="participant_dt_wide.RDS")
