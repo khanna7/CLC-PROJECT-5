@@ -27,6 +27,14 @@
       "Hash": "b203113193e70978a696b2809525649d",
       "Requirements": []
     },
+    "RColorBrewer": {
+      "Package": "RColorBrewer",
+      "Version": "1.1-3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "45f0398006e83a5b10b72a90663d8d8c",
+      "Requirements": []
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.1",
