@@ -393,6 +393,7 @@ na.val <- which(is.na(sum.to.avg.ratio)) #na is because one person reported 0s o
 dt$CDCGAQ[na.val]
 cdc_avg_out[na.val]
 
+dt$cdc_avg_out <- cdc_avg_out
 
 # Compute Secondary Outcome Variable statistics (for Table 4) ---------------------------
 
