@@ -61,6 +61,32 @@ attributes of their network members, structured in `r length(sns_vars)`
 columns, with names such as `r vars[sns_vars[1]]`,
 `r vars[sns_vars[2]]`, ..., `r vars[sns_vars[length(sns_vars)]]`.
 
+## Add (i.e., join) the CDC average reported scores for these participants to serve as
+## an outcome for analysis
+
+```{r}
+
+dim(sns_consenting_dt)
+#colnames(sns_consenting_dt)
+
+
+dim(dt)
+#colnames(dt)
+
+cdc_avg_out_dt <- select(dt, MTURK1, cdc_avg_out)
+sns_consenting_dt <- left_join(sns_consenting_dt, cdc_avg_out_dt, by=c("MTURK1", "cdc_avg_out"))
+(sns_consenting_dt$cdc_avg_out)
+
+sns_consenting_dt <- sns_consenting_dt %>% 
+  mutate(cdc_avg_out_adequate = if_else(cdc_avg_out >= 2, 1, 0))
+
+table(sns_consenting_dt$cdc_avg_out_adequate, exclude = NULL)
+
+xtabs(data = sns_consenting_dt, formula = 
+        ~factor(cdc_avg_out)+
+        factor(cdc_avg_out_adequate))
+```
+
 ## Network Descriptives
 
 How many friends are reported on?
@@ -258,13 +284,29 @@ dim(sns_dt_long_wide_no_minors)
 ```
 
 
+## join the average cdc scores to `sns_dt_long_wide_no_minors`
+
+
+```{r}
+outcome_dt <- 
+  sns_consenting_dt %>%
+  select(MTURK1, cdc_avg_out, cdc_avg_out_adequate)
+dim(outcome_dt)
+
+outcome_dt <- outcome_dt %>%
+  rename("MTURKID" = "MTURK1")
+
+sns_dt_long_wide_no_minors <- 
+  left_join(sns_dt_long_wide_no_minors, outcome_dt, by=c("MTURKID"))
+```
 
 
 ```{r}
 setDT(sns_dt_long_wide_no_minors)
 ```
 
- 
+
+
 ## Save data file 
 
 ```{r}
@@ -334,8 +376,6 @@ age_net_dt <-
 round(apply(age_net_dt, 2, function (x) summary(x)), 2)
 ```
 
-(Looks like we have reports on some children; these might have to be
-deleted since the survey was meant to interview adults?)
 
 ```{r age_nominors_dt}
 sns_dt_long_wide_no_minors[, 
@@ -347,6 +387,26 @@ sns_dt_long_wide_no_minors[,
      .N), 
   ]
 ```
+```{r}
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, 
+   .(
+     "mean"= mean(SN2),
+     "median" = median(SN2),
+     "min" = min(SN2),
+     "max" = max(SN2),
+     .N), 
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, 
+   .(
+     "mean"= mean(SN2),
+     "median" = median(SN2),
+     "min" = min(SN2),
+     "max" = max(SN2),
+     .N), 
+  ]
+```
+
 
 race (SN3),
 
@@ -386,7 +446,7 @@ sns_dt_long_wide_no_minors[, .N, by = c("SN3_2")][,
   ]
 ```
 
-gender (SN4),
+# gender (SN4),
 
 ```{r}
 gender_net_dt<- 
@@ -404,6 +464,16 @@ where 1=male, 2=female, 3=nonbinary, 4=transgender, 5 = don't know,
 
 ```{r gender_nominors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN4")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+```{r gender_nominors_dt}
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 1, .N, by = c("SN4")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 0, .N, by = c("SN4")][, 
   "%" := round(N /sum(N) * 100, 0)] [
   ]
 ```
@@ -426,6 +496,17 @@ where 1 is Non-Hispanic, 2 is Hispanic,
 
 ```{r ethnicity_nominors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN5")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
+
+```{r }
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN5")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN5")][, 
   "%" := round(N /sum(N) * 100, 0)] [
   ]
 ```
@@ -453,6 +534,15 @@ sns_dt_long_wide_no_minors[, .N, by = c("SN6")][,
   ]
 ```
 
+```{r}
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 1, .N, by = c("SN6")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 0, .N, by = c("SN6")][, 
+  "%" := round(N /sum(N) * 100, 0)] [
+  ]
+```
+
 employment (SN7),
 
 ```{r}
@@ -472,7 +562,17 @@ where 1 = Employed works remotely; 2= Employed, works in person;\
 
 ```{r employment_nominors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN7")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN7)
+  ]
+```
+
+```{r}
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN7")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN7)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN7")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN7)
   ]
 ```
 
@@ -497,17 +597,28 @@ dorm or other campus housing (5), 6 = someplace else (----), 7 = Don't
 know
 
 ```{r housing_nominors_dt}
-sns_dt_long_wide_no_minors[, .N, by = c("SN7")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+sns_dt_long_wide_no_minors[, .N, by = c("SN8")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN8)
   ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN8")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN8)]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN8")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN8)]
 ```
 
 political party/affiliation (SN9),
 
 ```{r politics_party_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN9")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
-  ]
+  "%" := round(N /sum(N) * 100, 0)] [order(SN9)]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 1, .N, by = c("SN9")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN9)]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 0, .N, by = c("SN9")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN9)]
 ```
 
 mode(s) of communication (SN10),
@@ -525,7 +636,15 @@ table(sns_dt_long_wide_no_minors$SN11, exclude = NULL)
 
 ```{r mode_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN11")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN11)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN11")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN11)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN11")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN11)
   ]
 ```
 
@@ -533,7 +652,15 @@ length of friendship (SN12),
 
 ```{r lengthfrn_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN12")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN12)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN12")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN12)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN12")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN12)
   ]
 ```
 
@@ -541,7 +668,15 @@ frequency of communication (SN13),
 
 ```{r freqcomm_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN13")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN13)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN13")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN13)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN13")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN13)
   ]
 ```
 
@@ -550,7 +685,15 @@ member (SN14),
 
 ```{r personalmatters_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN14")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN14)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN14")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN14)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN14")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN14)
   ]
 ```
 
@@ -559,7 +702,15 @@ matters (SN15),
 
 ```{r personaladvice_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN15")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN15)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN15")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN15)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN15")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN15)
   ]
 ```
 
@@ -567,7 +718,15 @@ whether the network member is a spouse or intimate partner (SN16),
 
 ```{r spouse_int_pt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN16")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN16)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN16")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN16)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN16")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN16)
   ]
 ```
 
@@ -577,7 +736,15 @@ whether the network member is a close relative
 
 ```{r close_relative}
 sns_dt_long_wide_no_minors[, .N, by = c("SN17")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN17)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN17")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN17)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN17")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN17)
   ]
 ```
 
@@ -586,7 +753,15 @@ member (SN18),
 
 ```{r sex_rel}
 sns_dt_long_wide_no_minors[, .N, by = c("SN18")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN18)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN18")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN18)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN18")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN18)
   ]
 ```
 
@@ -594,7 +769,15 @@ whether the participant lives with the network member (SN19),
 
 ```{r cohabit}
 sns_dt_long_wide_no_minors[, .N, by = c("SN19")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN19)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN19")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN19)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN19")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN19)
   ]
 ```
 
@@ -603,14 +786,31 @@ if so, how often (SN20a),
 
 ```{r smkg}
 sns_dt_long_wide_no_minors[, .N, by = c("SN20")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN20)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN20")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN20)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN20")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN20)
   ]
 ```
 
 ```{r }
 sns_dt_long_wide_no_minors[SN20==1, .N, by = c("SN20a")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN20a)
   ]
+
+sns_dt_long_wide_no_minors[SN20==1 & cdc_avg_out_adequate==1, .N, by = c("SN20a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN20a)
+  ]
+
+sns_dt_long_wide_no_minors[SN20==1 & cdc_avg_out_adequate==0, .N, by = c("SN20a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN20a)
+  ]
+
 ```
 
 if the network member has encouraged the participant to smoke tobacco
@@ -618,19 +818,44 @@ with them since the start of COVID-19 (SN21), if so, how often (SN 21a),
 
 ```{r}
 sns_dt_long_wide_no_minors[, .N, by = c("SN21")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21)
   ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN21")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN21")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21)
+  ]
+
 ```
 
 ```{r smkg_freq}
 sns_dt_long_wide_no_minors[SN21 == 1, .N, by = c("SN21a")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21a)
+  ]
+
+sns_dt_long_wide_no_minors[SN21 == 1 & cdc_avg_out_adequate==1, .N, by = c("SN21a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21a)
+  ]
+
+sns_dt_long_wide_no_minors[SN21 == 1 & cdc_avg_out_adequate==0, .N, by = c("SN21a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21a)
   ]
 ```
 
 ```{r }
 sns_dt_long_wide_no_minors[SN20 == 1 & SN21 == 1, .N, by = c("SN21a")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21a)
+  ]
+
+sns_dt_long_wide_no_minors[SN20 == 1 & SN21 == 1 & cdc_avg_out_adequate==1, .N, by = c("SN21a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21a)
+  ]
+
+sns_dt_long_wide_no_minors[SN20 == 1 & SN21 == 1 & cdc_avg_out_adequate==0, .N, by = c("SN21a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN21a)
   ]
 ```
 
@@ -639,14 +864,32 @@ if so, how often (SN22a),
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN22")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN22)
   ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN22")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN22)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN22")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN22)
+  ]
+
 ```
 
 ```{r }
 sns_dt_long_wide_no_minors[SN22==1, .N, by = c("SN22a")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 0)] [order(SN22a)
   ]
+
+sns_dt_long_wide_no_minors[SN22==1 & cdc_avg_out_adequate==1, .N, by = c("SN22a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN22a)
+  ]
+
+sns_dt_long_wide_no_minors[SN22==1 & cdc_avg_out_adequate==0, .N, by = c("SN22a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN22a)
+  ]
+
 ```
 
 if the network member has encouraged the participant to drink alcohol
@@ -654,20 +897,33 @@ with them since the start of COVID-19 (SN23), if so, how often (SN23a),
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN23")][, 
-  "%" := round(N /sum(N) * 100, 0)] [,
+  "%" := round(N /sum(N) * 100, 0)] [order(SN23)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN23")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN23)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN23")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN23)
   ]
 ```
-
-
-
 
 and, if in a bar, restaurant, or other public place (SN24),
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN24")][, 
-  "%" := round(N /sum(N) * 100, 0)] [,
+  "%" := round(N /sum(N) * 100, 0)] [order(SN24)
   ]
 #colSums(.Last.value)
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN24")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN24)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN24")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN24)
+  ]
 ```
 
 ```{r }
@@ -683,9 +939,17 @@ which drugs the network member uses (SN25a), how often (SN25b),
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN25")][, 
-  "%" := round(N /sum(N) * 100, 0)] [,
+  "%" := round(N /sum(N) * 100, 0)] [order(SN25)
   ]
 #colSums(.Last.value)
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN25")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN25)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN25")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN25)
+  ]
 ```
 ```{r }
 npd_dt <- sns_dt_long_wide_no_minors[, .SD, .SDcols=grep("SN25a",colnames(sns_dt_long_wide_no_minors),
@@ -711,13 +975,29 @@ with them (SN26), and how often (SN26b);
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN26")][, 
-  "%" := round(N /sum(N) * 100, 0)] [,
+  "%" := round(N /sum(N) * 100, 0)] [order(SN26)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN26")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN26)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN26")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN26)
   ]
 ```
 
 ```{r }
 sns_dt_long_wide_no_minors[SN26==1, .N, by = c("SN26b")][, 
-  "%" := round(N /sum(N) * 100, 0)] [,
+  "%" := round(N /sum(N) * 100, 0)] [order(SN26b)
+  ]
+
+sns_dt_long_wide_no_minors[SN26==1 & cdc_avg_out_adequate==1, .N, by = c("SN26b")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN26b)
+  ]
+
+sns_dt_long_wide_no_minors[SN26==1 & cdc_avg_out_adequate==0, .N, by = c("SN26b")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN26b)
   ]
 ```
 
@@ -725,7 +1005,15 @@ if the network member has been tested for COVID-19 (SN27),
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN27")][, 
-  "%" := round(N /sum(N) * 100, 0)] [,
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN27")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN27")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27)
   ]
 ```
 
@@ -734,13 +1022,29 @@ network member has been hospitalized for COVID-19 (SN27a1),
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN27a")][, 
-  "%" := round(N /sum(N) * 100, 0)] [,
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27a)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN27a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27a)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN27a")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27a)
   ]
 ```
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN27a1")][, 
-  "%" := round(N /sum(N) * 100, 0)] [,
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27a1)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN27a1")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27a1)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN27a1")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN27a1)
   ]
 ```
 
@@ -759,6 +1063,20 @@ any_hospitalized <-
 apply(any_hospitalized, 2, function (x) table(x, exclude = NULL))
 ```
 
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN28")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN28)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN28")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN28)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN28")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN28)
+  ]
+```
+
 if the network member knows anyone who has died of COVID-19 (SN29),
 
 ```{r}
@@ -771,6 +1089,20 @@ any_died <-
                 FUA8_SN29
   )
 apply(any_died, 2, function (x) table(x, exclude = NULL))
+```
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN29")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN29)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN29")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN29)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN29")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN29)
+  ]
 ```
 
 if the network member has any of the listed conditions (SN30),
@@ -793,6 +1125,19 @@ encd_covid_testing <-
 apply(encd_covid_testing, 2, function (x) table(x, exclude = NULL))
 ```
 
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN32")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN32)
+  ]
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN32")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN32)
+  ]
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN32")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN32)
+  ]
+```
+
 if the network member follows social distancing guidelines (SN33),
 
 ```{r}
@@ -805,6 +1150,18 @@ SD_guidelines <-
                 FUA8_SN33
   )
 apply(SD_guidelines, 2, function (x) table(x, exclude = NULL))
+```
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN33")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN33)
+  ]
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN33")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN33)
+  ]
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN33")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN33)
+  ]
 ```
 
 if the network member has encouraged the participant to follow social
@@ -820,6 +1177,18 @@ encd_SD_guidelines <-
                 FUA8_SN34
   )
 apply(encd_SD_guidelines, 2, function (x) table(x, exclude = NULL))
+```
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN34")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN34)
+  ]
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN34")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN34)
+  ]
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN34")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN34)
+  ]
 ```
 
 how often the network member wears a mask in public (SN35),
@@ -846,6 +1215,20 @@ apply(recd_one_dose_net_dt, 2, function (x) table(x, exclude = NULL))
 
 where 1=Yes, 2=No.
 
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN37")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN37)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN37")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN37)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN37")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN37)
+  ]
+```
+
 if the network member has encouraged the participant to get the COVID-19
 vaccine (SN38),
 
@@ -863,6 +1246,20 @@ apply(encd_vaccine_net_dt, 2, function (x) table(x, exclude = NULL))
 
 where 1=Yes, 2=No.
 
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN38")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN38)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN38")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN38)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN38")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN38)
+  ]
+```
+
 if the network member has discouraged the participant from getting the
 COVID-19 vaccine (SN39).
 
@@ -876,4 +1273,18 @@ discd_vaccine_net_dt <-
                 FUA8_SN39
   )
 apply(discd_vaccine_net_dt, 2, function (x) table(x, exclude = NULL))
+```
+
+```{r }
+sns_dt_long_wide_no_minors[, .N, by = c("SN39")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN39)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==1, .N, by = c("SN39")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN39)
+  ]
+
+sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN39")][, 
+  "%" := round(N /sum(N) * 100, 0)] [order(SN39)
+  ]
 ```
