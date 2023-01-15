@@ -13,7 +13,7 @@
   * Compute summaries of behaviors and demographic characteristics among all 851 members, stratify by CDC scores (satisfactory vs not) 
   * Test whether the summary statistics are significantly different or not (To Be Done)
 
-- [Characteristics and behaviors of the 173 participants providing data]()
+- [Compare characteristics and behaviors of the 173 participants providing data vs not](https://github.com/khanna7/CLC-PROJECT-5/blob/master/compare_characteristics_fusn_consent.Rmd)
   * Compute the same characteristics and behaviors as reported in Monnig's [Table 2](https://github.com/khanna7/CLC-PROJECT-5/blob/master/EDA.R)
   * Test whether these characteristics are statistically the same between two groups that provided network information and those that did not. 
 
