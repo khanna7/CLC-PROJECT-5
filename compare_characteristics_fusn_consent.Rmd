@@ -1,0 +1,162 @@
+---
+title: Compare characteristics of network consenting vs non-consenting participants
+output: html_document
+date: "2023-01-15"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, setup, include=FALSE}
+rm(list=ls())
+knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+```
+
+```{r, echo=FALSE, message=FALSE}
+rm(list=ls())
+library(dplyr)
+```
+
+```{r}
+tab2_dt <- as.data.frame(readRDS("tab2_comparison_data.RDS"))
+class(tab2_dt)
+dim(tab2_dt)
+colnames(tab2_dt)
+```
+
+Compare `FUSNCONSENT == 7` vs not. 
+
+Recode NA is FUSNCONSENT as 0 for easier comparison
+
+```{r}
+tab2_dt <- 
+  tab2_dt %>% mutate(FUSNCONSENT_numeric = 
+                     ifelse(is.na(FUSNCONSENT), 0, FUSNCONSENT))
+```
+
+
+```{r}
+t.test(as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 7]),
+       as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 0])
+       )
+```
+```{r}
+  tab2_dt %>%  
+  select(gender_3cat, FUSNCONSENT_numeric) %>%
+  group_by(FUSNCONSENT_numeric)
+
+gender_xtab <- 
+  xtabs(~factor(tab2_dt$gender_3cat)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+chisq.test(gender_xtab)
+chisq.test(gender_xtab[1:2, 1:2])
+```
+```{r}
+race_xtab <- 
+  xtabs(~factor(tab2_dt$race_4cat)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+race_xtab
+chisq.test(race_xtab)
+chisq.test(race_xtab[c(1, 2, 4),])
+```
+```{r}
+ethnicity_xtab <- 
+  xtabs(~factor(tab2_dt$ethnicity)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+ethnicity_xtab
+chisq.test(ethnicity_xtab)
+```
+
+
+```{r}
+education_xtab <- 
+  xtabs(~factor(tab2_dt$education)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+education_xtab
+chisq.test(education_xtab)
+```
+```{r}
+income_xtab <- 
+  xtabs(~factor(tab2_dt$income)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+income_xtab
+chisq.test(income_xtab)
+```
+
+```{r}
+tab2_dt$household_size = as.numeric(tab2_dt$household_size)
+t.test(tab2_dt$household_size[tab2_dt$FUSNCONSENT_numeric == 7],
+       tab2_dt$household_size[tab2_dt$FUSNCONSENT_numeric == 0]
+       )
+```
+```{r}
+dwelling_ownership_xtab <- 
+  xtabs(~factor(tab2_dt$dwelling_ownership)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+dwelling_ownership_xtab
+chisq.test(dwelling_ownership_xtab)
+```
+
+```{r}
+essential_worker_xtab <- 
+  xtabs(~factor(tab2_dt$essential_worker)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+essential_worker_xtab
+chisq.test(essential_worker_xtab)
+```
+
+```{r}
+tab2_dt$cdc_avg_out = as.numeric(tab2_dt$cdc_avg_out)
+t.test(tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 7],
+       tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 0]
+       )
+```
+
+```{r}
+covid_test_xtab <- 
+  xtabs(~factor(tab2_dt$covid_test)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+covid_test_xtab
+chisq.test(covid_test_xtab)
+```
+
+```{r}
+tab2_dt <- 
+  tab2_dt %>% mutate(sub_last7days = 
+                     ifelse(is.na(sub_last7days), 0, sub_last7days))
+sub_last7days_xtab <- 
+  xtabs(~factor(tab2_dt$sub_last7days, exclude = NULL)+
+          factor(tab2_dt$FUSNCONSENT_numeric))
+
+sub_last7days_xtab
+chisq.test(sub_last7days_xtab)
+```
+
+```{r}
+daily_drinking_xtab <- 
+  xtabs(~factor(tab2_dt$daily_drinking, exclude = NULL)+
+          factor(tab2_dt$FUSNCONSENT_numeric))
+
+daily_drinking_xtab
+chisq.test(daily_drinking_xtab)
+```
+
+
+```{r}
+daily_opioid_xtab <- 
+  xtabs(~factor(tab2_dt$daily_opioid, exclude = NULL)+
+          factor(tab2_dt$FUSNCONSENT_numeric))
+
+daily_opioid_xtab
+chisq.test(daily_opioid_xtab)
+```
+
+
+```{r}
+daily_stimulant_xtab <- 
+  xtabs(~factor(tab2_dt$daily_stimulant, exclude = NULL)+
+          factor(tab2_dt$FUSNCONSENT_numeric))
+
+daily_stimulant_xtab
+chisq.test(daily_stimulant_xtab)
+```
