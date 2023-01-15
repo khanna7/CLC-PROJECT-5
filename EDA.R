@@ -471,6 +471,32 @@ table(daily_drinking)/sum(table(daily_drinking))
 table(daily_opioid); table(daily_opioid)/sum(table(daily_opioid))
 table(daily_stimulant); table(daily_stimulant)/sum(table(daily_stimulant))
 
+# Create dataset with Table 2 variables and MTURKD IDs ---------------------------
+# to be used in comparing the characteristics and behaviors among 
+# people providing FUSN consent vs not
+
+tab2_dt <- cbind(
+  MTURK1=dt$MTURK1,
+  FUSNCONSENT=dt$FUSNCONSENT,
+  age, 
+  gender_3cat,
+  race_4cat,  
+  ethnicity,  
+  education,
+  income,
+  household_size=dt$RDEMO8, 
+  dwelling_ownership, 
+  essential_worker, 
+  cdc_avg_out,
+  covid_test, 
+  #pos_covid_test,
+  sub_last7days=dt$USED7SUB_1,
+  daily_drinking,
+  daily_opioid, 
+  daily_stimulant
+  )
+
+saveRDS(object = tab2_dt, file = "tab2_comparison_data.RDS")
 
 # Save image ---------------------------
 
