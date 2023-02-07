@@ -18,9 +18,11 @@ knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Dat
 ```
 
 ```{r}
+library(haven)
 library(igraph)
 library(dplyr)
 library(data.table)
+library(RColorBrewer)
 ```
 
 Read social network data with minors removed, including MTURK IDs for participants 
@@ -176,6 +178,21 @@ vertex_attr_names(updated_alterdt_ig)
 table(V(updated_alterdt_ig)$SN37, exclude = NULL)
 ```
 
+```{r}
+
+V(updated_alterdt_ig)$SN37[1:10]
+#V(updated_alterdt_ig)[SN37 == 1]$color <- "yellow"
+#V(updated_alterdt_ig)[SN37 == 1]$color <- "yellow"
+#V(updated_alterdt_ig)[SN37 == 2]$color <- "blue"
+
+```
+
+```{r}
+
+pal <- brewer.pal(length(unique(V(updated_alterdt_ig)$SN37)), "Dark2")
+plot(updated_alterdt_ig, 
+     vertex.color = pal[as.numeric(as.factor(vertex_attr(updated_alterdt_ig, "SN37")))])
+```
 
 
 
