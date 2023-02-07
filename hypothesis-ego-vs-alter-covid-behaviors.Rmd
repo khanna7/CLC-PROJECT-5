@@ -1,0 +1,41 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+Test hypothesis that COVID behavior scores (continuously or dummy coded) are significantly correlated with COVID protection behaviors among the agents. 
+
+## Load libraries, set working directory, and dataset used in descriptive analysis
+
+```{r, echo=FALSE, message=FALSE}
+rm(list=ls())
+library(haven)
+library(dplyr)
+library(data.table)
+```
+
+Set the working directory:
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+```
+
+Read the dataset:
+
+```{r, include=FALSE}
+dir <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
+sns_dt_long_wide_no_minors <- readRDS(paste0(dir, "sns_dt_long_wide_no_minors.RDS"))
+```
+
+Query the dataset:
+
+```{r}
+View(sns_dt_long_wide_no_minors)
+colnames(sns_dt_long_wide_no_minors)
+```
