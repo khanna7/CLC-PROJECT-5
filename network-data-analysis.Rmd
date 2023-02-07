@@ -78,7 +78,7 @@ sns_consenting_dt <- left_join(sns_consenting_dt, cdc_avg_out_dt, by=c("MTURK1",
 (sns_consenting_dt$cdc_avg_out)
 
 sns_consenting_dt <- sns_consenting_dt %>% 
-  mutate(cdc_avg_out_adequate = if_else(cdc_avg_out >= 2, 1, 0))
+  mutate(cdc_avg_out_adequate = if_else(cdc_avg_out > 2, 1, 0))
 
 table(sns_consenting_dt$cdc_avg_out_adequate, exclude = NULL)
 
@@ -362,7 +362,8 @@ sns_dt_long_wide_no_minors[, .N, by = c("SN20")][,
 ### Analysis of Full Network Dataset
 
 Other reported characteristics of the social network members include:
-age (SN2),
+
+#### AGE (SN2),
 
 ```{r}
 age_net_dt <- 
@@ -408,7 +409,7 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0,
 ```
 
 
-race (SN3),
+#### RACE (SN3),
 
 ```{r}
 race_net_dt_white <- 
@@ -446,7 +447,7 @@ sns_dt_long_wide_no_minors[, .N, by = c("SN3_2")][,
   ]
 ```
 
-# gender (SN4),
+#### GENDER (SN4),
 
 ```{r}
 gender_net_dt<- 
@@ -464,21 +465,21 @@ where 1=male, 2=female, 3=nonbinary, 4=transgender, 5 = don't know,
 
 ```{r gender_nominors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN4")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 1)] [
   ]
 ```
 
 ```{r}
 sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 1, .N, by = c("SN4")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 1)] [
   ]
 
 sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 0, .N, by = c("SN4")][, 
-  "%" := round(N /sum(N) * 100, 0)] [
+  "%" := round(N /sum(N) * 100, 1)] [
   ]
 ```
 
-ethnicity (SN5),
+#### ETHNICITY (SN5),
 
 ```{r}
 ethnicity_net_dt<- 
@@ -511,7 +512,7 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN5")][,
   ]
 ```
 
-education (SN6),
+#### EDUCATION (SN6),
 
 ```{r}
 education_net_dt<- 
@@ -543,7 +544,7 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 0, .N, by = c("SN6")][,
   ]
 ```
 
-employment (SN7),
+#### EMPLOYMENT (SN7),
 
 ```{r}
 employment_net_dt<- 
@@ -576,7 +577,7 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN7")][,
   ]
 ```
 
-housing (SN8),
+#### HOUSING (SN8),
 
 ```{r}
 housing_net_dt<- 
@@ -608,7 +609,16 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN8")][,
   "%" := round(N /sum(N) * 100, 0)] [order(SN8)]
 ```
 
-political party/affiliation (SN9),
+#### POLITICAL PARTY/AFFILIATION (SN9),
+
+o	Republican  (1) 
+o	Democrat  (2) 
+o	Independent  (3) 
+o	Libertarian  (4) 
+o	Green  (5) 
+o	Other:  (6) ________________________________________________
+o	Prefer not to answer  (7) 
+o	Don't know  (8) 
 
 ```{r politics_party_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN9")][, 
@@ -621,7 +631,13 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 0, .N, by = c("SN9")][,
   "%" := round(N /sum(N) * 100, 0)] [order(SN9)]
 ```
 
-mode(s) of communication (SN10),
+#### MODES OF COMMUNICATION (SN10),
+
+▢	In person  (1) 
+▢	Social media  (2) 
+▢	Text or messaging  (3) 
+▢	Phone call  (4) 
+▢	Video conference or video chat  (5) 
 
 ```{r politics_party_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN10_1", "SN10_2", "SN10_3", "SN10_4", "SN10_5")][
@@ -648,7 +664,12 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN11")][,
   ]
 ```
 
-length of friendship (SN12),
+#### LENGTH OF FRIENDSHIP (SN12),
+o	Less than a year  (1) 
+o	1-2 years  (2) 
+o	2-5 years  (3) 
+o	5-10 years  (4) 
+o	More than 10 years  (5) 
 
 ```{r lengthfrn_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN12")][, 
@@ -664,7 +685,13 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN12")][,
   ]
 ```
 
-frequency of communication (SN13),
+#### FREQUENCY OF COMMUNICATION (SN13),
+
+o	Daily  (1) 
+o	Every few days  (2) 
+o	Weekly  (3) 
+o	Monthly  (4) 
+o	Less than monthly  (5) 
 
 ```{r freqcomm_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN13")][, 
@@ -680,8 +707,11 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN13")][,
   ]
 ```
 
-whether the participant discusses personal matters with the network
-member (SN14),
+#### DISCUSS PERSONAL MATTERS? (SN14),
+
+o	Yes  (1) 
+o	Sometimes  (2) 
+o	No  (3) 
 
 ```{r personalmatters_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN14")][, 
@@ -697,8 +727,11 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN14")][,
   ]
 ```
 
-whether the participant asks the network member for advice on personal
-matters (SN15),
+#### ASK FOR ADVICE ON PERSONAL MATTERS (SN15),
+
+o	Yes  (1) 
+o	Sometimes  (2) 
+o	No  (3) 
 
 ```{r personaladvice_nonminors_dt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN15")][, 
@@ -714,7 +747,10 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN15")][,
   ]
 ```
 
-whether the network member is a spouse or intimate partner (SN16),
+#### SPOUSE OR INTIMATE PARTNER (SN16),
+
+o	Yes  (1) 
+o	No  (2) 
 
 ```{r spouse_int_pt}
 sns_dt_long_wide_no_minors[, .N, by = c("SN16")][, 
@@ -731,8 +767,12 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN16")][,
 ```
 
 
-whether the network member is a close relative
-(parent/grandparent/sibling) (SN17),
+#### CLOSE RELATIVE (SN17),
+(e.g., parent/grandparent/sibling)
+
+o	Yes  (1) 
+o	No  (2) 
+
 
 ```{r close_relative}
 sns_dt_long_wide_no_minors[, .N, by = c("SN17")][, 
@@ -748,8 +788,11 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN17")][,
   ]
 ```
 
-whether there participant has a sexual relationship with the network
-member (SN18),
+#### SEXUAL RELATIONSHIP (SN18)
+
+o	Yes  (1) 
+o	No  (2) 
+
 
 ```{r sex_rel}
 sns_dt_long_wide_no_minors[, .N, by = c("SN18")][, 
@@ -765,7 +808,10 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN18")][,
   ]
 ```
 
-whether the participant lives with the network member (SN19),
+#### LIVES WITH (SN19),
+
+o	Yes  (1) 
+o	No  (2) 
 
 ```{r cohabit}
 sns_dt_long_wide_no_minors[, .N, by = c("SN19")][, 
@@ -781,8 +827,14 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN19")][,
   ]
 ```
 
-whether the network member smokes tobacco (cigarettes or cigars) (SN20),
+#### TOBACCO SMOKING (cigarettes or cigars) (SN20),
+o	Yes  (1) 
+o	No  (2) 
+
 if so, how often (SN20a),
+o	Daily  (1) 
+o	Less than daily  (2) 
+o	Don't know  (3) 
 
 ```{r smkg}
 sns_dt_long_wide_no_minors[, .N, by = c("SN20")][, 
@@ -813,8 +865,20 @@ sns_dt_long_wide_no_minors[SN20==1 & cdc_avg_out_adequate==0, .N, by = c("SN20a"
 
 ```
 
+#### ENCOURAGE TO SMOKE TOGETHER  (SN21)
+
 if the network member has encouraged the participant to smoke tobacco
-with them since the start of COVID-19 (SN21), if so, how often (SN 21a),
+with them since the start of COVID-19 (SN21),
+o	Yes  (1) 
+o	No  (2) 
+
+
+if so, how often (SN 21a),
+o	Daily  (1) 
+o	Every few days  (2) 
+o	Weekly  (3) 
+o	Monthly  (4) 
+o	Less than monthly  (5) 
 
 ```{r}
 sns_dt_long_wide_no_minors[, .N, by = c("SN21")][, 
@@ -859,8 +923,19 @@ sns_dt_long_wide_no_minors[SN20 == 1 & SN21 == 1 & cdc_avg_out_adequate==0, .N, 
   ]
 ```
 
+#### DRINKS ALCOHOL (SN22)
+
 whether the network member drinks alcohol (wine, beer or liquor) (SN22),
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
 if so, how often (SN22a),
+o	Daily  (1) 
+o	A few times a week  (2) 
+o	A few times a month  (3) 
+o	Monthly or less  (4) 
+o	Don't know  (5) 
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN22")][, 
@@ -892,8 +967,21 @@ sns_dt_long_wide_no_minors[SN22==1 & cdc_avg_out_adequate==0, .N, by = c("SN22a"
 
 ```
 
+#### ENCOURAGED DRINKING TOGETHER (SN23)
+
 if the network member has encouraged the participant to drink alcohol
-with them since the start of COVID-19 (SN23), if so, how often (SN23a),
+with them since the start of COVID-19 (SN23), 
+o	Yes  (1) 
+o	No  (2) 
+
+
+if so, how often (SN23a),
+o	Daily  (1) 
+o	Every few days  (2) 
+o	Weekly  (3) 
+o	Monthly  (4) 
+o	Less than monthly  (5) 
+
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN23")][, 
@@ -909,7 +997,12 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN23")][,
   ]
 ```
 
+#### DRINKING IN A PUBLIC PLACE (SN24)
+
 and, if in a bar, restaurant, or other public place (SN24),
+
+o	Yes  (1) 
+o	No  (2) 
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN24")][, 
@@ -933,9 +1026,36 @@ sns_dt_long_wide_no_minors[!is.na(SN24), .N, by = c("SN24")][,
 #colSums(.Last.value)
 ```
 
+
+#### USES DRUGS (SN25)
+
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
 if the network member uses non-prescription drugs (cocaine, painkiller
 pills, heroin, fentanyl, methamphetamine, or marijuana) (SN25), if so,
-which drugs the network member uses (SN25a), how often (SN25b),
+which drugs the network member uses (SN25a), 
+
+▢	Cocaine  (1) 
+▢	Methamphetamine  (2) 
+▢	Other stimulants or uppers  (3) 
+▢	Painkiller pills, such as oxycodone or hydrocodone  (4) 
+▢	Heroin  (5) 
+▢	Fentanyl  (6) 
+▢	Marijuana  (7) 
+▢	Other:  (8) ________________________________________________
+▢	Don't know  (9) 
+
+
+
+how often (SN25b),
+
+o	Daily  (1) 
+o	A few times a week  (2) 
+o	About once a week  (3) 
+o	Monthly or less  (4) 
+o	Don't know  (5) 
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN25")][, 
@@ -970,8 +1090,24 @@ levels(haven::as_factor(npd_dt$SN25a_6))
 levels(haven::as_factor(npd_dt$SN25a_7))
 ```
 
+
+#### ENCOURAGED USING DRUGS TOGETHER (SN26)
+
 and if the network member has encouraged the participant to use drugs
-with them (SN26), and how often (SN26b);
+with them (SN26), 
+
+o	Yes  (1) 
+o	No  (2) 
+
+
+
+and how often (SN26b);
+o	Daily  (1) 
+o	Every few days  (2) 
+o	Weekly  (3) 
+o	Monthly  (4) 
+o	Less than monthly  (5) 
+
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN26")][, 
@@ -1017,8 +1153,22 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN27")][,
   ]
 ```
 
-if the network member has tested positive for COVID-19 (SN27a), if the
-network member has been hospitalized for COVID-19 (SN27a1),
+#### TESTED FOR COVID-19 (SN27)
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
+if the network member has tested positive for COVID-19 (SN27a), 
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
+
+if the network member has been hospitalized for COVID-19 (SN27a1),
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
 
 ```{r }
 sns_dt_long_wide_no_minors[, .N, by = c("SN27a")][, 
@@ -1048,8 +1198,14 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN27a1")][,
   ]
 ```
 
+#### KNOW ANYONE HOSPITALIZED BECAUSE OF COVID-19 (SN28)
+
 if the network member knows anyone who has been hospitalized for
 COVID-19 (SN28),
+
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
 
 ```{r}
 any_hospitalized <- 
@@ -1077,6 +1233,7 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN28")][,
   ]
 ```
 
+#### KNOW ANYONE DIED OF COVID19  (SN29)
 if the network member knows anyone who has died of COVID-19 (SN29),
 
 ```{r}
@@ -1105,10 +1262,32 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN29")][,
   ]
 ```
 
-if the network member has any of the listed conditions (SN30),
+#### ANY CONDITIONS (SN30)
 
+if the network member has any of the listed conditions (SN30),
+▢	Autoimmune disease  (1) 
+▢	Cardiovascular disease, such as hypertension (high blood pressure), coronary artery disease, heart attack, or heart failure  (2) 
+▢	Cerebrovascular disease, such as stroke or transient ischemic attack  (3) 
+▢	Chronic lung disease, such as asthma, chronic obstructive pulmonary disease (COPD), emphysema, or pulmonary hypertension  (4) 
+▢	Diabetes  (5) 
+▢	Immunocompromised or immune suppressed  (6) 
+▢	Kidney disease  (7) 
+▢	Mental health condition (depression, anxiety, bipolar disorder, schizophrenia, PTSD, etc.)  (8) 
+▢	Substance use problem  (9) 
+▢	None of the above  (10) 
+▢	Don't know  (11) 
+
+#### CLINICAL/DENTAL PRACTICE CLOSED (SN31)
 if the network member's clinic, doctor's office or dental practice has
 closed or cancelled an appointment (SN31),
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
+
+#### ENCOURAGED TESTING (SN32)
+o	Yes  (1) 
+o	No  (2) 
 
 if the network member has ever encouraged the participant to get tested
 for COVID-19 (SN32),
@@ -1138,7 +1317,10 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN32")][,
   ]
 ```
 
+#### FOLLOWS SOCIAL DISTANCING GUIDELINES (SN33)
 if the network member follows social distancing guidelines (SN33),
+o	Yes  (1) 
+o	No  (2) 
 
 ```{r}
 SD_guidelines <- 
@@ -1164,8 +1346,13 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN33")][,
   ]
 ```
 
+
+#### ENCOURAGED FOLLOWING SOCIAL DISTANCING GUIDELINES (SN34)
+
 if the network member has encouraged the participant to follow social
 distancing guidelines (SN34),
+o	Yes  (1) 
+o	No  (2) 
 
 ```{r}
 encd_SD_guidelines <- 
@@ -1191,15 +1378,43 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN34")][,
   ]
 ```
 
+
+#### FREQUENCY OF MASK WEARING (SN35)
+
 how often the network member wears a mask in public (SN35),
+o	Always  (1) 
+o	Usually  (2) 
+o	Sometimes  (3) 
+o	Rarely or never  (4) 
+o	Don't know  (5) 
+
+#### ENCOURAGED MASK WEARING (SN36)
 
 if the network member has encouraged the participant to wear a mask in
 public (SN36),
 
+o	Yes  (1) 
+o	No  (2) 
+
+#### RECEIVED AT LEAST ONE VACCINE DOSE (SN37)
 if the network member has received at least one dose of the COVID-19
-vaccine (SN37), if the network member had a negative reaction or bad
-side effects after the COVID-19 vaccine (SN37a), if the network member
+vaccine (SN37),
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
+if the network member had a negative reaction or bad
+side effects after the COVID-19 vaccine (SN37a), 
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
+if the network member
 is open to receiving a vaccine (SN37b),
+o	Yes  (1) 
+o	No  (2) 
+o	Don't know  (3) 
+
 
 ```{r}
 recd_one_dose_net_dt<- 
@@ -1228,6 +1443,8 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN37")][,
   "%" := round(N /sum(N) * 100, 0)] [order(SN37)
   ]
 ```
+
+#### ENCOURAGED RECEIVING VACCINE  (SN38)
 
 if the network member has encouraged the participant to get the COVID-19
 vaccine (SN38),
@@ -1260,6 +1477,8 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN38")][,
   ]
 ```
 
+
+#### DISCOURAGED RECEIVING VACCINE  (SN39)
 if the network member has discouraged the participant from getting the
 COVID-19 vaccine (SN39).
 
