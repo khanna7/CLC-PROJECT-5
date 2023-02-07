@@ -468,7 +468,7 @@ sns_dt_long_wide_no_minors[, .N, by = c("SN4")][,
   ]
 ```
 
-```{r gender_nominors_dt}
+```{r}
 sns_dt_long_wide_no_minors[cdc_avg_out_adequate == 1, .N, by = c("SN4")][, 
   "%" := round(N /sum(N) * 100, 0)] [
   ]
