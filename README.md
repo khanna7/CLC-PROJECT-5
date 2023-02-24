@@ -20,9 +20,9 @@
 - Test association between substance use behaviors and pro-vaccine behaviors/attitudes for the network members. 
   * Similar to Monnig 2021, but for the network members instead of the participants.
 
-- Test association between vaccine behaviors of the network members and satisfactory COVID scores (discrete) of the participants.
+- Test association between vaccine behaviors of the network members and satisfactory COVID scores (discrete) of the participants (i.e., egos).
 
-- Test association between substance use behaviors of the network members and satisfactory COVID scores (discrete) of the participants.
+- Test association between substance use behaviors of the network members and satisfactory COVID scores (discrete) of the network members.
  
     
 
