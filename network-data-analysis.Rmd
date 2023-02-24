@@ -1507,3 +1507,16 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN39")][,
   "%" := round(N /sum(N) * 100, 0)] [order(SN39)
   ]
 ```
+
+Save objects in an environment to be used later 
+```{r}
+my_env <- new.env()
+#my_env$object1 <- object1
+#my_env$object2 <- object2
+#my_env$object3 <- object3
+
+my_env$sns_dt_long_wide_no_minors <- sns_dt_long_wide_no_minors
+
+saveRDS(my_env, "my_objects.rds")
+```
+
