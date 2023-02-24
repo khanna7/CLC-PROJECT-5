@@ -18,6 +18,8 @@ rm(list=ls())
 library(haven)
 library(dplyr)
 library(data.table)
+library(lme4)
+library(geem)
 ```
 
 Set the working directory:
@@ -29,8 +31,8 @@ knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Dat
 Read the dataset:
 
 ```{r, include=FALSE}
-dir <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
-sns_dt_long_wide_no_minors <- readRDS(paste0(dir, "sns_dt_long_wide_no_minors.RDS"))
+my_env <- readRDS("my_objects.rds")
+sns_dt_long_wide_no_minors <- my_env$sns_dt_long_wide_no_minors
 ```
 
 Query the dataset:
@@ -39,3 +41,129 @@ Query the dataset:
 View(sns_dt_long_wide_no_minors)
 colnames(sns_dt_long_wide_no_minors)
 ```
+Obtain demographics on the egos:
+
+```{r}
+tab2_dt <- as.data.table(readRDS("tab2_comparison_data.RDS"))
+tab2_dt$MTURKID <- tab2_dt$MTURK1
+```
+
+Merge ego demographics into long form network dataset:
+
+```{r}
+sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_wide_no_minors, tab2_dt, by="MTURKID")
+class(sns_dt_long_merged_ego_characteristics)
+
+sns_dt_long_merged_ego_characteristics[,age := as.numeric(age)]
+```
+
+
+
+
+```{r}
+#model <- glmer(outcome ~ predictor1 + predictor2 + (1 | ego_id), data = data, family = binomial)
+
+model_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID), family="binomial")
+summary(model_disc_glmer)
+
+m1_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN27 + (1|MTURKID), family="binomial")
+summary(m1_disc_glmer)
+
+m2_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN28 + (1|MTURKID), family="binomial")
+summary(m2_disc_glmer)
+
+m3_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN33 + (1|MTURKID), family="binomial")
+summary(m3_disc_glmer)
+
+m4_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN34 + (1|MTURKID), family="binomial")
+summary(m4_disc_glmer)
+
+m5_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN37 + (1|MTURKID), family="binomial")
+summary(m5_disc_glmer)
+
+m6_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN38 + (1|MTURKID), family="binomial")
+summary(m6_disc_glmer)
+
+m7_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN39 + (1|MTURKID), family="binomial")
+summary(m7_disc_glmer)
+```
+Discrete Outcome
+```{r}
+model_disc <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID), family="binomial")
+summary(model_disc)
+```
+
+Continuous Outcome
+
+```{r}
+# Set the control options
+ctrl <- lmerControl(optCtrl = list(maxfun = 1e7))
+
+# model_cont <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~ 
+#                  SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID),
+#                  control = ctrl)
+
+model_cont <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~
+                 SN28 + (1|MTURKID),
+                 control = ctrl)
+summary(model_cont)
+```
+
+```{r}
+model_disc_gee <- geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN27 + SN28 + SN33 + SN34 + SN37 + SN38, id = MTURKID, family="binomial")
+summary(model_disc_gee)
+
+m1_gee_disc <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN27, id = MTURKID, family="binomial")
+summary(m1_gee_disc)
+
+m2_gee_disc <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN28, id = MTURKID, family="binomial")
+summary(m2_gee_disc)
+
+m3_gee_disc <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN33, id = MTURKID, family="binomial")
+summary(m3_gee_disc)
+
+m4_gee_disc <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN34, id = MTURKID, family="binomial")
+summary(m4_gee_disc)
+
+m5_gee_disc <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN37, id = MTURKID, family="binomial")
+summary(m5_gee_disc)
+
+m6_gee_disc <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN38, id = MTURKID, family="binomial")
+summary(m6_gee_disc)
+
+m7_gee_disc <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN39, id = MTURKID, family="binomial")
+summary(m7_gee_disc)
+```
+
+```{r}
+model_cont_gee <- geem(cdc_avg_out.x ~ SN27 + SN28 + SN33 + SN34 + SN37 + SN38, 
+                  id=MTURKID, data=sns_dt_long_merged_ego_characteristics, 
+                  family=gaussian, corstr="exchangeable")
+
+summary(model_gee)
+```
+
