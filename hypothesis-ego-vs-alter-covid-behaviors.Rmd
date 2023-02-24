@@ -19,7 +19,7 @@ library(haven)
 library(dplyr)
 library(data.table)
 library(lme4)
-library(geem)
+library(geeM)
 ```
 
 Set the working directory:
@@ -38,7 +38,7 @@ sns_dt_long_wide_no_minors <- my_env$sns_dt_long_wide_no_minors
 Query the dataset:
 
 ```{r}
-View(sns_dt_long_wide_no_minors)
+#View(sns_dt_long_wide_no_minors)
 colnames(sns_dt_long_wide_no_minors)
 ```
 Obtain demographics on the egos:
@@ -112,15 +112,20 @@ ctrl <- lmerControl(optCtrl = list(maxfun = 1e7))
 #                  SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID),
 #                  control = ctrl)
 
-model_cont <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~
+model_cont_28 <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~
                  SN28 + (1|MTURKID),
                  control = ctrl)
-summary(model_cont)
+summary(model_cont_28)
+
+model_cont_33 <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~
+                 SN28 + (1|MTURKID),
+                 control = ctrl)
+summary(model_cont_33)
 ```
 
 ```{r}
 model_disc_gee <- geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN27 + SN28 + SN33 + SN34 + SN37 + SN38, id = MTURKID, family="binomial")
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, family="binomial")
 summary(model_disc_gee)
 
 m1_gee_disc <- 
@@ -132,6 +137,11 @@ m2_gee_disc <-
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN28, id = MTURKID, family="binomial")
 summary(m2_gee_disc)
+
+m2a_gee_disc <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN29, id = MTURKID, family="binomial")
+summary(m2a_gee_disc)
 
 m3_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
@@ -160,10 +170,10 @@ summary(m7_gee_disc)
 ```
 
 ```{r}
-model_cont_gee <- geem(cdc_avg_out.x ~ SN27 + SN28 + SN33 + SN34 + SN37 + SN38, 
+model_cont_gee <- geem(cdc_avg_out.x ~ SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, 
                   id=MTURKID, data=sns_dt_long_merged_ego_characteristics, 
                   family=gaussian, corstr="exchangeable")
 
-summary(model_gee)
+summary(model_cont_gee)
 ```
 
