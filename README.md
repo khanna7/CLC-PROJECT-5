@@ -22,7 +22,7 @@
 
 - Test association between vaccine behaviors of the network members and satisfactory COVID scores (discrete) of the participants.
 
-- Test association between substance use behaviors of the network members and satisfactory COVID scores (discrete) of the participants.
+- Test association between substance use behaviors of the network members and satisfactory COVID scores (discrete) of the network members.
  
     
 
