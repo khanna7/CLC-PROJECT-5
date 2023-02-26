@@ -119,12 +119,12 @@ ctrl <- lmerControl(optCtrl = list(maxfun = 1e7))
 #                  SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID),
 #                  control = ctrl)
 
-model_cont_28 <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~
+model_cont_28 <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~
                  SN28 + (1|MTURKID),
                  control = ctrl)
 summary(model_cont_28)
 
-model_cont_33 <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~
+model_cont_33 <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~
                  SN28 + (1|MTURKID),
                  control = ctrl)
 summary(model_cont_33)
@@ -177,7 +177,7 @@ summary(m7_gee_disc)
 ```
 
 ```{r}
-model_cont_gee <- geem(cdc_avg_out.x ~ SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, 
+model_cont_gee <- geem(cdc_avg_out ~ SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, 
                   id=MTURKID, data=sns_dt_long_merged_ego_characteristics, 
                   family=gaussian, corstr="exchangeable")
 
