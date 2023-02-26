@@ -28,11 +28,17 @@ Set the working directory:
 knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
 ```
 
-Read the dataset:
+Read the datasets:
 
 ```{r, include=FALSE}
-my_env <- readRDS("my_objects.rds")
-sns_dt_long_wide_no_minors <- my_env$sns_dt_long_wide_no_minors
+network_env <- readRDS("network_objects.rds")
+sns_dt_long_wide_no_minors <- network_env$sns_dt_long_wide_no_minors
+
+eda_env <- readRDS("eda_objects.rds")
+tab2_dt <- as.data.table(eda_env$tab2_dt)
+cdc_scores <- eda_env$cdc_scores
+
+tab2_dt$MTURKID <- as.factor(tab2_dt$MTURK1)
 ```
 
 Query the dataset:
@@ -41,18 +47,16 @@ Query the dataset:
 #View(sns_dt_long_wide_no_minors)
 colnames(sns_dt_long_wide_no_minors)
 ```
-Obtain demographics on the egos:
 
-```{r}
-tab2_dt <- as.data.table(readRDS("tab2_comparison_data.RDS"))
-tab2_dt$MTURKID <- tab2_dt$MTURK1
-```
+Demographics on the egos are present in the `tab2_dt` object in the `eda_env` environment.
+
 
 Merge ego demographics into long form network dataset:
 
 ```{r}
 sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_wide_no_minors, tab2_dt, by="MTURKID")
 class(sns_dt_long_merged_ego_characteristics)
+#sns_dt_long_merged_ego_characteristics$MTURKID <- as.factor(sns_dt_long_merged_ego_characteristics$MTURKID)
 
 sns_dt_long_merged_ego_characteristics[,age := as.numeric(age)]
 ```
@@ -66,6 +70,9 @@ sns_dt_long_merged_ego_characteristics[,age := as.numeric(age)]
 model_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID), family="binomial")
 summary(model_disc_glmer)
+
+model_disc_glmer <- glmer(cdc_avg_out_adequate ~ SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID), data = sns_dt_long_merged_ego_characteristics, family="binomial")
+
 
 m1_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN27 + (1|MTURKID), family="binomial")
