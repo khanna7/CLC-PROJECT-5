@@ -373,10 +373,11 @@ dim(dt)
 summary(dt$CDCGAQ)
 
 ## any missing values in the 13 criteria
-cdc <- cbind(dt$CDC1, dt$CDC2, dt$CDC3, dt$CDC4,
-             dt$CDC5, dt$CDC6, dt$CDC7, dt$CDC8,
-             dt$CDC9, dt$CDC10, dt$CDC11, dt$CDC12,
-             dt$CDC13)
+cdc <- as.data.frame(
+  cbind(CDC1=dt$CDC1, CDC2=dt$CDC2, CDC3=dt$CDC3, CDC4=dt$CDC4,
+        CDC5=dt$CDC5, CDC6=dt$CDC6, CDC7=dt$CDC7, CDC8=dt$CDC8,
+        CDC9=dt$CDC9, CDC10=dt$CDC10, CDC11=dt$CDC11, CDC12=dt$CDC12,
+        CDC13=dt$CDC13))
 dim(cdc)
 which(is.na(cdc))
 
@@ -394,6 +395,10 @@ dt$CDCGAQ[na.val]
 cdc_avg_out[na.val]
 
 dt$cdc_avg_out <- cdc_avg_out
+
+
+cdc_scores <- cbind.data.frame(cdc, cdc_avg_out, MTURKID=dt$MTURK1)
+
 
 # Compute Secondary Outcome Variable statistics (for Table 4) ---------------------------
 
@@ -487,7 +492,7 @@ tab2_dt <- cbind(
   household_size=dt$RDEMO8, 
   dwelling_ownership, 
   essential_worker, 
-  cdc_avg_out,
+  as.numeric(cdc_avg_out),
   covid_test, 
   #pos_covid_test,
   sub_last7days=dt$USED7SUB_1,
@@ -496,7 +501,16 @@ tab2_dt <- cbind(
   daily_stimulant
   )
 
-saveRDS(object = tab2_dt, file = "tab2_comparison_data.RDS")
+
+# Save RDS object ---------------------------
+
+eda_env <- new.env()
+eda_env$tab2_dt <- tab2_dt
+eda_env$cdc_scores <- cdc_scores
+
+#saveRDS(object = tab2_dt, file = "tab2_comparison_data.RDS")
+saveRDS(eda_env, "eda_objects.rds")
+
 
 # Save image ---------------------------
 

@@ -1510,13 +1510,13 @@ sns_dt_long_wide_no_minors[cdc_avg_out_adequate==0, .N, by = c("SN39")][,
 
 Save objects in an environment to be used later 
 ```{r}
-my_env <- new.env()
+network_env <- new.env()
 #my_env$object1 <- object1
 #my_env$object2 <- object2
 #my_env$object3 <- object3
 
-my_env$sns_dt_long_wide_no_minors <- sns_dt_long_wide_no_minors
+network_env$sns_dt_long_wide_no_minors <- sns_dt_long_wide_no_minors
 
-saveRDS(my_env, "my_objects.rds")
+saveRDS(network_env, "network_objects.rds")
 ```
 

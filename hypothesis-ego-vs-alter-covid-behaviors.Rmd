@@ -28,11 +28,17 @@ Set the working directory:
 knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
 ```
 
-Read the dataset:
+Read the datasets:
 
 ```{r, include=FALSE}
-my_env <- readRDS("my_objects.rds")
-sns_dt_long_wide_no_minors <- my_env$sns_dt_long_wide_no_minors
+network_env <- readRDS("network_objects.rds")
+sns_dt_long_wide_no_minors <- network_env$sns_dt_long_wide_no_minors
+
+eda_env <- readRDS("eda_objects.rds")
+tab2_dt <- as.data.table(eda_env$tab2_dt)
+cdc_scores <- eda_env$cdc_scores
+
+tab2_dt$MTURKID <- as.factor(tab2_dt$MTURK1)
 ```
 
 Query the dataset:
@@ -41,87 +47,52 @@ Query the dataset:
 #View(sns_dt_long_wide_no_minors)
 colnames(sns_dt_long_wide_no_minors)
 ```
-Obtain demographics on the egos:
 
-```{r}
-tab2_dt <- as.data.table(readRDS("tab2_comparison_data.RDS"))
-tab2_dt$MTURKID <- tab2_dt$MTURK1
-```
+Demographics on the egos are present in the `tab2_dt` object in the `eda_env` environment.
+
 
 Merge ego demographics into long form network dataset:
 
 ```{r}
 sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_wide_no_minors, tab2_dt, by="MTURKID")
 class(sns_dt_long_merged_ego_characteristics)
+#sns_dt_long_merged_ego_characteristics$MTURKID <- as.factor(sns_dt_long_merged_ego_characteristics$MTURKID)
 
 sns_dt_long_merged_ego_characteristics[,age := as.numeric(age)]
 ```
 
-
-
-
-```{r}
-#model <- glmer(outcome ~ predictor1 + predictor2 + (1 | ego_id), data = data, family = binomial)
-
-model_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID), family="binomial")
-summary(model_disc_glmer)
-
-m1_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN27 + (1|MTURKID), family="binomial")
-summary(m1_disc_glmer)
-
-m2_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN28 + (1|MTURKID), family="binomial")
-summary(m2_disc_glmer)
-
-m3_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN33 + (1|MTURKID), family="binomial")
-summary(m3_disc_glmer)
-
-m4_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN34 + (1|MTURKID), family="binomial")
-summary(m4_disc_glmer)
-
-m5_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN37 + (1|MTURKID), family="binomial")
-summary(m5_disc_glmer)
-
-m6_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN38 + (1|MTURKID), family="binomial")
-summary(m6_disc_glmer)
-
-m7_disc_glmer <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN39 + (1|MTURKID), family="binomial")
-summary(m7_disc_glmer)
-```
-Discrete Outcome
-```{r}
-model_disc <- glmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID), family="binomial")
-summary(model_disc)
-```
-
-Continuous Outcome
+Merge in the component outcomes of the the CDC average score:
 
 ```{r}
-# Set the control options
-ctrl <- lmerControl(optCtrl = list(maxfun = 1e7))
-
-# model_cont <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~ 
-#                  SN27 + SN28 + SN33 + SN34 + SN37 + SN38 + (1|MTURKID),
-#                  control = ctrl)
-
-model_cont_28 <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~
-                 SN28 + (1|MTURKID),
-                 control = ctrl)
-summary(model_cont_28)
-
-model_cont_33 <- lmer(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out.x ~
-                 SN28 + (1|MTURKID),
-                 control = ctrl)
-summary(model_cont_33)
+sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_merged_ego_characteristics,
+                                                    cdc_scores %>% select(-cdc_avg_out),
+                                                    by = "MTURKID")
 ```
+
+Component variables of social network score:
+
+- If the network member has been tested for COVID-19 (SN27)
+- If the network member has tested positive for COVID-19 (SN27a), 
+- If the network member has been hospitalized for COVID-19 (SN27a1)
+- If the network member knows anyone who has been hospitalized for
+COVID-19 (SN28),
+- If the network member knows anyone who has died of COVID-19 (SN29),
+- if the network member has ever encouraged the participant to get tested
+for COVID-19 (SN32),
+- If the network member follows social distancing guidelines (SN33),
+- If the network member has encouraged the participant to follow social
+distancing guidelines (SN34)
+- If the network member has received at least one dose of the COVID-19
+vaccine (SN37), if the network member had a negative reaction or bad
+side effects after the COVID-19 vaccine (SN37a), if the network member
+is open to receiving a vaccine (SN37b),
+- If the network member has encouraged the participant to get the COVID-19
+vaccine (SN38),
+- If the network member has discouraged the participant from getting the
+COVID-19 vaccine (SN39).
+
+
+
 
 ```{r}
 model_disc_gee <- geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
@@ -169,11 +140,122 @@ m7_gee_disc <-
 summary(m7_gee_disc)
 ```
 
-```{r}
-model_cont_gee <- geem(cdc_avg_out.x ~ SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, 
-                  id=MTURKID, data=sns_dt_long_merged_ego_characteristics, 
-                  family=gaussian, corstr="exchangeable")
+Component Outcomes of CDC Score:
 
-summary(model_cont_gee)
+1. Wash your hands often with soap and water for at least 20 seconds especially after you have been in a public place, or after blowing your nose, coughing, or sneezing? (CDC1) 
+2. Use hand sanitizer that contains at least 60% alcohol when soap and water was not readily available? (CDC2) 
+3. Avoid touching your eyes, nose, and mouth? (CDC3) 
+4. Avoid close contact with people who are sick? (CDC4) 
+5. Remain at least 6 feet away from other people when in public? (CDC5) 
+6.Stay home as much as possible? (CDC6) 
+7. Use a cloth face cover over your nose and mouth when in public? (CDC7) 
+8. Cover your mouth and nose with a tissue or use the inside of your elbow when you coughed or sneezed? (CDC8) 
+9. Throw used tissues in the trash? (CDC9) 
+10. Immediately wash your hands with soap and water for at least 20 seconds after coughing or sneezing? (CDC10) 
+11. Clean and disinfectant frequently touched surfaces in your home (examples: tables, doorknobs, light switches, countertops, desks, phones, toilets, faucets)? (CDC11) 
+12. Use detergent or soap and water to clean dirty surfaces before disinfection? (CDC12) 
+13. When cleaning surfaces, how often did you use any of the following: a diluted household bleach, a solution that was at least 70% alcohol, or another EPA-registered household disinfect? (CDC13) 
+
+```{r}
+sns_dt_long_merged_ego_characteristics$cdc1_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC1 > 2, 1, 0)
+
+model_cdc1 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc1_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc1)
+
+sns_dt_long_merged_ego_characteristics$cdc2_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC2 > 2, 1, 0)
+
+model_cdc2 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc2_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc2)
+
+sns_dt_long_merged_ego_characteristics$cdc3_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC3 > 2, 1, 0)
+model_cdc3 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc3_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc3)
+
+sns_dt_long_merged_ego_characteristics$cdc4_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC4 > 2, 1, 0)
+model_cdc4 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc4_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc4)
+
+sns_dt_long_merged_ego_characteristics$cdc5_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC5 > 2, 1, 0)
+model_cdc5 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc5_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc5)
+
+sns_dt_long_merged_ego_characteristics$cdc6_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC6 > 2, 1, 0)
+model_cdc6 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc6_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc6)
+
+sns_dt_long_merged_ego_characteristics$cdc7_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC7 > 2, 1, 0)
+model_cdc7 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc7_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc7)
+
+sns_dt_long_merged_ego_characteristics$cdc8_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC8 > 2, 1, 0)
+model_cdc8 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc8_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc8)
+
+sns_dt_long_merged_ego_characteristics$cdc9_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC9 > 2, 1, 0)
+model_cdc9 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc9_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc9)
+
+sns_dt_long_merged_ego_characteristics$cdc10_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC10 > 2, 1, 0)
+model_cdc10 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc10_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc10)
+
+sns_dt_long_merged_ego_characteristics$cdc11_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC11 > 2, 1, 0)
+model_cdc11 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc11_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc11)
+
+sns_dt_long_merged_ego_characteristics$cdc12_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC12 > 2, 1, 0)
+model_cdc12 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc12_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc12)
+
+sns_dt_long_merged_ego_characteristics$cdc13_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$CDC12 > 2, 1, 0)
+model_cdc13 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc13_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc13)
 ```
+
+# ```{r}
+# model_cont_gee <- geem(cdc_avg_out ~ SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, 
+#                   id=MTURKID, data=sns_dt_long_merged_ego_characteristics, 
+#                   family=gaussian, corstr="exchangeable")
+# 
+# summary(model_cont_gee)
+# ```
 
