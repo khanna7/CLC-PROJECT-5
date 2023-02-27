@@ -347,6 +347,8 @@ sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_merged_ego_character
 
 ### Test associations
 
+VH1: Plans to take COVID vaccine 
+
 ```{r}
 sns_dt_long_merged_ego_characteristics$vh1_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$vh1 < 2, 1, 0)
@@ -398,5 +400,61 @@ summary(model_vh1_SN38)
  #                 vh1_adequate ~ SN39_reversed,
   #               family="binomial", corstr = corstr)
 #summary(model_vh1_SN39)
+```
+
+VH3: attitude towards receiving a COVID-19 
+
+```{r}
+sns_dt_long_merged_ego_characteristics$vh3_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$vh3 <= 2, 1, 0)
+
+model_vh3 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh3_adequate ~ 
+                 SN27_reversed + SN28_reversed + SN29_reversed +
+                   SN33_reversed+
+                   SN34_reversed + SN37_reversed + SN38_reversed,
+                 #+ SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial", corstr = corstr)
+summary(model_vh3)
+
+model_vh3_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh3_adequate ~ SN27_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_sn27)
+
+model_vh3_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh3_adequate ~ SN28_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_SN28)
+
+model_vh3_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh3_adequate ~ SN29_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_SN29)
+
+model_vh3_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh3_adequate ~ SN33_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_sn33)
+
+model_vh3_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh3_adequate ~ SN34_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_SN34)
+
+model_vh3_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh3_adequate ~ SN37_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_sn37)
+
+model_vh3_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh3_adequate ~ SN38_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_SN38)
+
+#model_vh3_SN39 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                  vh3_adequate ~ SN39_reversed,
+#                   family="binomial", corstr = corstr)
+# summary(model_vh3_SN39)
 ```
 
