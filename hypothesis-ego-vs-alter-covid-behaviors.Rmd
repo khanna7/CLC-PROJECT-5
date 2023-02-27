@@ -112,101 +112,104 @@ sns_dt_long_merged_ego_characteristics$SN39_reversed <- ifelse(sns_dt_long_merge
 # Check the frequencies of the new variable
 table(sns_dt_long_merged_ego_characteristics$SN27_reversed, exclude = NULL)
 
+# Specify correlation structure
+corstr <- "exchangeable"
 
 ## SN27
 m1_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN27, id = MTURKID, family="binomial")
+                 SN27, id = MTURKID, family="binomial", corstr = corstr)
 summary(m1_gee_disc)
 
 m1_gee_disc_reversed <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN27_reversed, id = MTURKID, family="binomial")
+                 SN27_reversed, id = MTURKID, family="binomial", corstr = corstr)
 summary(m1_gee_disc_reversed)
 
 ## SN28
 m2_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN28, id = MTURKID, family="binomial")
+                 SN28, id = MTURKID, family="binomial", corstr = corstr)
 summary(m2_gee_disc)
 
 m2_gee_disc_reversed <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN28_reversed, id = MTURKID, family="binomial")
+                 SN28_reversed, id = MTURKID, family="binomial", corstr = corstr)
 summary(m2_gee_disc_reversed)
 
 ## SN29
 m2a_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN29, id = MTURKID, family="binomial")
+                 SN29, id = MTURKID, family="binomial", corstr = corstr)
 summary(m2a_gee_disc)
 
 m2a_gee_disc_reversed <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN29_reversed, id = MTURKID, family="binomial")
+                 SN29_reversed, id = MTURKID, family="binomial", corstr = corstr)
 summary(m2a_gee_disc_reversed)
 
 
 ## SN33
 m3_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN33, id = MTURKID, family="binomial")
+                 SN33, id = MTURKID, family="binomial", corstr = corstr)
 summary(m3_gee_disc)
 
 m3_gee_disc_reversed <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN33_reversed, id = MTURKID, family="binomial")
+                 SN33_reversed, id = MTURKID, family="binomial", corstr = corstr)
 summary(m3_gee_disc_reversed)
 
 ## SN34
 m4_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN34, id = MTURKID, family="binomial")
+                 SN34, id = MTURKID, family="binomial", corstr = corstr)
 summary(m4_gee_disc)
 
 m4_gee_disc_reversed <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN34_reversed, id = MTURKID, family="binomial")
+                 SN34_reversed, id = MTURKID, family="binomial", corstr = corstr)
 summary(m4_gee_disc_reversed)
 
 ## m5
 m5_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN37, id = MTURKID, family="binomial")
+                 SN37, id = MTURKID, family="binomial", corstr = corstr)
 summary(m5_gee_disc)
 
 m5_gee_disc_reversed <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN37_reversed, id = MTURKID, family="binomial")
+                 SN37_reversed, id = MTURKID, family="binomial", corstr = corstr)
 summary(m5_gee_disc_reversed)
 
 
 ## m6
 m6_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN38, id = MTURKID, family="binomial")
+                 SN38, id = MTURKID, family="binomial", corstr = corstr)
 summary(m6_gee_disc)
 
 m6_gee_disc_reversed <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN38_reversed, id = MTURKID, family="binomial")
+                 SN38_reversed, id = MTURKID, family="binomial", corstr = corstr)
 summary(m6_gee_disc_reversed)
 
 ## m7
 m7_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN39, id = MTURKID, family="binomial")
+                 SN39, id = MTURKID, family="binomial", corstr = corstr)
 summary(m7_gee_disc)
 
 m7_gee_disc_reversed <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN39_reversed, id = MTURKID, family="binomial")
+                 SN39_reversed, id = MTURKID, family="binomial", corstr = corstr)
 summary(m7_gee_disc_reversed)
 
 ## include all covariates
 model_disc_gee_reversed <- geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN27_reversed + SN28_reversed + SN29_reversed + SN33_reversed + 
-                   SN34_reversed + SN37_reversed + SN38_reversed, id = MTURKID, family="binomial")
+                   SN34_reversed + SN37_reversed + SN38_reversed, id = MTURKID, family="binomial",
+                 corstr = corstr)
 summary(model_disc_gee_reversed)
 
 ```
@@ -233,7 +236,7 @@ sns_dt_long_merged_ego_characteristics$cdc1_adequate <-
 
 model_cdc1 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc1_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc1)
 
 sns_dt_long_merged_ego_characteristics$cdc2_adequate <- 
@@ -241,84 +244,85 @@ sns_dt_long_merged_ego_characteristics$cdc2_adequate <-
 
 model_cdc2 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc2_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc2)
 
 sns_dt_long_merged_ego_characteristics$cdc3_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC3 > 2, 1, 0)
 model_cdc3 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc3_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc3)
 
 sns_dt_long_merged_ego_characteristics$cdc4_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC4 > 2, 1, 0)
 model_cdc4 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc4_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc4)
 
 sns_dt_long_merged_ego_characteristics$cdc5_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC5 > 2, 1, 0)
 model_cdc5 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc5_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc5)
 
 sns_dt_long_merged_ego_characteristics$cdc6_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC6 > 2, 1, 0)
 model_cdc6 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc6_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc6)
 
 sns_dt_long_merged_ego_characteristics$cdc7_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC7 > 2, 1, 0)
 model_cdc7 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc7_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc7)
 
 sns_dt_long_merged_ego_characteristics$cdc8_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC8 > 2, 1, 0)
 model_cdc8 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc8_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc8)
 
 sns_dt_long_merged_ego_characteristics$cdc9_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC9 > 2, 1, 0)
 model_cdc9 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc9_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc9)
 
 sns_dt_long_merged_ego_characteristics$cdc10_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC10 > 2, 1, 0)
 model_cdc10 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc10_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc10)
 
 sns_dt_long_merged_ego_characteristics$cdc11_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC11 > 2, 1, 0)
 model_cdc11 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc11_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc11)
 
 sns_dt_long_merged_ego_characteristics$cdc12_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC12 > 2, 1, 0)
 model_cdc12 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc12_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc12)
 
+### EXCHANGEABLE CORSTR PRODUCES WARNINGS
 sns_dt_long_merged_ego_characteristics$cdc13_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$CDC12 > 2, 1, 0)
 model_cdc13 <- geem(data=sns_dt_long_merged_ego_characteristics, cdc13_adequate ~ 
                  SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
+                 family="binomial", corstr = corstr)
 summary(model_cdc13)
 ```
 
@@ -347,9 +351,22 @@ sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_merged_ego_character
 sns_dt_long_merged_ego_characteristics$vh1_adequate <- 
   ifelse(sns_dt_long_merged_ego_characteristics$vh1 < 2, 1, 0)
 
-model_vh1 <- geem(data=sns_dt_long_merged_ego_characteristics, vh1_adequate ~ 
-                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial")
-summary(model_cdc1)
+model_vh1 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh1_adequate ~ 
+                 SN27_reversed + SN28_reversed + SN29_reversed +
+                   SN34_reversed + SN38_reversed,
+                 #+ SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial", corstr = corstr)
+summary(model_vh1)
+
+model_vh1_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh1_adequate ~ SN33_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh1)
+
+model_vh1_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh1_adequate ~ SN37_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh1_sn37)
 ```
 
