@@ -37,6 +37,7 @@ sns_dt_long_wide_no_minors <- network_env$sns_dt_long_wide_no_minors
 eda_env <- readRDS("eda_objects.rds")
 tab2_dt <- as.data.table(eda_env$tab2_dt)
 cdc_scores <- eda_env$cdc_scores
+vh_scores <- eda_env$vh_info_scores
 
 tab2_dt$MTURKID <- as.factor(tab2_dt$MTURK1)
 ```
@@ -92,52 +93,122 @@ vaccine (SN38),
 COVID-19 vaccine (SN39).
 
 
+## Association of COVID Behaviors among Egos with Alter Attitudes/Behaviors 
 
 
 ```{r}
-model_disc_gee <- geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
-                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, family="binomial")
-summary(model_disc_gee)
 
+# Create a new variable that is the reverse of SN27,... and coded as 0 and 1
+sns_dt_long_merged_ego_characteristics$SN27_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN27 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN28_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN28 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN29_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN29 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN33_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN33 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN34_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN34 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN37_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN37 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN38_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN38 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN39_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN39 == 1, 1, 0)
+
+
+# Check the frequencies of the new variable
+table(sns_dt_long_merged_ego_characteristics$SN27_reversed, exclude = NULL)
+
+
+## SN27
 m1_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN27, id = MTURKID, family="binomial")
 summary(m1_gee_disc)
 
+m1_gee_disc_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN27_reversed, id = MTURKID, family="binomial")
+summary(m1_gee_disc_reversed)
+
+## SN28
 m2_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN28, id = MTURKID, family="binomial")
 summary(m2_gee_disc)
 
+m2_gee_disc_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN28_reversed, id = MTURKID, family="binomial")
+summary(m2_gee_disc_reversed)
+
+## SN29
 m2a_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN29, id = MTURKID, family="binomial")
 summary(m2a_gee_disc)
 
+m2a_gee_disc_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN29_reversed, id = MTURKID, family="binomial")
+summary(m2a_gee_disc_reversed)
+
+
+## SN33
 m3_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN33, id = MTURKID, family="binomial")
 summary(m3_gee_disc)
 
+m3_gee_disc_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN33_reversed, id = MTURKID, family="binomial")
+summary(m3_gee_disc_reversed)
+
+## SN34
 m4_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN34, id = MTURKID, family="binomial")
 summary(m4_gee_disc)
 
+m4_gee_disc_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN34_reversed, id = MTURKID, family="binomial")
+summary(m4_gee_disc_reversed)
+
+## m5
 m5_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN37, id = MTURKID, family="binomial")
 summary(m5_gee_disc)
 
+m5_gee_disc_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN37_reversed, id = MTURKID, family="binomial")
+summary(m5_gee_disc_reversed)
+
+
+## m6
 m6_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN38, id = MTURKID, family="binomial")
 summary(m6_gee_disc)
 
+m6_gee_disc_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN38_reversed, id = MTURKID, family="binomial")
+summary(m6_gee_disc_reversed)
+
+## m7
 m7_gee_disc <- 
   geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
                  SN39, id = MTURKID, family="binomial")
 summary(m7_gee_disc)
+
+m7_gee_disc_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN39_reversed, id = MTURKID, family="binomial")
+summary(m7_gee_disc_reversed)
+
+## include all covariates
+model_disc_gee_reversed <- geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out_adequate ~ 
+                 SN27_reversed + SN28_reversed + SN29_reversed + SN33_reversed + 
+                   SN34_reversed + SN37_reversed + SN38_reversed, id = MTURKID, family="binomial")
+summary(model_disc_gee_reversed)
+
 ```
 
 Component Outcomes of CDC Score:
@@ -258,4 +329,27 @@ summary(model_cdc13)
 # 
 # summary(model_cont_gee)
 # ```
+
+## Association of Vaccine Hesitance among Egos with Alter Attitudes/Behaviors
+
+### Merge datasets
+
+```{r}
+sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_merged_ego_characteristics,
+                                                    vh_scores,
+                                                    by = "MTURKID")
+```
+
+
+### Test associations
+
+```{r}
+sns_dt_long_merged_ego_characteristics$vh1_adequate <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$vh1 < 2, 1, 0)
+
+model_vh1 <- geem(data=sns_dt_long_merged_ego_characteristics, vh1_adequate ~ 
+                 SN27 + SN28 + SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
+                 family="binomial")
+summary(model_cdc1)
+```
 
