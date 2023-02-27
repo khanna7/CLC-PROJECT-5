@@ -376,10 +376,10 @@ model_vh1_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics,
                  family="binomial", corstr = corstr)
 summary(model_vh1_SN29)
 
-model_vh1_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN33_reversed,
-                 family="binomial", corstr = corstr)
-summary(model_vh1)
+# model_vh1_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   vh1_adequate ~ SN33_reversed,
+#                  family="binomial", corstr = corstr)
+# summary(model_vh1)
 
 model_vh1_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
                   vh1_adequate ~ SN28_reversed,
@@ -456,5 +456,44 @@ summary(model_vh3_SN38)
 #                  vh3_adequate ~ SN39_reversed,
 #                   family="binomial", corstr = corstr)
 # summary(model_vh3_SN39)
+```
+
+```{r}
+library(ergm)
+```
+
+
+```{r}
+# Load the dataset
+edges <- cbind(sns_dt_long_merged_ego_characteristics[,1], sns_dt_long_merged_ego_characteristics[,2])
+
+# Convert the edges to an igraph object
+library(igraph)
+g <- graph_from_edgelist(as.matrix(edges))
+
+# Set the vertex attributes
+vertex_atts <- cbind(sns_dt_long_merged_ego_characteristics$MTURKID, sns_dt_long_merged_ego_characteristics$vh3_adequate)
+V(g)$name <- vertex_atts[,1]
+V(g)$vh3_adequate <- vertex_atts[,2]
+
+# Set the edge attributes
+#E(g)$color <- "gray"
+
+# Plot the network
+layout <- layout_with_fr(g)
+E(g)$color <- "black"
+
+V(g)$head <- vertex_atts[,3]
+
+# Identify the head vertices
+is_head <- !grepl("_\\d+$", V(g)$name)
+
+# Create a vector of vertex colors
+vertex_color <- ifelse(is_head, "blue", "red")
+
+
+plot(g, vertex.label=NA, vertex.size=5, layout=layout, edge.color=E(g)$black, vertex.color = vertex_color)
+#plot(g, vertex.color=V(g)$vh3_adequate, vertex.label.color="black", edge.color=E(g)$color, vertex.size=10, layout=layout_with_kk)
+
 ```
 
