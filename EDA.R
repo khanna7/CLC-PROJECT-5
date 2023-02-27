@@ -502,11 +502,106 @@ tab2_dt <- cbind(
   )
 
 
+# Vaccine information---------------------------
+
+
+
+
+# Vaccine hesitancy ---------------------------
+
+# VH1 Would you take a COVID-19 vaccine if offered?
+#   o	Definitely  (1) 
+#   o	Probably  (2) 
+#   o	I may or I may not  (3) 
+#   o	Probably not  (4) 
+#   o	Definitely not  (5) 
+#   o	Don't know  (6) 
+
+# VH2 When a COVID-19 vaccine is available:
+#   o	I will want to get it as soon as possible  (1) 
+#   o	I will take it when offered  (2) 
+#   o	I'm not sure what I will do  (3) 
+#   o	I will put off (delay) getting it  (4) 
+#   o	I will refuse to get it  (5) 
+#   o	Don't know  (6) 
+
+# VH3 I would describe my attitude towards receiving a COVID-19 vaccine as:
+#   o	Very positive  (1) 
+# o	Pretty positive  (2) 
+# o	Neutral  (3) 
+# o	Pretty Negative  (4) 
+# o	Very Negative  (5) 
+# o	Don't know  (6) 
+
+# VH4 If a COVID-19 vaccine was available at my pharmacy, I would:
+#   o	Get it as soon as possible  (1) 
+# o	Get it when I have time  (2) 
+# o	Delay getting it  (3) 
+# o	Avoid getting it for as long as possible  (4) 
+# o	Never get it  (5) 
+# o	Don't know  (6) 
+
+# VH5 If my family or friends were thinking of getting a COVID-19 vaccination, I would:
+#   o	Strongly encourage them  (1) 
+# o	Encourage them  (2) 
+# o	Not say anything about it  (3) 
+# o	Ask them to delay getting the vaccination  (4) 
+# o	Suggest they do not get the vaccination  (5) 
+# o	Don't know  (6) 
+
+
+# VH6 I would describe myself as:
+#   o	Eager to get a COVID-19 vaccine  (1) 
+# o	Willing to get the COVID-19 vaccine  (2) 
+# o	Not bothered about getting the COVID-19 vaccine  (3) 
+# o	Unwilling to get the COVID-19 vaccine  (4) 
+# o	Anti-vaccination for COVID-19  (5) 
+# o	Don't know  (6) 
+
+# VH7 Taking a COVID-19 vaccination is:
+#   o	Really important  (1) 
+# o	Important  (2) 
+# o	Neither important nor unimportant  (3) 
+# o	Unimportant  (4) 
+# o	Really unimportant  (5) 
+# o	Don't know  (6) 
+
+# # VH10 How confident are you that the coronavirus vaccines that are available have been tested for safety and efficacy?
+#   o	Very confident  (1) 
+# o	Somewhat confident  (2) 
+# o	Not too confident  (3) 
+# o	Not at all confident  (4) 
+# o	Don't know  (5) 
+
+# VH11 How confident are you that coronavirus vaccines are being distributed in a way that is fair?
+#   o	Very confident  (1) 
+# o	Somewhat confident  (2) 
+# o	Not too confident  (3) 
+# o	Not at all confident  (4) 
+# o	Don't know  (5) 
+
+
+v_hesitancy_info <- 
+  as.data.frame(
+    cbind(vh1=dt$FUVH1, vh2=dt$FUVH2, vh3=dt$FUVH4, vh4=dt$FUVH4,
+        vh5=dt$FUVH5, vh6=dt$FUVH6, vh7=dt$FUVH7, 
+        #vh9=dt$FUVH,
+        vh10=dt$FUVH10, vh11=dt$FUVH11)
+    )
+dim(v_hesitancy_info)
+which(is.na(v_hesitancy_info))
+
+vh_info_avg_out <- apply(cdc, 1, mean)
+
+vh_info_scores <- cbind.data.frame(v_hesitancy_info, vh_info_avg_out, MTURKID=dt$MTURK1)
+
+
 # Save RDS object ---------------------------
 
 eda_env <- new.env()
 eda_env$tab2_dt <- tab2_dt
 eda_env$cdc_scores <- cdc_scores
+eda_env$vh_info_scores <- vh_info_scores
 
 #saveRDS(object = tab2_dt, file = "tab2_comparison_data.RDS")
 saveRDS(eda_env, "eda_objects.rds")
