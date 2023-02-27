@@ -359,14 +359,44 @@ model_vh1 <- geem(data=sns_dt_long_merged_ego_characteristics,
                  family="binomial", corstr = corstr)
 summary(model_vh1)
 
+model_vh1_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh1_adequate ~ SN27_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh1_sn27)
+
+model_vh1_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh1_adequate ~ SN28_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh1_SN28)
+
+model_vh1_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh1_adequate ~ SN29_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh1_SN29)
+
 model_vh1_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
                   vh1_adequate ~ SN33_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh1)
 
+model_vh1_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh1_adequate ~ SN28_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh1_SN28)
+
 model_vh1_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
                   vh1_adequate ~ SN37_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh1_sn37)
+
+model_vh1_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  vh1_adequate ~ SN38_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh1_SN38)
+
+#model_vh1_SN39 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+ #                 vh1_adequate ~ SN39_reversed,
+  #               family="binomial", corstr = corstr)
+#summary(model_vh1_SN39)
 ```
 
