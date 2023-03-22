@@ -62,8 +62,32 @@ head(V(g)$name)
 
 ## Visualize network objects (vaccine outcomes are of interest) ----------
 
+## preliminary visualization
+
 ggraph(g, layout = 'kk') +
   geom_edge_link() +
   geom_node_point() +
   theme_void()
+
+
+## color vertices by participant vs network member  labels:
+
+### define vertex attribute
+V(g)$label <- ifelse(grepl("_\\d+$", V(g)$name), "Network Member", "Participant")
+
+### create a color palette for the labels
+color_palette <- c("Participant" = "blue", "Network Member" = "red")
+
+### plot the graph with labeled vertices
+
+p <- 
+  ggraph(g, layout = "kk") + 
+  geom_edge_link() + 
+  geom_node_point(aes(color = label)) +
+  scale_color_manual(values = color_palette) +
+  #geom_node_text(aes(label = ifelse(grepl("_\\d+$", name), "Network Member", "Participant"))) +
+  theme_void()
+
+ggsave("network_plot.png", width = 8, height = 8, dpi = 300)
+
 
