@@ -60,6 +60,11 @@ igraph::vertex_attr(g)
 head(V(g)$name)
 
 
+## count the number of clusters in g
+clusters <- clusters(g)
+num_clusters <- length(clusters$membership)
+
+
 ## Visualize network objects (vaccine outcomes are of interest) ----------
 
 ## preliminary visualization
@@ -89,5 +94,6 @@ p <-
   theme_void()
 
 ggsave("network_plot.png", width = 8, height = 8, dpi = 300)
+
 
 
