@@ -21,16 +21,6 @@ library(ggraph)
 
 ## Load data ----------
 
-network_env <- readRDS("network_objects.rds")
-sns_dt_long_wide_no_minors <- network_env$sns_dt_long_wide_no_minors
-
-eda_env <- readRDS("eda_objects.rds")
-tab2_dt <- as.data.table(eda_env$tab2_dt)
-cdc_scores <- eda_env$cdc_scores
-vh_scores <- eda_env$vh_info_scores
-
-tab2_dt$MTURKID <- as.factor(tab2_dt$MTURK1)
-
 merged_network_participant_env <- readRDS("merged_network_participant_objects.rds")
 sns_dt_long_merged_ego_characteristics <- merged_network_participant_env$sns_dt_long_merged_ego_characteristics
 
