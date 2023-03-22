@@ -210,7 +210,7 @@ model_disc_gee_reversed <- geem(data=sns_dt_long_merged_ego_characteristics, cdc
                  SN27_reversed + SN28_reversed + SN29_reversed + SN33_reversed + 
                    SN34_reversed + SN37_reversed + SN38_reversed, id = MTURKID, family="binomial",
                  corstr = corstr)
-summary(model_disc_gee_reversed)
+(summary(model_disc_gee_reversed))
 
 ```
 
@@ -464,36 +464,36 @@ library(ergm)
 
 
 ```{r}
-# Load the dataset
-edges <- cbind(sns_dt_long_merged_ego_characteristics[,1], sns_dt_long_merged_ego_characteristics[,2])
-
-# Convert the edges to an igraph object
-library(igraph)
-g <- graph_from_edgelist(as.matrix(edges))
-
-# Set the vertex attributes
-vertex_atts <- cbind(sns_dt_long_merged_ego_characteristics$MTURKID, sns_dt_long_merged_ego_characteristics$vh3_adequate)
-V(g)$name <- vertex_atts[,1]
-V(g)$vh3_adequate <- vertex_atts[,2]
-
-# Set the edge attributes
-#E(g)$color <- "gray"
-
-# Plot the network
-layout <- layout_with_fr(g)
-E(g)$color <- "black"
-
-V(g)$head <- vertex_atts[,3]
-
-# Identify the head vertices
-is_head <- !grepl("_\\d+$", V(g)$name)
-
-# Create a vector of vertex colors
-vertex_color <- ifelse(is_head, "blue", "red")
-
-
-plot(g, vertex.label=NA, vertex.size=5, layout=layout, edge.color=E(g)$black, vertex.color = vertex_color)
-#plot(g, vertex.color=V(g)$vh3_adequate, vertex.label.color="black", edge.color=E(g)$color, vertex.size=10, layout=layout_with_kk)
+# # Load the dataset
+# edges <- cbind(sns_dt_long_merged_ego_characteristics[,1], sns_dt_long_merged_ego_characteristics[,2])
+# 
+# # Convert the edges to an igraph object
+# library(igraph)
+# g <- graph_from_edgelist(as.matrix(edges))
+# 
+# # Set the vertex attributes
+# vertex_atts <- cbind(sns_dt_long_merged_ego_characteristics$MTURKID, sns_dt_long_merged_ego_characteristics$vh3_adequate)
+# V(g)$name <- vertex_atts[,1]
+# V(g)$vh3_adequate <- vertex_atts[,2]
+# 
+# # Set the edge attributes
+# #E(g)$color <- "gray"
+# 
+# # Plot the network
+# layout <- layout_with_fr(g)
+# E(g)$color <- "black"
+# 
+# V(g)$head <- vertex_atts[,3]
+# 
+# # Identify the head vertices
+# is_head <- !grepl("_\\d+$", V(g)$name)
+# 
+# # Create a vector of vertex colors
+# vertex_color <- ifelse(is_head, "blue", "red")
+# 
+# 
+# plot(g, vertex.label=NA, vertex.size=5, layout=layout, edge.color=E(g)$black, vertex.color = vertex_color)
+# #plot(g, vertex.color=V(g)$vh3_adequate, vertex.label.color="black", edge.color=E(g)$color, vertex.size=10, layout=layout_with_kk)
 
 ```
 
