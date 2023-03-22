@@ -33,26 +33,10 @@ tab2_dt$MTURKID <- as.factor(tab2_dt$MTURK1)
 
 
 
-## Merge individual data in to the network object ----------
+## Create a network object ----------
 
 edge_list <- as.matrix(sns_dt_long_wide_no_minors[, c("MTURKID", "alterID")])
 g <- igraph::graph_from_edgelist(edge_list)
-
-
-### get the MTURKID values from the data frame
-mturk_ids <- tab2_dt$MTURKID
-
-### create a named list of vertex attributes
-vertex_attrs <- 
-  list(
-  age = tab2_dt$age
-  # attribute2 = tab2_dt$attribute2,
-  # Add more attributes here as needed
-)
-
-
-### subset the graph based on MTURKID values
-sub_g <- induced_subgraph(g, V(g)$name %in% mturk_ids)
 
 
 ### investigate the structure of g
@@ -60,7 +44,7 @@ igraph::vertex_attr(g)
 head(V(g)$name)
 
 
-## count the number of clusters in g
+### count the number of clusters in g
 clusters <- clusters(g)
 num_clusters <- length(clusters$membership)
 
@@ -93,7 +77,37 @@ p <-
   #geom_node_text(aes(label = ifelse(grepl("_\\d+$", name), "Network Member", "Participant"))) +
   theme_void()
 
+p
+
 ggsave("network_plot.png", width = 8, height = 8, dpi = 300)
 
+## Visualize a cluster instead of the whole network ----------
+
+### extract the clusters from the graph object
+clusters <- clusters(g)
 
 
+### extract the vertices belonging to the cluster
+sub_vertices <- V(g)[clusters$membership == 2] #specifies which cluster to extract
+  
+### extract the edges belonging to the cluster
+sub_edges <- E(g)[.from(sub_vertices) %in% sub_vertices & .to(sub_vertices) %in% sub_vertices]
+
+### create the subgraph
+sub_g <- induced_subgraph(g, sub_vertices)
+
+### set the label attribute for the subgraph vertices
+V(sub_g)$label <- ifelse(grepl("_\\d+$", V(sub_g)$name), "Network Member", "Participant")
+
+### create the plot
+ggraph(sub_g, layout = "kk") +
+  geom_edge_link() +
+  geom_node_point(aes(color = label)) +
+  scale_color_manual(values = c("Participant" = "blue", "Network Member" = "red")) +
+  labs(title = paste0("Cluster ", i))
+
+
+
+
+## Visualize clustering on one "trait" of interest ----------
+### vh1 in the egos vs 
