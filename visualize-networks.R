@@ -31,11 +31,12 @@ vh_scores <- eda_env$vh_info_scores
 
 tab2_dt$MTURKID <- as.factor(tab2_dt$MTURK1)
 
-
+merged_network_participant_env <- readRDS("merged_network_participant_objects.rds")
+sns_dt_long_merged_ego_characteristics <- merged_network_participant_env$sns_dt_long_merged_ego_characteristics
 
 ## Create a network object ----------
 
-edge_list <- as.matrix(sns_dt_long_wide_no_minors[, c("MTURKID", "alterID")])
+edge_list <- as.matrix(sns_dt_long_merged_ego_characteristics[, c("MTURKID", "alterID")])
 g <- igraph::graph_from_edgelist(edge_list)
 
 
@@ -104,7 +105,7 @@ ggraph(sub_g, layout = "kk") +
   geom_edge_link() +
   geom_node_point(aes(color = label)) +
   scale_color_manual(values = c("Participant" = "blue", "Network Member" = "red")) +
-  labs(title = paste0("Cluster ", i))
+  labs(title = paste0("Cluster "))
 
 
 
