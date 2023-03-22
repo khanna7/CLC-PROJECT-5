@@ -497,3 +497,13 @@ library(ergm)
 
 ```
 
+Create a merged network member participant environment that can be used in analysis later:
+
+```{r}
+merged_network_participant_env <- new.env()
+
+merged_network_participant_env$sns_dt_long_merged_ego_characteristics <- sns_dt_long_merged_ego_characteristics
+
+saveRDS(merged_network_participant_env, "merged_network_participant_objects.rds")
+```
+
