@@ -497,6 +497,27 @@ library(ergm)
 
 ```
 
+
+Query the `sns_dt_long_merged_ego_characteristics` object to confirm that 
+it only contains information on alter attributes. This can be done by looking at
+an outcome (e.g., `cdc_avg_out_adequate`, `vh1_adequate`, `vh3_adequate`) 
+and show that it clusters across all
+network members by MTURKID.
+
+```{r}
+clustering_dt <- sns_dt_long_merged_ego_characteristics[, .(MTURKID, alterID, 
+                                                            cdc_avg_out_adequate,
+                                                            vh1_adequate,
+                                                            vh3_adequate
+                                                            )
+                                                        ]
+print(clustering_dt)
+```
+
+Note that `vh1_adequate`, `vh3_adequate` have lots of NAs but the 0s and 1s cluster
+by MTURKID. 
+
+
 Create a merged network member participant environment that can be used in analysis later:
 
 ```{r}
