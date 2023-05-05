@@ -283,9 +283,11 @@ assign_alter_color <- function(is_ego, sn9_value) {
   }
 }
 
+threshold <- 2
+
 V(g)$color <- mapply(assign_alter_color, V(g)$is_ego, V(g)$SN9_numeric)
-V(g)$color[V(g)$is_ego & V(g)$cdc_avg_out > 2] <- "blue"
-  V(g)$color[V(g)$is_ego & V(g)$cdc_avg_out <= 2] <- "red"
+V(g)$color[V(g)$is_ego & V(g)$cdc_avg_out > threshold] <- "blue"
+  V(g)$color[V(g)$is_ego & V(g)$cdc_avg_out <= threshold] <- "red"
     V(g)$size <- ifelse(V(g)$is_ego, V(g)$cdc_avg_out * 2, 5)
     plot(g, vertex.label = NA)
     
@@ -293,7 +295,8 @@ V(g)$color[V(g)$is_ego & V(g)$cdc_avg_out > 2] <- "blue"
       
 
 # Select a few clusters to visualize
-clusters_to_show <- 1:3
+set.seed(Sys.time())
+clusters_to_show <- sample(cluster_info$no, 6) #sample X out of the total number of clusters 
 subgraphs <- lapply(clusters_to_show, function(x) { induced_subgraph(g, which(cluster_info$membership == x)) })
 
 # Plot the selected clusters
