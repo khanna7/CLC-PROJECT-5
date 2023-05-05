@@ -17,13 +17,17 @@
   * Compute the same characteristics and behaviors as reported in Monnig's [Table 2](https://github.com/khanna7/CLC-PROJECT-5/blob/master/EDA.R)
   * Test whether these characteristics are statistically the same between two groups that provided network information and those that did not. 
 
-- Test association between substance use behaviors and pro-vaccine behaviors/attitudes for the network members. 
-  * Similar to Monnig 2021, but for the network members instead of the participants.
 
 - Test association between vaccine behaviors of the network members and satisfactory COVID scores (discrete) of the participants (i.e., egos).
+  * See [here](https://github.com/khanna7/CLC-PROJECT-5/blob/1d9de71440fb9f1015110800edc8b1d7a3203f89/hypothesis-ego-vs-alter-covid-behaviors.Rmd)
 
+- Visualize the networks
+  * See [here](https://github.com/khanna7/CLC-PROJECT-5/blob/1d9de71440fb9f1015110800edc8b1d7a3203f89/visualize-networks.R)
+
+## To be Done  
+- Test association between substance use behaviors and pro-vaccine behaviors/attitudes for the network members. 
+  * Similar to Monnig 2021, but for the network members instead of the participants.
+  
 - Test association between substance use behaviors of the network members and satisfactory COVID scores (discrete) of the network members.
  
-    
-
 
