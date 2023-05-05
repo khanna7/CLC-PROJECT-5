@@ -9,7 +9,7 @@ rm(list=ls())
 # Set knitr chunk options ----------
 
 
-
+library(haven)
 library(dplyr)
 library(data.table)
 library(igraph)
@@ -232,9 +232,102 @@ print(alter_original_filtered)
 print("Merged alter data:")
 print(alter_merged_filtered)
 
-identical(
-  alter_original_filtered %>% select(-MTURKID),
-  alter_merged_filtered %>% select(-MTURKID)
+# identical(
+#   alter_original_filtered %>% select(-MTURKID),
+#   alter_merged_filtered %>% select(-MTURKID)
+# )
+
+# Prepare data to plot traits ----------
+
+# Set vertex attributes
+V(g)$is_ego <- !grepl("_\\d+$", V(g)$name)
+V(g)$cdc_avg_out <- vertex_dt$cdc_avg_out.x[match(V(g)$name, vertex_dt$name)]
+V(g)$SN9 <- vertex_dt$SN9[match(V(g)$name, vertex_dt$name)]
+V(g)$SN9_numeric <- as.numeric(as.character(V(g)$SN9))
+
+# Set vertex colors based on attributes
+V(g)$color <- ifelse(V(g)$is_ego, "red", "blue")
+
+# Set vertex sizes based on cdc_avg_out for egos and SN9 for alters
+V(g)$size <- ifelse(V(g)$is_ego, V(g)$cdc_avg_out * 2, V(g)$SN9 * 2)
+
+# Replace infinite or missing values with a default size (e.g., 5)
+V(g)$size[is.infinite(V(g)$size) | is.na(V(g)$size)] <- 5
+
+# Try plotting the graph again
+layout <- layout_with_fr(g)
+plot(g, vertex.label = NA, layout = layout)
+
+# Plot the graph
+plot(g, vertex.label = NA)
+
+# Color based on ego/alter behaviors.
+
+assign_alter_color <- function(is_ego, sn9_value) {
+  if (is_ego) {
+    return(NA)
+  } else {
+    if (is.na(sn9_value)) {
+      return("gray")
+    } else if (sn9_value == 1) {
+      return("red")
+    } else if (sn9_value == 2) {
+      return("blue")
+    } else if (sn9_value == 3) {
+      return("orange")
+    } else if (sn9_value %in% c(4, 5, 6, 7, 8)) {
+      return("purple")
+    } else {
+      return("gray")
+    }
+  }
+}
+
+V(g)$color <- mapply(assign_alter_color, V(g)$is_ego, V(g)$SN9_numeric)
+V(g)$color[V(g)$is_ego & V(g)$cdc_avg_out > 2] <- "blue"
+  V(g)$color[V(g)$is_ego & V(g)$cdc_avg_out <= 2] <- "red"
+    V(g)$size <- ifelse(V(g)$is_ego, V(g)$cdc_avg_out * 2, 5)
+    plot(g, vertex.label = NA)
+    
+
+      
+
+# Select a few clusters to visualize
+clusters_to_show <- 1:3
+subgraphs <- lapply(clusters_to_show, function(x) { induced_subgraph(g, which(cluster_info$membership == x)) })
+
+# Plot the selected clusters
+par(mfrow = c(1, length(clusters_to_show)))
+for (i in seq_along(subgraphs)) {
+  plot(subgraphs[[i]], vertex.label = NA, main = paste0("Cluster ", clusters_to_show[i]))
+}
+
+
+# Legend for study participants (egos)
+legend(
+  "bottomleft",
+  title = "Study Participants",
+  legend = c("Score > 2", "Score <= 2"),
+  col = c("blue", "red"),
+  pch = 21,
+  pt.bg = c("blue", "red"),
+  bty = "n", # No box around the legend
+  cex = 0.8,
+  y.intersp = 1.5,
+  ncol = 1
 )
 
+# Legend for network members (alters)
+legend(
+  "bottomright",
+  title = "Network Members",
+  legend = c("Republican", "Democrat", "Independent", "Others"),
+  col = c("red", "blue", "orange", "purple"),
+  pch = 21,
+  pt.bg = c("red", "blue", "orange", "purple"),
+  bty = "n", # No box around the legend
+  cex = 0.8,
+  y.intersp = 1.5,
+  ncol = 1
+)
 
