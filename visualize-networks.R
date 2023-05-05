@@ -8,7 +8,7 @@ rm(list=ls())
 
 # Set knitr chunk options ----------
 
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
 
 library(dplyr)
 library(data.table)
@@ -145,7 +145,7 @@ ggraph(subgraph_g, layout = 'kk') +
 ### ---------- 
 
 
-## Visualize clustering on one "trait" of interest ----------
+# Visualize clustering on one "trait" of interest ----------
 
 ## cdc_avg_out_adequate in the egos vs 
 setnames(sns_consenting_dt, "MTURK1", "MTURKID")
@@ -163,5 +163,78 @@ g <- set_vertex_attr(g, name = "cdc_avg_out_adequate",
                                     sns_consenting_dt[MTURKID %in% matching_nodes$name, "cdc_avg_out_adequate"],
                                     NA))
 
+
+
+
+## Create data table with egos, alters, and traits of interest
+
+# Extract vertex names
+vertex_names <- V(g)$name
+
+# Create a data.table with vertex names
+vertex_dt <- data.table(name = vertex_names)
+
+# Merge ego attributes from sns_consenting_dt
+vertex_dt <- vertex_dt %>%
+  merge(sns_consenting_dt, by.x = "name", by.y = "MTURKID", all.x = TRUE)
+
+# Merge alter attributes from sns_dt_long_merged_ego_characteristics
+vertex_dt <- vertex_dt %>%
+  merge(sns_dt_long_merged_ego_characteristics, by.x = "name", by.y = "alterID", all.x = TRUE)
+
+# Display the merged data.table
+head(vertex_dt)
+
+### test ego characteristics ----------
+
+# Check specific ego attributes
+ego_id <- sample(sns_consenting_dt$MTURKID, 1)
+print(ego_id)
+ego_original <- sns_consenting_dt[sns_consenting_dt$MTURKID == ego_id, ]
+ego_merged <- vertex_dt[vertex_dt$name == ego_id, ]
+
+# Choose specific columns to display
+columns_to_show <- c("MTURKID", "DEMO1", "DEMO2", "DEMO3_1")
+
+# Filter the original ego data
+ego_original_filtered <- ego_original %>% select(columns_to_show)
+
+# Filter the merged ego data
+ego_merged_filtered <- ego_merged %>% select(columns_to_show)
+ego_merged_filtered$MTURKID <- ego_id
+
+# Compare the original ego data with the merged data
+print("Original ego data:")
+print(ego_original_filtered)
+
+print("Merged ego data:")
+print(ego_merged_filtered)
+
+
+### test alter characteristics -----------
+ego_id <- sample(sns_consenting_dt$MTURKID, 1)
+print(ego_id)
+
+edge_dt <- sns_dt_long_merged_ego_characteristics[, c("MTURKID", "alterID")]
+alter_ids <- edge_dt[edge_dt$MTURKID == ego_id,]$alterID
+print(alter_ids)
+
+alter_original <- sns_dt_long_merged_ego_characteristics[alterID %in% alter_ids, ]
+alter_merged <- vertex_dt[name %in% alter_ids, ]
+columns_to_show <- c("MTURKID", "SN11", "SN12", "SN13", "SN25") #just pick a few that are mostly populated across the columns
+
+alter_original_filtered <- alter_original %>% select(columns_to_show)
+alter_merged_filtered <- alter_merged %>% select(columns_to_show)
+alter_merged_filtered$MTURKID <- alter_ids
+
+print("Original alter data:")
+print(alter_original_filtered)
+print("Merged alter data:")
+print(alter_merged_filtered)
+
+identical(
+  alter_original_filtered %>% select(-MTURKID),
+  alter_merged_filtered %>% select(-MTURKID)
+)
 
 
