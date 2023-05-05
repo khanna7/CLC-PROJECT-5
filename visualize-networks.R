@@ -6,9 +6,6 @@
 rm(list=ls())
 
 
-## Set working directory ----------
-
-setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
 
 
 ## Import packages ----------
@@ -20,16 +17,19 @@ library(ggplot2)
 library(ggraph)
 
 
-## Load data ----------
+## Data location ----------
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT"
+
+
 
 ### extract egos (i.e. participants) consenting to give SNS data, 
 ### and their attributes
 
-network_env <- readRDS("network_objects.rds")
+network_env <- readRDS(paste0(data_loc, "/network_objects.rds"))
 sns_consenting_dt <- as.data.table(network_env$sns_consenting_dt)
 
 ### extract attributes of adult alters (i.e., network members)
-merged_network_participant_env <- readRDS("merged_network_participant_objects.rds")
+merged_network_participant_env <- readRDS(paste0(data_loc, "/merged_network_participant_objects.rds"))
 sns_dt_long_merged_ego_characteristics <- merged_network_participant_env$sns_dt_long_merged_ego_characteristics
 
 
