@@ -334,3 +334,42 @@ legend(
   ncol = 1
 )
 
+ego_alter_stats <- lapply(1:length(unique_clusters), function(cluster_id) {
+  ego_score <- vertex_dt$cdc_avg_out.x[match(V(g)$name, vertex_dt$name)][cluster_info$membership == cluster_id][1]
+  
+  # Handle missing values in the SN3 columns
+  alter_party_data <- vertex_dt$SN9[match(V(g)$name, vertex_dt$name)][cluster_info$membership == cluster_id][-1]
+  alter_party_data_clean <- na.omit(alter_party_data)
+  
+  alter_party_counts <- table(alter_party_data_clean)
+  all_parties <- 1:8
+  missing_parties <- setdiff(all_parties, as.integer(names(alter_party_counts)))
+  alter_party_counts_full <- c(alter_party_counts, setNames(as.list(rep(0, length(missing_parties))), as.character(missing_parties)))
+  alter_party_counts_full <- alter_party_counts_full[order(as.integer(names(alter_party_counts_full)))]
+  alter_party_counts_full <- unlist(alter_party_counts_full) # Convert to numeric vector
+  
+  alter_party_proportions <- alter_party_counts_full / sum(alter_party_counts_full)
+  
+  list(score = ego_score, proportions = alter_party_proportions)
+})
+
+compute_mean_alter_party_distribution <- function(ego_alter_stats, threshold) {
+  high_score_egos <- which(sapply(ego_alter_stats, function(x) x$score) > threshold)
+  low_score_egos <- which(sapply(ego_alter_stats, function(x) x$score) <= threshold)
+  
+  # Filter out entries with NaN values in proportions
+  high_score_egos_filtered <- high_score_egos[sapply(ego_alter_stats[high_score_egos], function(x) !any(is.nan(x$proportions)))]
+  
+  mean_proportions_high_score <- colMeans(do.call(rbind, lapply(ego_alter_stats[high_score_egos_filtered], function(x) as.numeric(x$proportions))))
+  mean_proportions_low_score <- colMeans(do.call(rbind, lapply(ego_alter_stats[low_score_egos], function(x) as.numeric(x$proportions))))
+  
+  return(list(mean_proportions_high_score = mean_proportions_high_score,
+              mean_proportions_low_score = mean_proportions_low_score))
+}
+
+# Apply the functions
+threshold <- 2
+results <- compute_mean_alter_party_distribution(ego_alter_stats, threshold)
+
+
+
