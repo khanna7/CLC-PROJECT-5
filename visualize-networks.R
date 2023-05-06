@@ -296,7 +296,7 @@ V(g)$color[V(g)$is_ego & V(g)$cdc_avg_out > threshold] <- "blue"
 
 # Select a few clusters to visualize
 set.seed(Sys.time())
-clusters_to_show <- sample(cluster_info$no, 6) #sample X out of the total number of clusters 
+clusters_to_show <- sample(cluster_info$no, 3) #sample X out of the total number of clusters 
 subgraphs <- lapply(clusters_to_show, function(x) { induced_subgraph(g, which(cluster_info$membership == x)) })
 
 # Plot the selected clusters
@@ -333,6 +333,9 @@ legend(
   y.intersp = 1.5,
   ncol = 1
 )
+
+# Compute distributions of alter political party affiliations ---------------
+## for the adequately/in- protected group at different thresholds 
 
 ego_alter_stats <- lapply(1:length(unique_clusters), function(cluster_id) {
   ego_score <- vertex_dt$cdc_avg_out.x[match(V(g)$name, vertex_dt$name)][cluster_info$membership == cluster_id][1]
@@ -372,8 +375,8 @@ compute_mean_alter_party_distribution <- function(ego_alter_stats, threshold) {
 
 # Apply the functions
 threshold <- seq(0.5, 2.75, by=0.25)
-a <- lapply(threshold, function(x) compute_mean_alter_party_distribution(ego_alter_stats, x))
+alter_pol_dist<- lapply(threshold, function(x) compute_mean_alter_party_distribution(ego_alter_stats, x))
 
+alter_pol_dist
 
-
-
+# end ---------------
