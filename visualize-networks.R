@@ -360,16 +360,20 @@ compute_mean_alter_party_distribution <- function(ego_alter_stats, threshold) {
   # Filter out entries with NaN values in proportions
   high_score_egos_filtered <- high_score_egos[sapply(ego_alter_stats[high_score_egos], function(x) !any(is.nan(x$proportions)))]
   
+  # Filter out entries with NaN values in proportions
+  low_score_egos_filtered <- low_score_egos[sapply(ego_alter_stats[low_score_egos], function(x) !any(is.nan(x$proportions)))]
+  
   mean_proportions_high_score <- colMeans(do.call(rbind, lapply(ego_alter_stats[high_score_egos_filtered], function(x) as.numeric(x$proportions))))
-  mean_proportions_low_score <- colMeans(do.call(rbind, lapply(ego_alter_stats[low_score_egos], function(x) as.numeric(x$proportions))))
+  mean_proportions_low_score <- colMeans(do.call(rbind, lapply(ego_alter_stats[low_score_egos_filtered], function(x) as.numeric(x$proportions))))
   
   return(list(mean_proportions_high_score = mean_proportions_high_score,
               mean_proportions_low_score = mean_proportions_low_score))
 }
 
 # Apply the functions
-threshold <- 2
-results <- compute_mean_alter_party_distribution(ego_alter_stats, threshold)
+threshold <- seq(0.5, 2.75, by=0.25)
+a <- lapply(threshold, function(x) compute_mean_alter_party_distribution(ego_alter_stats, x))
+
 
 
 
