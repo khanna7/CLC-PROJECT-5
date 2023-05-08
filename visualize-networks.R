@@ -914,3 +914,56 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
+  
+# Analyze alter encouraged drinking in public SN24 ------ 
+  
+  compute_ego_alter_attribute_proportions_SN24 <- function(vertex_dt, edge_dt, attribute_name) {
+    egos <- unique(edge_dt$MTURKID)
+    ego_alter_attribute_proportions <- list()
+    
+    for (ego in egos) {
+      alter_ids <- edge_dt[edge_dt$MTURKID == ego,]$alterID
+      alter_data <- vertex_dt[vertex_dt$name %in% alter_ids, c("name", attribute_name), with = FALSE]
+      
+      yes_count <- sum(alter_data[[attribute_name]] == 1, na.rm = TRUE)
+      no_count <- sum(alter_data[[attribute_name]] == 2, na.rm = TRUE)
+      missing_count <- sum(is.na(alter_data[[attribute_name]]))
+      total_count <- yes_count + no_count + missing_count
+      
+      proportion_yes <- yes_count / total_count
+      proportion_no <- no_count / total_count
+      proportion_missing <- missing_count / total_count
+      
+      ego_alter_attribute_proportions[[as.character(ego)]] <- list(
+        proportion_yes = proportion_yes,
+        proportion_no = proportion_no,
+        proportion_missing = proportion_missing
+      )
+    }
+    
+    return(ego_alter_attribute_proportions)
+  }
+  
+  ego_alter_stats_SN24 <- compute_ego_alter_attribute_proportions_SN24(vertex_dt, edge_dt, "SN24")
+  
+  ## compute correlations with %alters 
+  ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
+  
+  ego_proportions_df_SN24 <- data.frame(# create data frame
+    MTURKID = names(ego_alter_stats_SN24),
+    cdc_avg_out = ego_data$cdc_avg_out.x,
+    proportion_yes = sapply(ego_alter_stats_SN24, function(x) x$proportion_yes),
+    proportion_no = sapply(ego_alter_stats_SN24, function(x) x$proportion_no),
+    proportion_missing = sapply(ego_alter_stats_SN24, function(x) x$proportion_missing)
+  )
+  
+  cor_cdc_yes_SN24 <- cor(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN24 <- cor(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN24 <- cor(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_missing, use = "complete.obs")
+  
+  list(cor_cdc_yes_SN24 = cor_cdc_yes_SN24, cor_cdc_no_SN24 = cor_cdc_no_SN24, cor_cdc_missing_SN24 = cor_cdc_missing_SN24)
+  
+  
+  
+  
+  
