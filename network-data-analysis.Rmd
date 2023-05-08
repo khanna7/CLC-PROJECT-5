@@ -17,20 +17,19 @@ containing results from the social network data from CLC Project 5.
 We start by describing the original dataset. Load the needed data:
 
 ```{r, setup, include=FALSE}
-#knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
-data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
-```
-
-```{r, echo=FALSE, message=FALSE}
 rm(list=ls())
 
 library(haven)
 library(dplyr)
 library(data.table)
 
-# Load complete (individual+network) data ---------------------------
-base::load(file="/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/eda.RData") 
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
+
+eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+dt <- as.data.table(eda_env$dt)
 ```
+
+
 
 We know that the `dt` dataset contains the sample of
 `r paste("n =", nrow(dt))` used for the original paper (Monnig 2021,
@@ -133,7 +132,7 @@ We first extract the social network columns of interest:
 
 head(colnames(sns_consenting_dt))
 
-sns_dt_only <- (sns_consenting_dt[,sns_vars])
+sns_dt_only <- (sns_consenting_dt[,..sns_vars])
 sns_dt_only$MTURK1 <- sns_consenting_dt$MTURK1 #MTURK ID
 sns_dt_only$comp_code_Text_Set <-sns_consenting_dt$comp_code_Text_Set #STUDYID
 
@@ -149,7 +148,7 @@ Save the `sns_consenting_dt` dataset for IDs and individual attributes of the
 allow us to populate the vertex attributes in the individual dataset.
 
 ```{r}
-saveRDS(sns_consenting_dt, file="sns_consenting_dt.RDS")
+saveRDS(sns_consenting_dt, file=paste0(data_loc, "sns_consenting_dt.RDS"))
 ```
 
 
@@ -172,31 +171,31 @@ colnames_net_dt <- lapply(colnames(extr_cols), function(x) substr(x, 6, nchar(x)
 
 net_A4 <- sns_consenting_dt %>% select(starts_with("FUA4_"))
 dim(net_A4)
-colnames(net_A4) <- colnames_net_dt
+colnames(net_A4) <- unlist(colnames_net_dt)
 
 net_A5 <- sns_consenting_dt %>% select(starts_with("FUA5_"))
 dim(net_A5)
-colnames(net_A5) <- colnames_net_dt
+colnames(net_A5) <- unlist(colnames_net_dt)
 
 net_A6 <- sns_consenting_dt %>% select(starts_with("FUA6_"))
 dim(net_A6)
-colnames(net_A6) <- colnames_net_dt
+colnames(net_A6) <- unlist(colnames_net_dt)
 
 net_A7 <- sns_consenting_dt %>% select(starts_with("FUA7_"))
 dim(net_A7)
-colnames(net_A7) <- colnames_net_dt
+colnames(net_A7) <- unlist(colnames_net_dt)
 
 net_A8 <- sns_consenting_dt %>% select(starts_with("FUA8_"))
 dim(net_A8)
-colnames(net_A8) <- colnames_net_dt
+colnames(net_A8) <- unlist(colnames_net_dt)
 
 sns_dt_long_wide <- rbind(net_A4, net_A5, net_A6, net_A7, net_A8)
 dim(sns_dt_long_wide)
 #colnames(sns_dt_long_wide)
 
 
-sns_dt_long_wide$MTURKID <- sns_consenting_dt$MTURK1
-sns_dt_long_wide$comp_code_Text_Set <- sns_consenting_dt$comp_code_Text_Set
+sns_dt_long_wide$MTURKID <- rep(sns_consenting_dt$MTURK1, times=5)
+sns_dt_long_wide$comp_code_Text_Set <- rep(sns_consenting_dt$comp_code_Text_Set, times=5)
 
 dim(sns_dt_long_wide)
 #colnames(sns_dt_long_wide)
