@@ -444,12 +444,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   list(cor_cdc_yes = cor_cdc_yes, cor_cdc_no = cor_cdc_no, cor_cdc_missing = cor_cdc_missing)
   
-<<<<<<< HEAD
-  
-# Analyze alter encouraging testing ----------
-=======
   # Analyze alter encouraged  testing SN32----------
->>>>>>> d9b4289fd5845bef1f8a5b8c550bf3f8b860f237
   
   compute_ego_alter_attribute_proportions_SN32 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
