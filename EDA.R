@@ -603,6 +603,7 @@ vh_info_scores <- cbind.data.frame(v_hesitancy_info, vh_info_avg_out, MTURKID=dt
 # Save RDS object ---------------------------
 
 eda_env <- new.env()
+eda_env$dt <- dt
 eda_env$tab2_dt <- tab2_dt
 eda_env$cdc_scores <- cdc_scores
 eda_env$vh_info_scores <- vh_info_scores
@@ -613,5 +614,4 @@ saveRDS(eda_env, paste0(data_loc, "eda_objects.rds"))
 
 # Save image ---------------------------
 
-save.image(file=paste0(data_loc, "eda.RData"))
 
