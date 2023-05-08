@@ -438,11 +438,12 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN29, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes <- cor(ego_proportions_df$cdc_avg_out, ego_proportions_df$proportion_yes, use = "complete.obs")
-  cor_cdc_no <- cor(ego_proportions_df$cdc_avg_out, ego_proportions_df$proportion_no, use = "complete.obs")
-  cor_cdc_missing <- cor(ego_proportions_df$cdc_avg_out, ego_proportions_df$proportion_missing, use = "complete.obs")
+  cor_cdc_yes_SN29 <- cor(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN29 <- cor(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN29 <- cor(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes = cor_cdc_yes, cor_cdc_no = cor_cdc_no, cor_cdc_missing = cor_cdc_missing)
+  list(cor_cdc_yes_SN29 = cor_cdc_yes_SN29, cor_cdc_no_SN29 = cor_cdc_no_SN29, cor_cdc_missing_SN29 = cor_cdc_missing_SN29)
+
   
   # Analyze alter encouraged  testing SN32----------
   
@@ -486,11 +487,11 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN32, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_yes, use = "complete.obs")
-  cor_cdc_no <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_no, use = "complete.obs")
-  cor_cdc_missing <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_missing, use = "complete.obs")
+  cor_cdc_yes_SN32 <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN32 <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN32 <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes = cor_cdc_yes, cor_cdc_no = cor_cdc_no, cor_cdc_missing = cor_cdc_missing)
+  list(cor_cdc_yes_SN32 = cor_cdc_yes_SN32, cor_cdc_no_SN32 = cor_cdc_no_SN32, cor_cdc_missing_SN32 = cor_cdc_missing_SN32)
   
 # Analyze alter encouraged  following social distancing guidelines----------
   
@@ -534,11 +535,11 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN34, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_yes, use = "complete.obs")
-  cor_cdc_no <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_no, use = "complete.obs")
-  cor_cdc_missing <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_missing, use = "complete.obs")
+  cor_cdc_yes_SN33 <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN33 <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN33 <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes = cor_cdc_yes, cor_cdc_no = cor_cdc_no, cor_cdc_missing = cor_cdc_missing)
+  list(cor_cdc_yes_SN33 = cor_cdc_yes_SN33, cor_cdc_no_SN33 = cor_cdc_no_SN33, cor_cdc_missing_SN33 = cor_cdc_missing_SN33)
   
   # Analyze alter encouraged  mask wearing SN36----------
   
@@ -587,5 +588,265 @@ g <- igraph::graph_from_edgelist(edge_list)
   cor_cdc_missing <- cor(ego_proportions_df_SN36$cdc_avg_out, ego_proportions_df_SN36$proportion_missing, use = "complete.obs")
   
   list(cor_cdc_yes = cor_cdc_yes, cor_cdc_no = cor_cdc_no, cor_cdc_missing = cor_cdc_missing)
+  
+  
+  
+  # Analyze alter follows social distancing guidelines SN33----------
+  
+  compute_ego_alter_attribute_proportions_SN33 <- function(vertex_dt, edge_dt, attribute_name) {
+    egos <- unique(edge_dt$MTURKID)
+    ego_alter_attribute_proportions <- list()
+    
+    for (ego in egos) {
+      alter_ids <- edge_dt[edge_dt$MTURKID == ego,]$alterID
+      alter_data <- vertex_dt[vertex_dt$name %in% alter_ids, c("name", attribute_name), with = FALSE]
+      
+      yes_count <- sum(alter_data[[attribute_name]] == 1, na.rm = TRUE)
+      no_count <- sum(alter_data[[attribute_name]] == 2, na.rm = TRUE)
+      missing_count <- sum(is.na(alter_data[[attribute_name]]))
+      total_count <- yes_count + no_count + missing_count
+      
+      proportion_yes <- yes_count / total_count
+      proportion_no <- no_count / total_count
+      proportion_missing <- missing_count / total_count
+      
+      ego_alter_attribute_proportions[[as.character(ego)]] <- list(
+        proportion_yes = proportion_yes,
+        proportion_no = proportion_no,
+        proportion_missing = proportion_missing
+      )
+    }
+    
+    return(ego_alter_attribute_proportions)
+  }
+  
+  ego_alter_stats_SN33 <- compute_ego_alter_attribute_proportions_SN33(vertex_dt, edge_dt, "SN33")
+  
+  ## compute correlations with %alters 
+  ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
+  
+  ego_proportions_df_SN33 <- data.frame(# create data frame
+    MTURKID = names(ego_alter_stats_SN33),
+    cdc_avg_out = ego_data$cdc_avg_out.x,
+    proportion_yes = sapply(ego_alter_stats_SN33, function(x) x$proportion_yes),
+    proportion_no = sapply(ego_alter_stats_SN33, function(x) x$proportion_no),
+    proportion_missing = sapply(ego_alter_stats_SN33, function(x) x$proportion_missing)
+  )
+  
+  cor_cdc_yes <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_yes, use = "complete.obs")
+  cor_cdc_no <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_no, use = "complete.obs")
+  cor_cdc_missing <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_missing, use = "complete.obs")
+  
+  list(cor_cdc_yes = cor_cdc_yes, cor_cdc_no = cor_cdc_no, cor_cdc_missing = cor_cdc_missing)
+  
+  
+  
+  # Analyze alter received at least one dose of the vaccine SN37 ------------
+  
+  compute_ego_alter_attribute_proportions_SN37 <- function(vertex_dt, edge_dt, attribute_name) {
+    egos <- unique(edge_dt$MTURKID)
+    ego_alter_attribute_proportions <- list()
+    
+    for (ego in egos) {
+      alter_ids <- edge_dt[edge_dt$MTURKID == ego,]$alterID
+      alter_data <- vertex_dt[vertex_dt$name %in% alter_ids, c("name", attribute_name), with = FALSE]
+      
+      yes_count <- sum(alter_data[[attribute_name]] == 1, na.rm = TRUE)
+      no_count <- sum(alter_data[[attribute_name]] == 2, na.rm = TRUE)
+      missing_count <- sum(is.na(alter_data[[attribute_name]]))
+      total_count <- yes_count + no_count + missing_count
+      
+      proportion_yes <- yes_count / total_count
+      proportion_no <- no_count / total_count
+      proportion_missing <- missing_count / total_count
+      
+      ego_alter_attribute_proportions[[as.character(ego)]] <- list(
+        proportion_yes = proportion_yes,
+        proportion_no = proportion_no,
+        proportion_missing = proportion_missing
+      )
+    }
+    
+    return(ego_alter_attribute_proportions)
+  }
+  
+  ego_alter_stats_SN37 <- compute_ego_alter_attribute_proportions_SN37(vertex_dt, edge_dt, "SN37")
+  
+  ## compute correlations with %alters 
+  ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
+  
+  ego_proportions_df_SN37 <- data.frame(# create data frame
+    MTURKID = names(ego_alter_stats_SN37),
+    cdc_avg_out = ego_data$cdc_avg_out.x,
+    proportion_yes = sapply(ego_alter_stats_SN37, function(x) x$proportion_yes),
+    proportion_no = sapply(ego_alter_stats_SN37, function(x) x$proportion_no),
+    proportion_missing = sapply(ego_alter_stats_SN37, function(x) x$proportion_missing)
+  )
+  
+  cor_cdc_yes_SN37 <- cor(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN37 <- cor(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN37 <- cor(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_missing, use = "complete.obs")
+  
+  list(cor_cdc_yes_SN37 = cor_cdc_yes_SN37, cor_cdc_no_SN37 = cor_cdc_no_SN37, cor_cdc_missing_SN37 = cor_cdc_missing_SN37)
+  
+  
+
+  # Analyze alter encouraged receiving vaccine SN38 ------ ------------
+  
+  compute_ego_alter_attribute_proportions_SN38 <- function(vertex_dt, edge_dt, attribute_name) {
+    egos <- unique(edge_dt$MTURKID)
+    ego_alter_attribute_proportions <- list()
+    
+    for (ego in egos) {
+      alter_ids <- edge_dt[edge_dt$MTURKID == ego,]$alterID
+      alter_data <- vertex_dt[vertex_dt$name %in% alter_ids, c("name", attribute_name), with = FALSE]
+      
+      yes_count <- sum(alter_data[[attribute_name]] == 1, na.rm = TRUE)
+      no_count <- sum(alter_data[[attribute_name]] == 2, na.rm = TRUE)
+      missing_count <- sum(is.na(alter_data[[attribute_name]]))
+      total_count <- yes_count + no_count + missing_count
+      
+      proportion_yes <- yes_count / total_count
+      proportion_no <- no_count / total_count
+      proportion_missing <- missing_count / total_count
+      
+      ego_alter_attribute_proportions[[as.character(ego)]] <- list(
+        proportion_yes = proportion_yes,
+        proportion_no = proportion_no,
+        proportion_missing = proportion_missing
+      )
+    }
+    
+    return(ego_alter_attribute_proportions)
+  }
+  
+  ego_alter_stats_SN38 <- compute_ego_alter_attribute_proportions_SN38(vertex_dt, edge_dt, "SN38")
+  
+  ## compute correlations with %alters 
+  ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
+  
+  ego_proportions_df_SN38 <- data.frame(# create data frame
+    MTURKID = names(ego_alter_stats_SN38),
+    cdc_avg_out = ego_data$cdc_avg_out.x,
+    proportion_yes = sapply(ego_alter_stats_SN38, function(x) x$proportion_yes),
+    proportion_no = sapply(ego_alter_stats_SN38, function(x) x$proportion_no),
+    proportion_missing = sapply(ego_alter_stats_SN38, function(x) x$proportion_missing)
+  )
+  
+  cor_cdc_yes_SN38 <- cor(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN38 <- cor(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN38 <- cor(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_missing, use = "complete.obs")
+  
+  list(cor_cdc_yes_SN38 = cor_cdc_yes_SN38, cor_cdc_no_SN38 = cor_cdc_no_SN38, cor_cdc_missing_SN38 = cor_cdc_missing_SN38)
+  
+  
+  
+  
+  
+  
+  # Analyze alter discouraged receiving vaccine SN39 ------ ------------
+  
+  compute_ego_alter_attribute_proportions_SN39 <- function(vertex_dt, edge_dt, attribute_name) {
+    egos <- unique(edge_dt$MTURKID)
+    ego_alter_attribute_proportions <- list()
+    
+    for (ego in egos) {
+      alter_ids <- edge_dt[edge_dt$MTURKID == ego,]$alterID
+      alter_data <- vertex_dt[vertex_dt$name %in% alter_ids, c("name", attribute_name), with = FALSE]
+      
+      yes_count <- sum(alter_data[[attribute_name]] == 1, na.rm = TRUE)
+      no_count <- sum(alter_data[[attribute_name]] == 2, na.rm = TRUE)
+      missing_count <- sum(is.na(alter_data[[attribute_name]]))
+      total_count <- yes_count + no_count + missing_count
+      
+      proportion_yes <- yes_count / total_count
+      proportion_no <- no_count / total_count
+      proportion_missing <- missing_count / total_count
+      
+      ego_alter_attribute_proportions[[as.character(ego)]] <- list(
+        proportion_yes = proportion_yes,
+        proportion_no = proportion_no,
+        proportion_missing = proportion_missing
+      )
+    }
+    
+    return(ego_alter_attribute_proportions)
+  }
+  
+  ego_alter_stats_SN39 <- compute_ego_alter_attribute_proportions_SN39(vertex_dt, edge_dt, "SN39")
+  
+  ## compute correlations with %alters 
+  ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
+  
+  ego_proportions_df_SN39 <- data.frame(# create data frame
+    MTURKID = names(ego_alter_stats_SN39),
+    cdc_avg_out = ego_data$cdc_avg_out.x,
+    proportion_yes = sapply(ego_alter_stats_SN39, function(x) x$proportion_yes),
+    proportion_no = sapply(ego_alter_stats_SN39, function(x) x$proportion_no),
+    proportion_missing = sapply(ego_alter_stats_SN39, function(x) x$proportion_missing)
+  )
+  
+  cor_cdc_yes_SN39 <- cor(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN39 <- cor(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN39 <- cor(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_missing, use = "complete.obs")
+  
+  list(cor_cdc_yes_SN39 = cor_cdc_yes_SN39, cor_cdc_no_SN39 = cor_cdc_no_SN39, cor_cdc_missing_SN39 = cor_cdc_missing_SN39)
+  
+  
+  
+  
+  
+  
+  
+  # Analyze alter knows someone hospitalized because of COVID-19 SN28 ------ 
+  
+  compute_ego_alter_attribute_proportions_SN28 <- function(vertex_dt, edge_dt, attribute_name) {
+    egos <- unique(edge_dt$MTURKID)
+    ego_alter_attribute_proportions <- list()
+    
+    for (ego in egos) {
+      alter_ids <- edge_dt[edge_dt$MTURKID == ego,]$alterID
+      alter_data <- vertex_dt[vertex_dt$name %in% alter_ids, c("name", attribute_name), with = FALSE]
+      
+      yes_count <- sum(alter_data[[attribute_name]] == 1, na.rm = TRUE)
+      no_count <- sum(alter_data[[attribute_name]] == 2, na.rm = TRUE)
+      missing_count <- sum(is.na(alter_data[[attribute_name]]))
+      total_count <- yes_count + no_count + missing_count
+      
+      proportion_yes <- yes_count / total_count
+      proportion_no <- no_count / total_count
+      proportion_missing <- missing_count / total_count
+      
+      ego_alter_attribute_proportions[[as.character(ego)]] <- list(
+        proportion_yes = proportion_yes,
+        proportion_no = proportion_no,
+        proportion_missing = proportion_missing
+      )
+    }
+    
+    return(ego_alter_attribute_proportions)
+  }
+  
+  ego_alter_stats_SN28 <- compute_ego_alter_attribute_proportions_SN28(vertex_dt, edge_dt, "SN28")
+  
+  ## compute correlations with %alters 
+  ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
+  
+  ego_proportions_df_SN28 <- data.frame(# create data frame
+    MTURKID = names(ego_alter_stats_SN28),
+    cdc_avg_out = ego_data$cdc_avg_out.x,
+    proportion_yes = sapply(ego_alter_stats_SN28, function(x) x$proportion_yes),
+    proportion_no = sapply(ego_alter_stats_SN28, function(x) x$proportion_no),
+    proportion_missing = sapply(ego_alter_stats_SN28, function(x) x$proportion_missing)
+  )
+  
+  cor_cdc_yes_SN28 <- cor(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN28 <- cor(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN28 <- cor(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_missing, use = "complete.obs")
+  
+  list(cor_cdc_yes_SN28 = cor_cdc_yes_SN28, cor_cdc_no_SN28 = cor_cdc_no_SN28, cor_cdc_missing_SN28 = cor_cdc_missing_SN28)
+  
+  
+  
   
   
