@@ -6,7 +6,8 @@
 rm(list=ls())
 
 
-# Set knitr chunk options ----------
+# libraries
+
 
 
 library(haven)
@@ -20,19 +21,22 @@ library(ggraph)
 # Read Data ----------
   
   ## specify data location 
-  data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT"
+  data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
 
 
   ## extract egos (i.e. participants) consenting to give SNS data, 
   ## and their attributes
 
-  network_env <- readRDS(paste0(data_loc, "/network_objects.rds"))
+  network_env <- readRDS(paste0(data_loc, "network_objects.rds"))
   sns_consenting_dt <- as.data.table(network_env$sns_consenting_dt)
 
   ## extract attributes of adult alters (i.e., network members)
-  merged_network_participant_env <- readRDS(paste0(data_loc, "/merged_network_participant_objects.rds"))
+  merged_network_participant_env <- readRDS(paste0(data_loc, "merged_network_participant_objects.rds"))
   sns_dt_long_merged_ego_characteristics <- merged_network_participant_env$sns_dt_long_merged_ego_characteristics
 
+  ## outcome scores
+  eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+  vh_scores <- eda_env$vh_info_scores
 
 # Create a network object ----------
 
@@ -332,12 +336,17 @@ g <- igraph::graph_from_edgelist(edge_list)
 
 
 
+  
+# Outcome: CDC_average_out -------------------------------------------------
 
-# Analyze alter-party distributions  ----------
+
+
+
+## Analyze alter-party distributions  ----------
 
   ## Compute alter distributions of  the adequately vs. not- protected group at different thresholds 
   
-  ego_alter_stats <- lapply(1:length(unique_clusters), function(cluster_id) {
+    ego_alter_stats <- lapply(1:length(unique_clusters), function(cluster_id) {
     ego_score <- vertex_dt$cdc_avg_out.x[match(V(g)$name, vertex_dt$name)][cluster_info$membership == cluster_id][1]
     
     # Handle missing values in the SN3 columns
@@ -397,7 +406,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-# Analyze alter knowing anyone who died of COVID-19  ----------
+## Analyze alter knowing anyone who died of COVID-19  ----------
   
   compute_ego_alter_attribute_proportions_SN29 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -447,7 +456,7 @@ g <- igraph::graph_from_edgelist(edge_list)
 
   
   
-# Analyze alter encouraged  testing SN32----------
+## Analyze alter encouraged  testing SN32----------
   
   compute_ego_alter_attribute_proportions_SN32 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -497,7 +506,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   list(cor_cdc_yes_SN32 = cor_cdc_yes_SN32, cor_cdc_no_SN32 = cor_cdc_no_SN32, cor_cdc_missing_SN32 = cor_cdc_missing_SN32)
   
   
-# Analyze alter encouraged  following social distancing guidelines SN34----------
+## Analyze alter encouraged  following social distancing guidelines SN34----------
   
   compute_ego_alter_attribute_proportions_SN34 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -547,7 +556,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
 
-# Analyze alter encouraged  mask wearing SN36----------
+## Analyze alter encouraged  mask wearing SN36----------
   
   compute_ego_alter_attribute_proportions_SN36 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -597,7 +606,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-# Analyze alter follows social distancing guidelines SN33----------
+## Analyze alter follows social distancing guidelines SN33----------
   
   compute_ego_alter_attribute_proportions_SN33 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -648,7 +657,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-# Analyze alter received at least one dose of the vaccine SN37 ------------
+## Analyze alter received at least one dose of the vaccine SN37 ------------
   
   compute_ego_alter_attribute_proportions_SN37 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -699,7 +708,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
 
   
-# Analyze alter encouraged receiving vaccine SN38 ------ ------------
+## Analyze alter encouraged receiving vaccine SN38 ------ ------------
   
   compute_ego_alter_attribute_proportions_SN38 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -752,7 +761,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-# Analyze alter discouraged receiving vaccine SN39 ------ ------------
+## Analyze alter discouraged receiving vaccine SN39 ------ ------------
   
   compute_ego_alter_attribute_proportions_SN39 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -806,7 +815,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-# Analyze alter knows someone hospitalized because of COVID-19 SN28 ------ 
+## Analyze alter knows someone hospitalized because of COVID-19 SN28 ------ 
   
   compute_ego_alter_attribute_proportions_SN28 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -859,7 +868,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-# Analyze alter how often wears mask in public SN 35 ------ 
+## Analyze alter how often wears mask in public SN 35 ------ 
   
   # Analyze the discrete SN35 variable
   ## we consider 1 (always) or 2 (usally) as "success" and 3 (sometimes) or 4 (rarely/never) as failure
@@ -915,7 +924,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-# Analyze alter encouraged drinking in public SN24 ------ 
+## Analyze alter encouraged drinking in public SN24 ------ 
   
   compute_ego_alter_attribute_proportions_SN24 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -969,7 +978,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
 
   
-# Analyze alter tested for COVID-19 SN27 ------ 
+## Analyze alter tested for COVID-19 SN27 ------ 
   
   compute_ego_alter_attribute_proportions_SN27 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -1076,3 +1085,96 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
+  
+# Outcome: vh_info_avg_out -------------------------------------------------
+  
+  
+  # # The vh_info_avg_out values in vertex_dt are assigned to the alter instead of the ego.
+  # # Correct it below.
+  #   
+  #   # copy the data
+  #   vertex_dt_vh_info_avg_out <- vertex_dt %>% select(name, vh_info_avg_out)
+  #   # Create a new column with the ego IDs
+  #   vertex_dt_vh_info_avg_out[, ego_id := gsub("_\\d+$", "", name)]
+  # 
+  #   # Calculate the average vh_info_avg_out for each ego_id, and store it in a new column
+  #   vertex_dt_vh_info_avg_out[, ego_avg := mean(vh_info_avg_out, na.rm = TRUE), by = ego_id]
+  # 
+  #   # Replace the vh_info_avg_out values for alters with NA
+  #   vertex_dt_vh_info_avg_out[grepl("_\\d+$", name), vh_info_avg_out := NA]
+  # 
+  #   # Replace the vh_info_avg_out values for egos with the calculated ego_avg
+  #   vertex_dt_vh_info_avg_out[!grepl("_\\d+$", name), vh_info_avg_out := ego_avg]
+  #   
+  #   # replace the column in vertex_dt
+  #   vertex_dt$vh_info_avg_out <- vertex_dt_vh_info_avg_out$vh_info_avg_out
+  # 
+# ## Analyze alter-party distributions  ----------
+# 
+#   ## Compute alter distributions of  VH info at thresholds
+# 
+#     ego_alter_stats <- lapply(1:length(unique_clusters), function(cluster_id) {
+#     ego_score <- vertex_dt$vh_info_avg_out[match(V(g)$name, vertex_dt$name)][cluster_info$membership == cluster_id][1]
+# 
+#     # Handle missing values in the SN3 columns
+#     alter_party_data <- vertex_dt$SN9[match(V(g)$name, vertex_dt$name)][cluster_info$membership == cluster_id][-1]
+#     alter_party_data_clean <- na.omit(alter_party_data)
+# 
+#     alter_party_counts <- table(alter_party_data_clean)
+#     all_parties <- 1:8
+#     missing_parties <- setdiff(all_parties, as.integer(names(alter_party_counts)))
+#     alter_party_counts_full <- c(alter_party_counts, setNames(as.list(rep(0, length(missing_parties))), as.character(missing_parties)))
+#     alter_party_counts_full <- alter_party_counts_full[order(as.integer(names(alter_party_counts_full)))]
+#     alter_party_counts_full <- unlist(alter_party_counts_full) # Convert to numeric vector
+# 
+#     alter_party_proportions <- alter_party_counts_full / sum(alter_party_counts_full)
+# 
+#     list(score = ego_score, proportions = alter_party_proportions)
+#   })
+# 
+#   compute_mean_alter_party_distribution <- function(ego_alter_stats, threshold) {
+#     #high_score_egos <- which(sapply(ego_alter_stats, function(x) x$score) > threshold)
+#     #low_score_egos <- which(sapply(ego_alter_stats, function(x) x$score) <= threshold)
+# 
+#     # Filter out entries with NaN values in proportions
+#     high_score_egos_filtered <- high_score_egos[sapply(ego_alter_stats[high_score_egos], function(x) !any(is.nan(x$proportions)))]
+# 
+#     # Filter out entries with NaN values in proportions
+#     low_score_egos_filtered <- low_score_egos[sapply(ego_alter_stats[low_score_egos], function(x) !any(is.nan(x$proportions)))]
+# 
+#     mean_proportions_high_score <- colMeans(do.call(rbind, lapply(ego_alter_stats[high_score_egos_filtered], function(x) as.numeric(x$proportions))))
+#     mean_proportions_low_score <- colMeans(do.call(rbind, lapply(ego_alter_stats[low_score_egos_filtered], function(x) as.numeric(x$proportions))))
+# 
+#     return(list(mean_proportions_high_score = mean_proportions_high_score,
+#                 mean_proportions_low_score = mean_proportions_low_score))
+#   }
+# 
+#   ## Check the values of ego_alter_stats
+#   vh_egos_w_scores <- unlist(lapply(ego_alter_stats, function(x)x$score))
+#   which(is.numeric(vh_egos_w_scores))
+#   
+#   ## Apply the functionsand summarize the distributions
+#   threshold <- seq(0.5, 2.75, by=0.25)
+#   alter_pol_dist<- lapply(threshold, function(x) compute_mean_alter_party_distribution(ego_alter_stats, x))
+# 
+#   alter_pol_dist
+# 
+#   ## compute homophily-like measure for the ego score and the alter party distribution
+# 
+#   ## we'll compute correlations
+#   ego_party_proportions <- data.frame(
+#     ego_score = sapply(ego_alter_stats, function(x) x$score),
+#     proportion_republicans = sapply(ego_alter_stats, function(x) x$proportions[1]),
+#     proportion_democrats = sapply(ego_alter_stats, function(x) x$proportions[2]),
+#     proportion_independents = sapply(ego_alter_stats, function(x) x$proportions[3])
+#   )
+# 
+#   correlations <- cor(ego_party_proportions, use = "complete.obs")
+#   correlations
+# 
+# 
+# 
+# 
+# 
+# 
+# 
