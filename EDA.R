@@ -592,9 +592,10 @@ v_hesitancy_info <-
         vh10=dt$FUVH10, vh11=dt$FUVH11)
     )
 dim(v_hesitancy_info)
+head(v_hesitancy_info)
 which(is.na(v_hesitancy_info))
 
-vh_info_avg_out <- apply(cdc, 1, mean)
+vh_info_avg_out <- apply(v_hesitancy_info, 1, mean)
 
 vh_info_scores <- cbind.data.frame(v_hesitancy_info, vh_info_avg_out, MTURKID=dt$MTURK1)
 
