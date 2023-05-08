@@ -25,16 +25,16 @@ library(geeM)
 Set the working directory:
 
 ```{r, setup, include=FALSE}
-knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
 ```
 
 Read the datasets:
 
 ```{r, include=FALSE}
-network_env <- readRDS("network_objects.rds")
+network_env <- readRDS(paste0(data_loc, "network_objects.rds"))
 sns_dt_long_wide_no_minors <- network_env$sns_dt_long_wide_no_minors
 
-eda_env <- readRDS("eda_objects.rds")
+eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
 tab2_dt <- as.data.table(eda_env$tab2_dt)
 cdc_scores <- eda_env$cdc_scores
 vh_scores <- eda_env$vh_info_scores
@@ -525,6 +525,6 @@ merged_network_participant_env <- new.env()
 
 merged_network_participant_env$sns_dt_long_merged_ego_characteristics <- sns_dt_long_merged_ego_characteristics
 
-saveRDS(merged_network_participant_env, "merged_network_participant_objects.rds")
+saveRDS(merged_network_participant_env, paste0(data_loc, "merged_network_participant_objects.rds"))
 ```
 
