@@ -3,7 +3,7 @@ rm(list=ls())
 
 # Set working directory ---------------------------
 
-setwd("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+data_loc <- ("/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/")
 
 
 # Load libraries ---------------------------
@@ -14,7 +14,8 @@ library(dplyr)
 
 # Read full data ---------------------------
 
-full_dt <- read_sav("../Coronavirus Pandemic_Merge_AllData.SAV") #should have all the network components, "wide dataset"
+full_dt <- read_sav(paste0(data_loc, 
+                           "../Coronavirus Pandemic_Merge_AllData.SAV")) #should have all the network components, "wide dataset"
 full_dt <- as.data.frame(full_dt)
 glimpse(full_dt)
 str(full_dt)
@@ -23,7 +24,9 @@ str(full_dt)
 # Correct for missing data ---------------------------
 
 ## Read data
-use_to_select_dt <- read_sav("../20210519_merge_USETOSELECT_N=1101.sav")
+use_to_select_dt <- read_sav(
+  paste0(data_loc,
+  "../20210519_merge_USETOSELECT_N=1101.sav"))
 View(use_to_select_dt)
 
 ## Filter for IDs used to select
@@ -604,10 +607,10 @@ eda_env$cdc_scores <- cdc_scores
 eda_env$vh_info_scores <- vh_info_scores
 
 #saveRDS(object = tab2_dt, file = "tab2_comparison_data.RDS")
-saveRDS(eda_env, "eda_objects.rds")
+saveRDS(eda_env, paste0(data_loc, "eda_objects.rds"))
 
 
 # Save image ---------------------------
 
-save.image(file="eda.RData")
+save.image(file=paste0(data_loc, "eda.RData"))
 
