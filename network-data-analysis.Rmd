@@ -18,7 +18,7 @@ We start by describing the original dataset. Load the needed data:
 
 ```{r, setup, include=FALSE}
 #knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
-data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT"
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
 ```
 
 ```{r, echo=FALSE, message=FALSE}
