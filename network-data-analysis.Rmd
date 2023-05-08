@@ -17,7 +17,8 @@ containing results from the social network data from CLC Project 5.
 We start by describing the original dataset. Load the needed data:
 
 ```{r, setup, include=FALSE}
-knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+#knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT"
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -1517,6 +1518,6 @@ network_env <- new.env()
 network_env$sns_consenting_dt <- sns_consenting_dt
 network_env$sns_dt_long_wide_no_minors <- sns_dt_long_wide_no_minors
 
-saveRDS(network_env, "network_objects.rds")
+saveRDS(network_env, paste0(data_loc, "network_objects.rds"))
 ```
 
