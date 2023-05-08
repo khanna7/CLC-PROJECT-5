@@ -396,6 +396,7 @@ g <- igraph::graph_from_edgelist(edge_list)
    
   
   
+  
 # Analyze alter knowing anyone who died of COVID-19  ----------
   
   compute_ego_alter_attribute_proportions_SN29 <- function(vertex_dt, edge_dt, attribute_name) {
@@ -430,7 +431,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   ## compute correlations with %alters reporting knowing someone who died of COVID-19
   ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
   
-  ego_proportions_df <- data.frame(# create data frame
+  ego_proportions_df_SN29 <- data.frame(# create data frame
     MTURKID = names(ego_alter_stats_SN29),
     cdc_avg_out = ego_data$cdc_avg_out.x,
     proportion_yes = sapply(ego_alter_stats_SN29, function(x) x$proportion_yes),
@@ -445,7 +446,8 @@ g <- igraph::graph_from_edgelist(edge_list)
   list(cor_cdc_yes_SN29 = cor_cdc_yes_SN29, cor_cdc_no_SN29 = cor_cdc_no_SN29, cor_cdc_missing_SN29 = cor_cdc_missing_SN29)
 
   
-  # Analyze alter encouraged  testing SN32----------
+  
+# Analyze alter encouraged  testing SN32----------
   
   compute_ego_alter_attribute_proportions_SN32 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -477,6 +479,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   ego_alter_stats_SN32 <- compute_ego_alter_attribute_proportions_SN32(vertex_dt, edge_dt, "SN32")
   
   ## compute correlations with %alters 
+  options(warn=1) #for correlations with constants, such as proportion_missing below
   ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
   
   ego_proportions_df_SN32 <- data.frame(# create data frame
@@ -493,7 +496,8 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   list(cor_cdc_yes_SN32 = cor_cdc_yes_SN32, cor_cdc_no_SN32 = cor_cdc_no_SN32, cor_cdc_missing_SN32 = cor_cdc_missing_SN32)
   
-# Analyze alter encouraged  following social distancing guidelines----------
+  
+# Analyze alter encouraged  following social distancing guidelines SN34----------
   
   compute_ego_alter_attribute_proportions_SN34 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -535,13 +539,15 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN34, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN33 <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN33 <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN33 <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_missing, use = "complete.obs")
+  cor_cdc_yes_SN34 <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN34 <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN34 <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN33 = cor_cdc_yes_SN33, cor_cdc_no_SN33 = cor_cdc_no_SN33, cor_cdc_missing_SN33 = cor_cdc_missing_SN33)
+  list(cor_cdc_yes_SN34 = cor_cdc_yes_SN34, cor_cdc_no_SN34 = cor_cdc_no_SN34, cor_cdc_missing_SN34 = cor_cdc_missing_SN34)
   
-  # Analyze alter encouraged  mask wearing SN36----------
+  
+
+# Analyze alter encouraged  mask wearing SN36----------
   
   compute_ego_alter_attribute_proportions_SN36 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -591,7 +597,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-  # Analyze alter follows social distancing guidelines SN33----------
+# Analyze alter follows social distancing guidelines SN33----------
   
   compute_ego_alter_attribute_proportions_SN33 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -641,7 +647,8 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-  # Analyze alter received at least one dose of the vaccine SN37 ------------
+  
+# Analyze alter received at least one dose of the vaccine SN37 ------------
   
   compute_ego_alter_attribute_proportions_SN37 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -691,7 +698,8 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
 
-  # Analyze alter encouraged receiving vaccine SN38 ------ ------------
+  
+# Analyze alter encouraged receiving vaccine SN38 ------ ------------
   
   compute_ego_alter_attribute_proportions_SN38 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -744,7 +752,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-  # Analyze alter discouraged receiving vaccine SN39 ------ ------------
+# Analyze alter discouraged receiving vaccine SN39 ------ ------------
   
   compute_ego_alter_attribute_proportions_SN39 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -798,7 +806,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-  # Analyze alter knows someone hospitalized because of COVID-19 SN28 ------ 
+# Analyze alter knows someone hospitalized because of COVID-19 SN28 ------ 
   
   compute_ego_alter_attribute_proportions_SN28 <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -845,6 +853,62 @@ g <- igraph::graph_from_edgelist(edge_list)
   cor_cdc_missing_SN28 <- cor(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_missing, use = "complete.obs")
   
   list(cor_cdc_yes_SN28 = cor_cdc_yes_SN28, cor_cdc_no_SN28 = cor_cdc_no_SN28, cor_cdc_missing_SN28 = cor_cdc_missing_SN28)
+  
+  
+  
+  
+  
+  
+# Analyze alter how often wears mask in public SN 35 ------ 
+  
+  # Analyze the discrete SN35 variable
+  ## we consider 1 (always) or 2 (usally) as "success" and 3 (sometimes) or 4 (rarely/never) as failure
+  compute_ego_alter_attribute_proportions_SN35_disc <- function(vertex_dt, edge_dt, attribute_name) {
+    egos <- unique(edge_dt$MTURKID)
+    ego_alter_attribute_proportions <- list()
+    
+    for (ego in egos) {
+      alter_ids <- edge_dt[edge_dt$MTURKID == ego,]$alterID
+      alter_data <- vertex_dt[vertex_dt$name %in% alter_ids, c("name", attribute_name), with = FALSE]
+      
+      yes_count <- sum(alter_data[[attribute_name]] %in% c(1, 2), na.rm = TRUE)
+      no_count <- sum(alter_data[[attribute_name]] %in% c(3,4), na.rm = TRUE) 
+      missing_count <- sum(is.na(alter_data[[attribute_name]]))
+      total_count <- yes_count + no_count + missing_count
+      
+      proportion_yes <- yes_count / total_count
+      proportion_no <- no_count / total_count
+      proportion_missing <- missing_count / total_count
+      
+      ego_alter_attribute_proportions[[as.character(ego)]] <- list(
+        proportion_yes = proportion_yes,
+        proportion_no = proportion_no,
+        proportion_missing = proportion_missing
+      )
+    }
+    
+    return(ego_alter_attribute_proportions)
+  }
+  
+  ego_alter_stats_SN35 <- compute_ego_alter_attribute_proportions_SN35_disc(vertex_dt, edge_dt, "SN35")
+  
+  ## compute correlations with %alters 
+  ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
+  
+  ego_proportions_df_SN35 <- data.frame(# create data frame
+    MTURKID = names(ego_alter_stats_SN35),
+    cdc_avg_out = ego_data$cdc_avg_out.x,
+    proportion_yes = sapply(ego_alter_stats_SN35, function(x) x$proportion_yes),
+    proportion_no = sapply(ego_alter_stats_SN35, function(x) x$proportion_no),
+    proportion_missing = sapply(ego_alter_stats_SN35, function(x) x$proportion_missing)
+  )
+  
+  cor_cdc_yes_SN35 <- cor(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_yes, use = "complete.obs")
+  cor_cdc_no_SN35 <- cor(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_no, use = "complete.obs")
+  cor_cdc_missing_SN35 <- cor(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_missing, use = "complete.obs")
+  
+  list(cor_cdc_yes_SN35 = cor_cdc_yes_SN35, cor_cdc_no_SN35 = cor_cdc_no_SN35, cor_cdc_missing_SN35 = cor_cdc_missing_SN35)
+  
   
   
   
