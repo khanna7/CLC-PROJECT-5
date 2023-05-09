@@ -1,14 +1,9 @@
 # Visualize networks and analyze ego/alter behaviors of interest
 
 
-# Clear the workspace ----------
+# Clear the workspace and load libraries
 
 rm(list=ls())
-
-
-# libraries
-
-
 
 library(haven)
 library(dplyr)
@@ -16,6 +11,7 @@ library(data.table)
 library(igraph)
 library(ggplot2)
 library(ggraph)
+library(psych)
 
 
 # Read Data ----------
@@ -337,6 +333,7 @@ g <- igraph::graph_from_edgelist(edge_list)
 
 
   
+  
 # Outcome: CDC_average_out -------------------------------------------------
 
 
@@ -448,12 +445,31 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN29, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN29 <- cor(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN29 <- cor(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN29 <- cor(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_missing, use = "complete.obs")
+  # For proportion_yes
+  cor_test_cdc_yes_SN29 <- cor.test(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_yes, use = "complete.obs")
   
-  list(cor_cdc_yes_SN29 = cor_cdc_yes_SN29, cor_cdc_no_SN29 = cor_cdc_no_SN29, cor_cdc_missing_SN29 = cor_cdc_missing_SN29)
-
+  # For proportion_no
+  cor_test_cdc_no_SN29 <- cor.test(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_no, use = "complete.obs")
+  
+  # For proportion_missing
+  cor_test_cdc_missing_SN29 <- cor.test(ego_proportions_df_SN29$cdc_avg_out, ego_proportions_df_SN29$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN29 <- cor_test_cdc_yes_SN29$estimate
+  p_value_cdc_yes_SN29 <- cor_test_cdc_yes_SN29$p.value
+  
+  cor_cdc_no_SN29 <- cor_test_cdc_no_SN29$estimate
+  p_value_cdc_no_SN29 <- cor_test_cdc_no_SN29$p.value
+  
+  cor_cdc_missing_SN29 <- cor_test_cdc_missing_SN29$estimate
+  p_value_cdc_missing_SN29 <- cor_test_cdc_missing_SN29$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN29 = cor_cdc_yes_SN29, p_value_cdc_yes_SN29 = p_value_cdc_yes_SN29,
+    cor_cdc_no_SN29 = cor_cdc_no_SN29, p_value_cdc_no_SN29 = p_value_cdc_no_SN29,
+    cor_cdc_missing_SN29 = cor_cdc_missing_SN29, p_value_cdc_missing_SN29 = p_value_cdc_missing_SN29
+  )
   
   
 ## Analyze alter encouraged  testing SN32----------
@@ -499,12 +515,32 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN32, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN32 <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN32 <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN32 <- cor(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN32 = cor_cdc_yes_SN32, cor_cdc_no_SN32 = cor_cdc_no_SN32, cor_cdc_missing_SN32 = cor_cdc_missing_SN32)
+  # For proportion_yes
+  cor_test_cdc_yes_SN32 <- cor.test(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN32 <- cor.test(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_no, use = "complete.obs")
+  
+  # For proportion_missing
+  cor_test_cdc_missing_SN32 <- cor.test(ego_proportions_df_SN32$cdc_avg_out, ego_proportions_df_SN32$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN32 <- cor_test_cdc_yes_SN32$estimate
+  p_value_cdc_yes_SN32 <- cor_test_cdc_yes_SN32$p.value
+  
+  cor_cdc_no_SN32 <- cor_test_cdc_no_SN32$estimate
+  p_value_cdc_no_SN32 <- cor_test_cdc_no_SN32$p.value
+  
+  cor_cdc_missing_SN32 <- cor_test_cdc_missing_SN32$estimate
+  p_value_cdc_missing_SN32 <- cor_test_cdc_missing_SN32$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN32 = cor_cdc_yes_SN32, p_value_cdc_yes_SN32 = p_value_cdc_yes_SN32,
+    cor_cdc_no_SN32 = cor_cdc_no_SN32, p_value_cdc_no_SN32 = p_value_cdc_no_SN32,
+    cor_cdc_missing_SN32 = cor_cdc_missing_SN32, p_value_cdc_missing_SN32 = p_value_cdc_missing_SN32
+  )
   
 ## Analyze alter encouraged  following social distancing guidelines SN34----------
   
@@ -548,13 +584,32 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN34, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN34 <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN34 <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN34 <- cor(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN34 = cor_cdc_yes_SN34, cor_cdc_no_SN34 = cor_cdc_no_SN34, cor_cdc_missing_SN34 = cor_cdc_missing_SN34)
+  # For proportion_yes
+  cor_test_cdc_yes_SN34 <- cor.test(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN34 <- cor.test(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_no, use = "complete.obs")
   
+  # For proportion_missing
+  cor_test_cdc_missing_SN34 <- cor.test(ego_proportions_df_SN34$cdc_avg_out, ego_proportions_df_SN34$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN34 <- cor_test_cdc_yes_SN34$estimate
+  p_value_cdc_yes_SN34 <- cor_test_cdc_yes_SN34$p.value
+  
+  cor_cdc_no_SN34 <- cor_test_cdc_no_SN34$estimate
+  p_value_cdc_no_SN34 <- cor_test_cdc_no_SN34$p.value
+  
+  cor_cdc_missing_SN34 <- cor_test_cdc_missing_SN34$estimate
+  p_value_cdc_missing_SN34 <- cor_test_cdc_missing_SN34$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN34 = cor_cdc_yes_SN34, p_value_cdc_yes_SN34 = p_value_cdc_yes_SN34,
+    cor_cdc_no_SN34 = cor_cdc_no_SN34, p_value_cdc_no_SN34 = p_value_cdc_no_SN34,
+    cor_cdc_missing_SN34 = cor_cdc_missing_SN34, p_value_cdc_missing_SN34 = p_value_cdc_missing_SN34
+  )
 
 ## Analyze alter encouraged  mask wearing SN36----------
   
@@ -598,12 +653,32 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN36, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes <- cor(ego_proportions_df_SN36$cdc_avg_out, ego_proportions_df_SN36$proportion_yes, use = "complete.obs")
-  cor_cdc_no <- cor(ego_proportions_df_SN36$cdc_avg_out, ego_proportions_df_SN36$proportion_no, use = "complete.obs")
-  cor_cdc_missing <- cor(ego_proportions_df_SN36$cdc_avg_out, ego_proportions_df_SN36$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes = cor_cdc_yes, cor_cdc_no = cor_cdc_no, cor_cdc_missing = cor_cdc_missing)
+  # For proportion_yes
+  cor_test_cdc_yes_SN36 <- cor.test(ego_proportions_df_SN36$cdc_avg_out, ego_proportions_df_SN36$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN36 <- cor.test(ego_proportions_df_SN36$cdc_avg_out, ego_proportions_df_SN36$proportion_no, use = "complete.obs")
+  
+  # For proportion_missing
+  cor_test_cdc_missing_SN36 <- cor.test(ego_proportions_df_SN36$cdc_avg_out, ego_proportions_df_SN36$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN36 <- cor_test_cdc_yes_SN36$estimate
+  p_value_cdc_yes_SN36 <- cor_test_cdc_yes_SN36$p.value
+  
+  cor_cdc_no_SN36 <- cor_test_cdc_no_SN36$estimate
+  p_value_cdc_no_SN36 <- cor_test_cdc_no_SN36$p.value
+  
+  cor_cdc_missing_SN36 <- cor_test_cdc_missing_SN36$estimate
+  p_value_cdc_missing_SN36 <- cor_test_cdc_missing_SN36$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN36 = cor_cdc_yes_SN36, p_value_cdc_yes_SN36 = p_value_cdc_yes_SN36,
+    cor_cdc_no_SN36 = cor_cdc_no_SN36, p_value_cdc_no_SN36 = p_value_cdc_no_SN36,
+    cor_cdc_missing_SN36 = cor_cdc_missing_SN36, p_value_cdc_missing_SN36 = p_value_cdc_missing_SN36
+  )
   
   
 ## Analyze alter follows social distancing guidelines SN33----------
@@ -648,12 +723,32 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN33, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_yes, use = "complete.obs")
-  cor_cdc_no <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_no, use = "complete.obs")
-  cor_cdc_missing <- cor(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes = cor_cdc_yes, cor_cdc_no = cor_cdc_no, cor_cdc_missing = cor_cdc_missing)
+  # For proportion_yes
+  cor_test_cdc_yes_SN33 <- cor.test(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN33 <- cor.test(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_no, use = "complete.obs")
+  
+  # For proportion_missing
+  cor_test_cdc_missing_SN33 <- cor.test(ego_proportions_df_SN33$cdc_avg_out, ego_proportions_df_SN33$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN33 <- cor_test_cdc_yes_SN33$estimate
+  p_value_cdc_yes_SN33 <- cor_test_cdc_yes_SN33$p.value
+  
+  cor_cdc_no_SN33 <- cor_test_cdc_no_SN33$estimate
+  p_value_cdc_no_SN33 <- cor_test_cdc_no_SN33$p.value
+  
+  cor_cdc_missing_SN33 <- cor_test_cdc_missing_SN33$estimate
+  p_value_cdc_missing_SN33 <- cor_test_cdc_missing_SN33$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN33 = cor_cdc_yes_SN33, p_value_cdc_yes_SN33 = p_value_cdc_yes_SN33,
+    cor_cdc_no_SN33 = cor_cdc_no_SN33, p_value_cdc_no_SN33 = p_value_cdc_no_SN33,
+    cor_cdc_missing_SN33 = cor_cdc_missing_SN33, p_value_cdc_missing_SN33 = p_value_cdc_missing_SN33
+  )
   
   
   
@@ -699,12 +794,32 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN37, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN37 <- cor(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN37 <- cor(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN37 <- cor(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN37 = cor_cdc_yes_SN37, cor_cdc_no_SN37 = cor_cdc_no_SN37, cor_cdc_missing_SN37 = cor_cdc_missing_SN37)
+  # For proportion_yes
+  cor_test_cdc_yes_SN37 <- cor.test(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN37 <- cor.test(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_no, use = "complete.obs")
+  
+  # For proportion_missing
+  cor_test_cdc_missing_SN37 <- cor.test(ego_proportions_df_SN37$cdc_avg_out, ego_proportions_df_SN37$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN37 <- cor_test_cdc_yes_SN37$estimate
+  p_value_cdc_yes_SN37 <- cor_test_cdc_yes_SN37$p.value
+  
+  cor_cdc_no_SN37 <- cor_test_cdc_no_SN37$estimate
+  p_value_cdc_no_SN37 <- cor_test_cdc_no_SN37$p.value
+  
+  cor_cdc_missing_SN37 <- cor_test_cdc_missing_SN37$estimate
+  p_value_cdc_missing_SN37 <- cor_test_cdc_missing_SN37$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN37 = cor_cdc_yes_SN37, p_value_cdc_yes_SN37 = p_value_cdc_yes_SN37,
+    cor_cdc_no_SN37 = cor_cdc_no_SN37, p_value_cdc_no_SN37 = p_value_cdc_no_SN37,
+    cor_cdc_missing_SN37 = cor_cdc_missing_SN37, p_value_cdc_missing_SN37 = p_value_cdc_missing_SN37
+  )
   
 
   
@@ -750,14 +865,33 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN38, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN38 <- cor(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN38 <- cor(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN38 <- cor(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_missing, use = "complete.obs")
-  
-  list(cor_cdc_yes_SN38 = cor_cdc_yes_SN38, cor_cdc_no_SN38 = cor_cdc_no_SN38, cor_cdc_missing_SN38 = cor_cdc_missing_SN38)
   
   
+  # For proportion_yes
+  cor_test_cdc_yes_SN38 <- cor.test(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN38 <- cor.test(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_no, use = "complete.obs")
+  
+  # For proportion_missing
+  cor_test_cdc_missing_SN38 <- cor.test(ego_proportions_df_SN38$cdc_avg_out, ego_proportions_df_SN38$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN38 <- cor_test_cdc_yes_SN38$estimate
+  p_value_cdc_yes_SN38 <- cor_test_cdc_yes_SN38$p.value
+  
+  cor_cdc_no_SN38 <- cor_test_cdc_no_SN38$estimate
+  p_value_cdc_no_SN38 <- cor_test_cdc_no_SN38$p.value
+  
+  cor_cdc_missing_SN38 <- cor_test_cdc_missing_SN38$estimate
+  p_value_cdc_missing_SN38 <- cor_test_cdc_missing_SN38$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN38 = cor_cdc_yes_SN38, p_value_cdc_yes_SN38 = p_value_cdc_yes_SN38,
+    cor_cdc_no_SN38 = cor_cdc_no_SN38, p_value_cdc_no_SN38 = p_value_cdc_no_SN38,
+    cor_cdc_missing_SN38 = cor_cdc_missing_SN38, p_value_cdc_missing_SN38 = p_value_cdc_missing_SN38
+  )
   
   
   
@@ -803,14 +937,32 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN39, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN39 <- cor(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN39 <- cor(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN39 <- cor(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN39 = cor_cdc_yes_SN39, cor_cdc_no_SN39 = cor_cdc_no_SN39, cor_cdc_missing_SN39 = cor_cdc_missing_SN39)
+  # For proportion_yes
+  cor_test_cdc_yes_SN39 <- cor.test(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN39 <- cor.test(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_no, use = "complete.obs")
   
+  # For proportion_missing
+  cor_test_cdc_missing_SN39 <- cor.test(ego_proportions_df_SN39$cdc_avg_out, ego_proportions_df_SN39$proportion_missing, use = "complete.obs")
   
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN39 <- cor_test_cdc_yes_SN39$estimate
+  p_value_cdc_yes_SN39 <- cor_test_cdc_yes_SN39$p.value
+  
+  cor_cdc_no_SN39 <- cor_test_cdc_no_SN39$estimate
+  p_value_cdc_no_SN39 <- cor_test_cdc_no_SN39$p.value
+  
+  cor_cdc_missing_SN39 <- cor_test_cdc_missing_SN39$estimate
+  p_value_cdc_missing_SN39 <- cor_test_cdc_missing_SN39$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN39 = cor_cdc_yes_SN39, p_value_cdc_yes_SN39 = p_value_cdc_yes_SN39,
+    cor_cdc_no_SN39 = cor_cdc_no_SN39, p_value_cdc_no_SN39 = p_value_cdc_no_SN39,
+    cor_cdc_missing_SN39 = cor_cdc_missing_SN39, p_value_cdc_missing_SN39 = p_value_cdc_missing_SN39
+  )
   
   
   
@@ -857,20 +1009,39 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN28, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN28 <- cor(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN28 <- cor(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN28 <- cor(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN28 = cor_cdc_yes_SN28, cor_cdc_no_SN28 = cor_cdc_no_SN28, cor_cdc_missing_SN28 = cor_cdc_missing_SN28)
+  # For proportion_yes
+  cor_test_cdc_yes_SN28 <- cor.test(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN28 <- cor.test(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_no, use = "complete.obs")
   
+  # For proportion_missing
+  cor_test_cdc_missing_SN28 <- cor.test(ego_proportions_df_SN28$cdc_avg_out, ego_proportions_df_SN28$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN28 <- cor_test_cdc_yes_SN28$estimate
+  p_value_cdc_yes_SN28 <- cor_test_cdc_yes_SN28$p.value
+  
+  cor_cdc_no_SN28 <- cor_test_cdc_no_SN28$estimate
+  p_value_cdc_no_SN28 <- cor_test_cdc_no_SN28$p.value
+  
+  cor_cdc_missing_SN28 <- cor_test_cdc_missing_SN28$estimate
+  p_value_cdc_missing_SN28 <- cor_test_cdc_missing_SN28$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN28 = cor_cdc_yes_SN28, p_value_cdc_yes_SN28 = p_value_cdc_yes_SN28,
+    cor_cdc_no_SN28 = cor_cdc_no_SN28, p_value_cdc_no_SN28 = p_value_cdc_no_SN28,
+    cor_cdc_missing_SN28 = cor_cdc_missing_SN28, p_value_cdc_missing_SN28 = p_value_cdc_missing_SN28
+  )
   
   
   
   
 ## Analyze alter how often wears mask in public SN 35 ------ 
   
-  # Analyze the discrete SN35 variable
+## Analyze the discrete SN35 variable ------ 
   ## we consider 1 (always) or 2 (usally) as "success" and 3 (sometimes) or 4 (rarely/never) as failure
   compute_ego_alter_attribute_proportions_SN35_disc <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -912,14 +1083,32 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN35, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN35 <- cor(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN35 <- cor(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN35 <- cor(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN35 = cor_cdc_yes_SN35, cor_cdc_no_SN35 = cor_cdc_no_SN35, cor_cdc_missing_SN35 = cor_cdc_missing_SN35)
+  # For proportion_yes
+  cor_test_cdc_yes_SN35 <- cor.test(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN35 <- cor.test(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_no, use = "complete.obs")
   
+  # For proportion_missing
+  cor_test_cdc_missing_SN35 <- cor.test(ego_proportions_df_SN35$cdc_avg_out, ego_proportions_df_SN35$proportion_missing, use = "complete.obs")
   
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN35 <- cor_test_cdc_yes_SN35$estimate
+  p_value_cdc_yes_SN35 <- cor_test_cdc_yes_SN35$p.value
+  
+  cor_cdc_no_SN35 <- cor_test_cdc_no_SN35$estimate
+  p_value_cdc_no_SN35 <- cor_test_cdc_no_SN35$p.value
+  
+  cor_cdc_missing_SN35 <- cor_test_cdc_missing_SN35$estimate
+  p_value_cdc_missing_SN35 <- cor_test_cdc_missing_SN35$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN35 = cor_cdc_yes_SN35, p_value_cdc_yes_SN35 = p_value_cdc_yes_SN35,
+    cor_cdc_no_SN35 = cor_cdc_no_SN35, p_value_cdc_no_SN35 = p_value_cdc_no_SN35,
+    cor_cdc_missing_SN35 = cor_cdc_missing_SN35, p_value_cdc_missing_SN35 = p_value_cdc_missing_SN35
+  )
   
   
   
@@ -966,13 +1155,32 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN24, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN24 <- cor(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN24 <- cor(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN24 <- cor(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN24 = cor_cdc_yes_SN24, cor_cdc_no_SN24 = cor_cdc_no_SN24, cor_cdc_missing_SN24 = cor_cdc_missing_SN24)
+  # For proportion_yes
+  cor_test_cdc_yes_SN24 <- cor.test(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_yes, use = "complete.obs")
   
+  # For proportion_no
+  cor_test_cdc_no_SN24 <- cor.test(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_no, use = "complete.obs")
   
+  # For proportion_missing
+  cor_test_cdc_missing_SN24 <- cor.test(ego_proportions_df_SN24$cdc_avg_out, ego_proportions_df_SN24$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN24 <- cor_test_cdc_yes_SN24$estimate
+  p_value_cdc_yes_SN24 <- cor_test_cdc_yes_SN24$p.value
+  
+  cor_cdc_no_SN24 <- cor_test_cdc_no_SN24$estimate
+  p_value_cdc_no_SN24 <- cor_test_cdc_no_SN24$p.value
+  
+  cor_cdc_missing_SN24 <- cor_test_cdc_missing_SN24$estimate
+  p_value_cdc_missing_SN24 <- cor_test_cdc_missing_SN24$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN24 = cor_cdc_yes_SN24, p_value_cdc_yes_SN24 = p_value_cdc_yes_SN24,
+    cor_cdc_no_SN24 = cor_cdc_no_SN24, p_value_cdc_no_SN24 = p_value_cdc_no_SN24,
+    cor_cdc_missing_SN24 = cor_cdc_missing_SN24, p_value_cdc_missing_SN24 = p_value_cdc_missing_SN24
+  )
   
   
   
@@ -1009,7 +1217,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   ego_alter_stats_SN27 <- compute_ego_alter_attribute_proportions_SN27(vertex_dt, edge_dt, "SN27")
   
-  ## compute correlations with %alters 
+  ## compute correlations with %alters and significance test
   ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
   
   ego_proportions_df_SN27 <- data.frame(# create data frame
@@ -1020,19 +1228,39 @@ g <- igraph::graph_from_edgelist(edge_list)
     proportion_missing = sapply(ego_alter_stats_SN27, function(x) x$proportion_missing)
   )
   
-  cor_cdc_yes_SN27 <- cor(ego_proportions_df_SN27$cdc_avg_out, ego_proportions_df_SN27$proportion_yes, use = "complete.obs")
-  cor_cdc_no_SN27 <- cor(ego_proportions_df_SN27$cdc_avg_out, ego_proportions_df_SN27$proportion_no, use = "complete.obs")
-  cor_cdc_missing_SN27 <- cor(ego_proportions_df_SN27$cdc_avg_out, ego_proportions_df_SN27$proportion_missing, use = "complete.obs")
   
-  list(cor_cdc_yes_SN27 = cor_cdc_yes_SN27, cor_cdc_no_SN27 = cor_cdc_no_SN27, cor_cdc_missing_SN27 = cor_cdc_missing_SN27)
+  # For proportion_yes
+  cor_test_cdc_yes_SN27 <- cor.test(ego_proportions_df_SN27$cdc_avg_out, ego_proportions_df_SN27$proportion_yes, use = "complete.obs")
+  
+  # For proportion_no
+  cor_test_cdc_no_SN27 <- cor.test(ego_proportions_df_SN27$cdc_avg_out, ego_proportions_df_SN27$proportion_no, use = "complete.obs")
+  
+  # For proportion_missing
+  cor_test_cdc_missing_SN27 <- cor.test(ego_proportions_df_SN27$cdc_avg_out, ego_proportions_df_SN27$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN27 <- cor_test_cdc_yes_SN27$estimate
+  p_value_cdc_yes_SN27 <- cor_test_cdc_yes_SN27$p.value
+  
+  cor_cdc_no_SN27 <- cor_test_cdc_no_SN27$estimate
+  p_value_cdc_no_SN27 <- cor_test_cdc_no_SN27$p.value
+  
+  cor_cdc_missing_SN27 <- cor_test_cdc_missing_SN27$estimate
+  p_value_cdc_missing_SN27 <- cor_test_cdc_missing_SN27$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN27 = cor_cdc_yes_SN27, p_value_cdc_yes_SN27 = p_value_cdc_yes_SN27,
+    cor_cdc_no_SN27 = cor_cdc_no_SN27, p_value_cdc_no_SN27 = p_value_cdc_no_SN27,
+    cor_cdc_missing_SN27 = cor_cdc_missing_SN27, p_value_cdc_missing_SN27 = p_value_cdc_missing_SN27
+  )
   
   
   
   
   
   
-  
-# Analyze alter tested positive for COVID-19 SN27a ------ 
+## Analyze alter tested positive for COVID-19 SN27a ------ 
   
   compute_ego_alter_attribute_proportions_SN27a <- function(vertex_dt, edge_dt, attribute_name) {
     egos <- unique(edge_dt$MTURKID)
@@ -1086,7 +1314,85 @@ g <- igraph::graph_from_edgelist(edge_list)
   
   
   
-# Outcome: vh_info_avg_out -------------------------------------------------
+
+# Outcome: Lifetime Smoking (100 cigs/day) -------------------------------------------------
+  
+  ## Analyze alter knows someone hospitalized because of COVID-19 SN33 ------ 
+  
+  compute_ego_alter_attribute_proportions_SN33 <- function(vertex_dt, edge_dt, attribute_name) {
+    egos <- unique(edge_dt$MTURKID)
+    ego_alter_attribute_proportions <- list()
+    
+    for (ego in egos) {
+      alter_ids <- edge_dt[edge_dt$MTURKID == ego,]$alterID
+      alter_data <- vertex_dt[vertex_dt$name %in% alter_ids, c("name", attribute_name), with = FALSE]
+      
+      yes_count <- sum(alter_data[[attribute_name]] == 1, na.rm = TRUE)
+      no_count <- sum(alter_data[[attribute_name]] == 2, na.rm = TRUE)
+      missing_count <- sum(is.na(alter_data[[attribute_name]]))
+      total_count <- yes_count + no_count + missing_count
+      
+      proportion_yes <- yes_count / total_count
+      proportion_no <- no_count / total_count
+      proportion_missing <- missing_count / total_count
+      
+      ego_alter_attribute_proportions[[as.character(ego)]] <- list(
+        proportion_yes = proportion_yes,
+        proportion_no = proportion_no,
+        proportion_missing = proportion_missing
+      )
+    }
+    
+    return(ego_alter_attribute_proportions)
+  }
+  
+  ego_alter_stats_SN33 <- compute_ego_alter_attribute_proportions_SN33(vertex_dt, edge_dt, "SN33")
+  
+  ## compute correlations with %alters 
+  ego_data <- vertex_dt[!grepl("_", vertex_dt$name),]
+  
+  ego_proportions_df_SN33 <- data.frame(# create data frame
+    MTURKID = names(ego_alter_stats_SN33),
+    lifetime_smoking = ego_data$TUHEA1,
+    proportion_yes = sapply(ego_alter_stats_SN33, function(x) x$proportion_yes),
+    proportion_no = sapply(ego_alter_stats_SN33, function(x) x$proportion_no),
+    proportion_missing = sapply(ego_alter_stats_SN33, function(x) x$proportion_missing)
+  )
+  
+  
+  # For proportion_yes
+  cor_test_cdc_yes_SN33 <- cor.test(ego_proportions_df_SN33$lifetime_smoking, ego_proportions_df_SN33$proportion_yes, use = "complete.obs")
+  
+  # For proportion_no
+  cor_test_cdc_no_SN33 <- cor.test(ego_proportions_df_SN33$lifetime_smoking, ego_proportions_df_SN33$proportion_no, use = "complete.obs")
+  
+  # For proportion_missing
+  cor_test_cdc_missing_SN33 <- cor.test(ego_proportions_df_SN33$lifetime_smoking, ego_proportions_df_SN33$proportion_missing, use = "complete.obs")
+  
+  # Access the correlation coefficients and p-values
+  cor_cdc_yes_SN33 <- cor_test_cdc_yes_SN33$estimate
+  p_value_cdc_yes_SN33 <- cor_test_cdc_yes_SN33$p.value
+  
+  cor_cdc_no_SN33 <- cor_test_cdc_no_SN33$estimate
+  p_value_cdc_no_SN33 <- cor_test_cdc_no_SN33$p.value
+  
+  cor_cdc_missing_SN33 <- cor_test_cdc_missing_SN33$estimate
+  p_value_cdc_missing_SN33 <- cor_test_cdc_missing_SN33$p.value
+  
+  # Combine the results into a list
+  list(
+    cor_cdc_yes_SN33 = cor_cdc_yes_SN33, p_value_cdc_yes_SN33 = p_value_cdc_yes_SN33,
+    cor_cdc_no_SN33 = cor_cdc_no_SN33, p_value_cdc_no_SN33 = p_value_cdc_no_SN33,
+    cor_cdc_missing_SN33 = cor_cdc_missing_SN33, p_value_cdc_missing_SN33 = p_value_cdc_missing_SN33
+  )
+  
+  
+  
+  
+  
+  
+  
+  # Outcome: vh_info_avg_out -------------------------------------------------
   
   
   # # The vh_info_avg_out values in vertex_dt are assigned to the alter instead of the ego.
@@ -1109,6 +1415,7 @@ g <- igraph::graph_from_edgelist(edge_list)
   #   # replace the column in vertex_dt
   #   vertex_dt$vh_info_avg_out <- vertex_dt_vh_info_avg_out$vh_info_avg_out
   # 
+  
 # ## Analyze alter-party distributions  ----------
 # 
 #   ## Compute alter distributions of  VH info at thresholds
