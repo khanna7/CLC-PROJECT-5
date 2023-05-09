@@ -61,6 +61,29 @@ attributes of their network members, structured in `r length(sns_vars)`
 columns, with names such as `r vars[sns_vars[1]]`,
 `r vars[sns_vars[2]]`, ..., `r vars[sns_vars[length(sns_vars)]]`.
 
+## HVaccine attitudes among egos
+
+```{r}
+## Vaccinated?
+sns_consenting_dt$FUVA3
+table(sns_consenting_dt$FUVA3, exclude = NULL)
+table(sns_consenting_dt$FUVA3, exclude = NULL)/sum(table(sns_consenting_dt$FUVA3, exclude = NULL))
+
+## Take vaccine if offered? 
+sns_consenting_dt$FUVH1 
+table(sns_consenting_dt$FUVH1, exclude = NULL)
+
+## Which month did you get the COVID-19 vaccine?
+sns_consenting_dt$FUVA8
+table(sns_consenting_dt$FUVA8, exclude = NULL)
+
+## Among non-uptakers, when a COVID-19 vaccine is available:
+sns_consenting_dt$FUVH2
+table(sns_consenting_dt$FUVH2, exclude = NULL)
+
+```
+
+
 ## Add (i.e., join) the CDC average reported scores for these participants to serve as
 ## an outcome for analysis
 
@@ -310,7 +333,7 @@ setDT(sns_dt_long_wide_no_minors)
 ## Save data file 
 
 ```{r}
-saveRDS(sns_dt_long_wide_no_minors, file="sns_dt_long_wide_no_minors.RDS")
+saveRDS(sns_dt_long_wide_no_minors, file=paste0(data_loc, "sns_dt_long_wide_no_minors.RDS"))
 ```
 
 
