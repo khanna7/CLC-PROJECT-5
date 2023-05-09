@@ -507,7 +507,9 @@ tab2_dt <- cbind(
 
 # Vaccine information---------------------------
 
-
+## at least one does of the vaccine
+head(dt$FUVA3)
+table(dt$FUVA3, exclude = NULL)
 
 
 # Vaccine hesitancy ---------------------------
