@@ -3,3 +3,4 @@
 *.RDS
 *.pdf
 *.html
+.Rproj.user
