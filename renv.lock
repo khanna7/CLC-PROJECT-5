@@ -576,12 +576,13 @@
     },
     "igraph": {
       "Package": "igraph",
-      "Version": "1.4.1",
+      "Version": "1.4.2",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "a7ef0d811cb66d8be9da0d7b5ab80ded",
+      "Hash": "3e476b375c746d899fd53a7281d78191",
       "Requirements": [
         "Matrix",
+        "cpp11",
         "magrittr",
         "pkgconfig",
         "rlang"
@@ -728,6 +729,14 @@
         "Rcpp"
       ]
     },
+    "mnormt": {
+      "Package": "mnormt",
+      "Version": "2.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c83992ef63553d1e4b97162a4a753470",
+      "Requirements": []
+    },
     "munsell": {
       "Package": "munsell",
       "Version": "0.5.0",
@@ -866,6 +875,18 @@
       "Repository": "CRAN",
       "Hash": "ebaacc87f539b1100e285e9e5d6496ad",
       "Requirements": []
+    },
+    "psych": {
+      "Package": "psych",
+      "Version": "2.3.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "458f21cdb24a71340615df3393e8fab1",
+      "Requirements": [
+        "lattice",
+        "mnormt",
+        "nlme"
+      ]
     },
     "purrr": {
       "Package": "purrr",
