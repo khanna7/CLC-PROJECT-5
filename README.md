@@ -1,7 +1,7 @@
 # Organization of Code
 
 ## Script to execute networks pipeline
-Run [this](https://github.com/khanna7/CLC-PROJECT-5/tree/test-homophily#:~:text=analyze%2Dnetworks%2Dpiple.sh)
+Run [this](https://github.com/khanna7/CLC-PROJECT-5/tree/test-homophily#:~:text=analyze%2Dnetworks%2Dpiple.sh) with `./ ./analyze-networks-piple.sh` 
 
 ## Reproduce results from [Monnig 2021](https://publichealth.jmir.org/2021/11/e29319/) 
 - Exploratory Analysis: [Table 2](https://github.com/khanna7/CLC-PROJECT-5/blob/master/EDA.R)
