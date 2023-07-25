@@ -1,7 +1,6 @@
 ---
 title: Compare characteristics of network consenting vs non-consenting participants
 output: html_document
-date: "2023-01-15"
 editor_options: 
   markdown: 
     wrap: 72
@@ -9,22 +8,36 @@ editor_options:
 
 ```{r, setup, include=FALSE}
 rm(list=ls())
-knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
-```
-
-```{r, echo=FALSE, message=FALSE}
-rm(list=ls())
 library(dplyr)
 ```
 
 ```{r}
-tab2_dt <- as.data.frame(readRDS("tab2_comparison_data.RDS"))
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
+
+#tab2_dt <- as.data.frame(readRDS(paste0(data_loc, "tab2_comparison_data.RDS")))
+eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+tab2_dt <- as.data.frame(eda_env$tab2_dt)
 class(tab2_dt)
 dim(tab2_dt)
 colnames(tab2_dt)
 ```
 
+
+## VARIABLE CODING
 Compare `FUSNCONSENT == 7` vs not. 
+
+
+```{r}
+table(tab2_dt$FUSNCONSENT, exclude = NULL)
+```
+
+
+## EXAMPLES 
+#### (may or may not be useful)
+
+```{r}
+tab2_dt$FUSNCONSENT_numeric <- as.numeric(tab2_dt$FUSNCONSENT)
+```
 
 Recode NA is FUSNCONSENT as 0 for easier comparison
 
@@ -34,23 +47,6 @@ tab2_dt <-
                      ifelse(is.na(FUSNCONSENT), 0, FUSNCONSENT))
 ```
 
-
-```{r}
-t.test(as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 7]),
-       as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 0])
-       )
-```
-```{r}
-  tab2_dt %>%  
-  select(gender_3cat, FUSNCONSENT_numeric) %>%
-  group_by(FUSNCONSENT_numeric)
-
-gender_xtab <- 
-  xtabs(~factor(tab2_dt$gender_3cat)+factor(tab2_dt$FUSNCONSENT_numeric))
-
-chisq.test(gender_xtab)
-chisq.test(gender_xtab[1:2, 1:2])
-```
 ```{r}
 race_xtab <- 
   xtabs(~factor(tab2_dt$race_4cat)+factor(tab2_dt$FUSNCONSENT_numeric))
@@ -106,10 +102,13 @@ chisq.test(essential_worker_xtab)
 ```
 
 ```{r}
-tab2_dt$cdc_avg_out = as.numeric(tab2_dt$cdc_avg_out)
-t.test(tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 7],
-       tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 0]
-       )
+
+## I NEED TO ADD THE CDC_AVG_OUT score to tab2_dt 
+
+# tab2_dt$cdc_avg_out = as.numeric(tab2_dt$cdc_avg_out)
+# t.test(tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 7],
+#        tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 0]
+#        )
 ```
 
 ```{r}
