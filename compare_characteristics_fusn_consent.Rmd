@@ -43,13 +43,11 @@ total_fusconsent_7
 total_fusconsent_0 = sum(tab2_dt$FUSNCONSENT_numeric == 0)
 total_fusconsent_0
 
-```{r}
 t.test(as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 7]),
        as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 0])
        )
 
 
-```{r}
 table(tab2_dt$gender_3cat)
 
 ```
