@@ -88,8 +88,8 @@ male_xtab <- xtabs(~gender_3cat + FUSNCONSENT_numeric, data = filter(tab2_dt, ge
 print(male_xtab)
 female_xtab <- xtabs(~gender_3cat + FUSNCONSENT_numeric, data = filter(tab2_dt, gender_3cat == "2"))
 print(female_xtab)
-not_reported_xtab <- xtabs(~gender_3cat + FUSNCONSENT_numeric, data = filter(tab2_dt, gender_3cat == "3"))
-print(not_reported_xtab)
+nonbinary_xtab <- xtabs(~gender_3cat + FUSNCONSENT_numeric, data = filter(tab2_dt, gender_3cat == "3"))
+print(nonbinary_xtab)
 
 # Run the chi-squared tests
 chi2_test_result_male <- chisq.test(male_xtab)
@@ -101,6 +101,39 @@ print(paste("Male p-value: ", chi2_test_result_male$p.value))
 print(paste("Female p-value: ", chi2_test_result_female$p.value))
 #print(paste("Not reported p-value: ", chi2_test_result_not_reported$p.value))
 ```
+
+Test for race
+
+```{r}
+table(tab2_dt$race_4cat)
+```
+```{r}
+# Generate cross-tabulations
+asian_xtab <- xtabs(~race_4cat + FUSNCONSENT_numeric, data = filter(tab2_dt, race_4cat == "Asian"))
+print(asian_xtab)
+
+black_xtab <- xtabs(~race_4cat + FUSNCONSENT_numeric, data = filter(tab2_dt, race_4cat == "Black"))
+print(black_xtab)
+
+other_multiple_race_xtab <- xtabs(~race_4cat + FUSNCONSENT_numeric, data = filter(tab2_dt, race_4cat == "Other/Multiple Race"))
+print(other_multiple_race_xtab)
+
+white_xtab <- xtabs(~race_4cat + FUSNCONSENT_numeric, data = filter(tab2_dt, race_4cat == "White"))
+print(white_xtab)
+
+# Run the chi-squared tests
+chi2_test_result_asian <- chisq.test(asian_xtab)
+chi2_test_result_black <- chisq.test(black_xtab)
+chi2_test_result_other_multiple_race <- chisq.test(other_multiple_race_xtab)
+chi2_test_result_white <- chisq.test(white_xtab)
+
+# Print the p-values from the chi-squared tests
+print(paste("Asian p-value: ", chi2_test_result_asian$p.value))
+print(paste("Black p-value: ", chi2_test_result_black$p.value))
+print(paste("Other/Multiple Race p-value: ", chi2_test_result_other_multiple_race$p.value))
+print(paste("White p-value: ", chi2_test_result_white$p.value))
+```
+
 ```{r}
 race_xtab <- 
   xtabs(~factor(tab2_dt$race_4cat)+factor(tab2_dt$FUSNCONSENT_numeric))
@@ -108,6 +141,30 @@ race_xtab <-
 race_xtab
 chisq.test(race_xtab)
 chisq.test(race_xtab[c(1, 2, 4),])
+```
+
+Test for Ethnicity
+
+```{r}
+table(tab2_dt$ethnicity)
+```
+
+```{r}
+# Generate cross-tabulations
+Hispanic_xtab <- xtabs(~ethnicity + FUSNCONSENT_numeric, data = filter(tab2_dt, ethnicity == "1"))
+print(Hispanic_xtab)
+
+Non_Hispanic_xtab <- xtabs(~ethnicity + FUSNCONSENT_numeric, data = filter(tab2_dt, ethnicity == "2"))
+print(Non_Hispanic_xtab)
+
+# Run the chi-squared tests
+chi2_test_result_hispanic <- chisq.test(Hispanic_xtab)
+chi2_test_result_non_hispanic <- chisq.test(Non_Hispanic_xtab)
+
+
+# Print the p-values from the chi-squared tests
+print(paste("Hispanic p-value: ", chi2_test_result_hispanic$p.value))
+print(paste("Non_hispanic p-value: ", chi2_test_result_non_hispanic$p.value))
 ```
 ```{r}
 ethnicity_xtab <- 
@@ -117,6 +174,37 @@ ethnicity_xtab
 chisq.test(ethnicity_xtab)
 ```
 
+Test for education
+
+```{r}
+table(tab2_dt$education)
+```
+```{r}
+# Generate cross-tabulations
+high_school_xtab <- xtabs(~education + FUSNCONSENT_numeric, data = filter(tab2_dt, education == "1"))
+print(high_school_xtab)
+
+some_college_xtab <- xtabs(~education + FUSNCONSENT_numeric, data = filter(tab2_dt, education == "2"))
+print(some_college_xtab)
+
+college_graduate_xtab <- xtabs(~education + FUSNCONSENT_numeric, data = filter(tab2_dt, education == "3"))
+print(college_graduate_xtab)
+
+other_xtab <- xtabs(~education+ FUSNCONSENT_numeric, data = filter(tab2_dt, education == "4"))
+print(white_xtab)
+
+# Run the chi-squared tests
+chi2_test_result_1 <- chisq.test(high_school_xtab)
+chi2_test_result_2 <- chisq.test(some_college_xtab)
+chi2_test_result_3 <- chisq.test(college_graduate_xtab)
+chi2_test_result_4 <- chisq.test(other_xtab)
+
+# Print the p-values from the chi-squared tests
+print(paste("High school p-value: ", chi2_test_result_1$p.value))
+print(paste("Some college: ", chi2_test_result_2$p.value))
+print(paste("College graduate: ", chi2_test_result_3$p.value))
+print(paste("Other: ", chi2_test_result_4$p.value))
+```
 
 ```{r}
 education_xtab <- 
@@ -125,6 +213,60 @@ education_xtab <-
 education_xtab
 chisq.test(education_xtab)
 ```
+
+Test for income
+
+```{r}
+table(tab2_dt$income)
+```
+```{r}
+# Generate cross-tabulations
+income_10_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "10"))
+print(income_10_xtab)
+
+income_11_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "11"))
+print(income_11_xtab)
+
+income_4_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "4"))
+print(income_4_xtab)
+
+income_5_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "5"))
+print(income_5_xtab)
+
+income_6_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "6"))
+print(income_6_xtab)
+
+income_7_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "7"))
+print(income_7_xtab)
+
+income_8_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "8"))
+print(income_8_xtab)
+
+income_9_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "9"))
+print(income_9_xtab)
+
+# Run the chi-squared tests
+chi2_test_result_income_10 <- chisq.test(income_10_xtab)
+chi2_test_result_income_11 <- chisq.test(income_11_xtab)
+chi2_test_result_income_4 <- chisq.test(income_4_xtab)
+chi2_test_result_income_5 <- chisq.test(income_5_xtab)
+chi2_test_result_income_6 <- chisq.test(income_6_xtab)
+chi2_test_result_income_7 <- chisq.test(income_7_xtab)
+chi2_test_result_income_8 <- chisq.test(income_8_xtab)
+chi2_test_result_income_9 <- chisq.test(income_9_xtab)
+
+# Print the p-values from the chi-squared tests
+print(paste("Income 10 p-value: ", chi2_test_result_income_10$p.value))
+print(paste("Income 11 p-value: ", chi2_test_result_income_11$p.value))
+print(paste("Income 4 p-value: ", chi2_test_result_income_4$p.value))
+print(paste("Income 5 p-value: ", chi2_test_result_income_5$p.value))
+print(paste("Income 6 p-value: ", chi2_test_result_income_6$p.value))
+print(paste("Income 7 p-value: ", chi2_test_result_income_7$p.value))
+print(paste("Income 8 p-value: ", chi2_test_result_income_8$p.value))
+print(paste("Income 9 p-value: ", chi2_test_result_income_9$p.value))
+
+```
+
 ```{r}
 income_xtab <- 
   xtabs(~factor(tab2_dt$income)+factor(tab2_dt$FUSNCONSENT_numeric))
@@ -133,12 +275,15 @@ income_xtab
 chisq.test(income_xtab)
 ```
 
+Test for household
 ```{r}
 tab2_dt$household_size = as.numeric(tab2_dt$household_size)
 t.test(tab2_dt$household_size[tab2_dt$FUSNCONSENT_numeric == 7],
        tab2_dt$household_size[tab2_dt$FUSNCONSENT_numeric == 0]
        )
 ```
+
+Test for ownership
 ```{r}
 dwelling_ownership_xtab <- 
   xtabs(~factor(tab2_dt$dwelling_ownership)+factor(tab2_dt$FUSNCONSENT_numeric))
@@ -147,6 +292,7 @@ dwelling_ownership_xtab
 chisq.test(dwelling_ownership_xtab)
 ```
 
+test for essential_worker
 ```{r}
 essential_worker_xtab <- 
   xtabs(~factor(tab2_dt$essential_worker)+factor(tab2_dt$FUSNCONSENT_numeric))
@@ -155,11 +301,25 @@ essential_worker_xtab
 chisq.test(essential_worker_xtab)
 ```
 
+test for cdc average guideline 
+
 ```{r}
-tab2_dt$cdc_avg_out = as.numeric(tab2_dt$cdc_avg_out)
-t.test(tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 7],
-       tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 0]
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
+eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+cdc_scores <- eda_env$cdc_scores
+cdc_scores
+```
+
+```{r}
+eda_env$cdc_scores = as.numeric(unlist(eda_env$cdc_scores))
+
+t.test(eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 7],
+      eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 0]
        )
+```
+Test for covid_test
+```{r}
+table(tab2_dt$covid_test)
 ```
 
 ```{r}
@@ -170,6 +330,13 @@ covid_test_xtab
 chisq.test(covid_test_xtab)
 ```
 
+
+Test for positive covid -- tab2_dt$covid_test == 1
+```{r}
+positive_covid_xtab <- xtabs(~covid_test + FUSNCONSENT_numeric, data = filter(tab2_dt, covid_test == "1"))
+chisq.test(positive_covid_xtab)
+```
+Test for sub_last7days
 ```{r}
 tab2_dt <- 
   tab2_dt %>% mutate(sub_last7days = 
@@ -209,4 +376,67 @@ daily_stimulant_xtab <-
 
 daily_stimulant_xtab
 chisq.test(daily_stimulant_xtab)
+```
+
+read the cdc_score data
+
+```{r}
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
+eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+cdc_scores <- eda_env$cdc_scores
+```
+
+
+Quartiles for age
+
+```{r}
+# Convert cdc_scores to numeric and create a data frame
+cdc_df <- data.frame(cdc_scores = as.numeric(unlist(eda_env$cdc_scores)))
+
+# Apply the ntile function to create quartiles
+cdc_df <- cdc_df %>%
+  mutate(cdc_quartiles = ntile(cdc_scores, 4))
+
+# Create a data frame from the age list in the environment
+age_df <- data.frame(age = as.numeric(unlist(tab2_dt$age)))
+
+# Combine cdc_scores and age into one data frame
+combined_df <- cbind(cdc_df, age_df)
+
+# Compute summary statistics for age within each quartile
+age_summary <- combined_df %>%
+  group_by(cdc_quartiles) %>%
+  summarise(age_mean = mean(age, na.rm = TRUE),
+            age_sd = sd(age, na.rm = TRUE))
+  
+print(age_summary)
+```
+
+Quartiles for Gender
+
+```{r}
+# Convert cdc_scores to numeric and create a data frame
+cdc_df <- data.frame(cdc_scores = as.numeric(unlist(eda_env$cdc_scores)))
+
+# Apply the ntile function to create quartiles
+cdc_df <- cdc_df %>%
+  mutate(cdc_quartiles = ntile(cdc_scores, 4))
+
+# Create a data frame from the gender list in the environment
+gender_df <- data.frame(gender = unlist(tab2_dt$gender))
+
+# Combine cdc_scores and gender into one data frame
+combined_df <- cbind(cdc_df, gender_df)
+
+# Compute quartiles for cdc_scores within each gender category
+gender_summary <- combined_df %>%
+  group_by(gender) %>%
+  summarise(
+    Q1 = quantile(cdc_scores, 0.25, na.rm = TRUE),
+    Q2 = quantile(cdc_scores, 0.5, na.rm = TRUE),
+    Q3 = quantile(cdc_scores, 0.75, na.rm = TRUE),
+    Q4 = quantile(cdc_scores, 1, na.rm = TRUE)
+  )
+  
+print(gender_summary)
 ```
