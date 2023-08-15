@@ -51,4 +51,4 @@ Test the same hypothesis but with only men and women:
 ```{r}
 chisq.test(gender_table[1:2,1:2])
 ```
-
+We see that there is even less evidence against the null if we just use the first 2 categories.  
