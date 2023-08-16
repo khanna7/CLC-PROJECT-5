@@ -25,7 +25,7 @@ Run [this](https://github.com/khanna7/CLC-PROJECT-5/tree/test-homophily#:~:text=
   * Test whether the summary statistics are significantly different or not (To Be Done)
   * This is Table 2 in the working draft of the manuscript.
   
-  ### Table 2: Characteristics of Reported Network Members Stratified by Participant's CDC Guideline Adherence Score Quartiles
+  ### [Table 2](https://github.com/khanna7/CLC-PROJECT-5/blob/mockups/network-contact-characteristics-by-quartile.R): Characteristics of Reported Network Members Stratified by Participant's CDC Guideline Adherence Score Quartiles
 
 | Sample Characteristic       | Fourth Quartile (n=?) | Third Quantile (n=?) | Second  Quantile (n=?) | First Quantile |
 |-----------------------------|-----------------------|----------------------|------------------------|----------------|
