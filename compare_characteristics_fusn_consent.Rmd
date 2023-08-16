@@ -67,26 +67,38 @@ chisq.test(gender_xtab[1:2, 1:2])
 Test for age
 ```{r}
 
-mean_age <- tab2_dt %>%
+library(dplyr)
+
+stats_age <- tab2_dt %>%
   mutate(age_numeric = as.numeric(as.character(age))) %>%  # Convert age to numeric
   group_by(FUSNCONSENT_numeric) %>%
-  summarise(mean_age = mean(age_numeric, na.rm = TRUE))
+  summarise(
+    mean_age = mean(age_numeric, na.rm = TRUE),
+    sd_age = sd(age_numeric, na.rm = TRUE)
+  )
 
-print(mean_age)
+print(stats_age)
+
 
 
 ```
 
 
 ```{r}
-tab2_dt %>%  
-  select(age, FUSNCONSENT_numeric) %>%
-  group_by(FUSNCONSENT_numeric)
+library(dplyr)
 
-age_xtab <- 
-  xtabs(~factor(tab2_dt$age)+factor(tab2_dt$FUSNCONSENT_numeric))
+# Convert age to numeric
+tab2_dt$age_numeric <- as.numeric(as.character(tab2_dt$age))
 
-chisq.test(age_xtab)
+# Split data based on FUSNCONSENT_numeric
+group1 <- tab2_dt$age_numeric[tab2_dt$FUSNCONSENT_numeric == 0]
+group2 <- tab2_dt$age_numeric[tab2_dt$FUSNCONSENT_numeric == 7]
+
+# Perform t-test
+t_test_result <- t.test(group1, group2)
+
+print(t_test_result)
+
 ```
 
 Test for Gender
@@ -376,11 +388,33 @@ chisq.test(income_xtab)
 
 Test for household
 ```{r}
-mean_household_size <- tab2_dt %>%
-  group_by(FUSNCONSENT_numeric) %>%
-  summarise(mean_size = mean(household_size, na.rm = TRUE))
+library(dplyr)
 
-print(mean_household_size)
+
+stats_household_size <- tab2_dt %>%
+  mutate(household_size_numeric = as.numeric(as.character(household_size))) %>%  # Convert household_size to numeric
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(
+    mean_household_size = mean(household_size_numeric, na.rm = TRUE),
+    sd_household_size = sd(household_size_numeric, na.rm = TRUE)
+  )
+
+print(stats_household_size)
+
+```
+
+```{r}
+# Convert to numeric
+tab2_dt$household_numeric <- as.numeric(as.character(tab2_dt$household_size))
+
+# Split data based on FUSNCONSENT_numeric
+group1 <- tab2_dt$household_numeric [tab2_dt$FUSNCONSENT_numeric == 0]
+group2 <- tab2_dt$household_numeric[tab2_dt$FUSNCONSENT_numeric == 7]
+
+# Perform t-test
+t_test_result <- t.test(group1, group2)
+
+print(t_test_result)
 ```
 
 test for essential_worker
@@ -423,9 +457,15 @@ scores_0 <- eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 0]
 mean_scores_7 <- mean(scores_7, na.rm = TRUE)
 mean_scores_0 <- mean(scores_0, na.rm = TRUE)
 
+sd_scores_7 <- sd(scores_7, na.rm = TRUE)
+sd_scores_0 <- sd(scores_0, na.rm = TRUE)
+
+
 cat("Mean CDC Score for FUSNCONSENT_numeric == 7:", mean_scores_7, "\n")
 cat("Mean CDC Score for FUSNCONSENT_numeric == 0:", mean_scores_0, "\n")
 
+cat("SD CDC Score for FUSNCONSENT_numeric == 7:", sd_scores_7, "\n")
+cat("SD CDC Score for FUSNCONSENT_numeric == 0:", sd_scores_0, "\n")
 ```
 
 ```{r}
