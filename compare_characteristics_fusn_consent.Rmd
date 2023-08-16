@@ -65,19 +65,63 @@ chisq.test(gender_xtab[1:2, 1:2])
 ```
 
 Test for age
+```{r}
+
+library(dplyr)
+
+stats_age <- tab2_dt %>%
+  mutate(age_numeric = as.numeric(as.character(age))) %>%  # Convert age to numeric
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(
+    mean_age = mean(age_numeric, na.rm = TRUE),
+    sd_age = sd(age_numeric, na.rm = TRUE)
+  )
+
+print(stats_age)
+
+
+
+```
+
 
 ```{r}
-tab2_dt %>%  
-  select(age, FUSNCONSENT_numeric) %>%
-  group_by(FUSNCONSENT_numeric)
+library(dplyr)
 
-age_xtab <- 
-  xtabs(~factor(tab2_dt$age)+factor(tab2_dt$FUSNCONSENT_numeric))
+# Convert age to numeric
+tab2_dt$age_numeric <- as.numeric(as.character(tab2_dt$age))
 
-chisq.test(age_xtab)
+# Split data based on FUSNCONSENT_numeric
+group1 <- tab2_dt$age_numeric[tab2_dt$FUSNCONSENT_numeric == 0]
+group2 <- tab2_dt$age_numeric[tab2_dt$FUSNCONSENT_numeric == 7]
+
+# Perform t-test
+t_test_result <- t.test(group1, group2)
+
+print(t_test_result)
+
 ```
 
 Test for Gender
+
+```{r}
+#male_count
+tab2_dt %>%
+  filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "1") %>%
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(male_count = n())
+```
+```{r}
+tab2_dt %>%
+  filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "2") %>%
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(female_count = n())
+```
+```{r}
+tab2_dt %>%
+  filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "3") %>%
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(not_reported_count = n())
+```
 
 ```{r}
 # Load the necessary libraries
@@ -103,6 +147,24 @@ print(paste("Female p-value: ", chi2_test_result_female$p.value))
 ```
 
 Test for race
+
+```{r}
+library(dplyr)
+
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+race_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, race_4cat) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(race_summary)
+
+```
 
 ```{r}
 table(tab2_dt$race_4cat)
@@ -144,10 +206,28 @@ chisq.test(race_xtab[c(1, 2, 4),])
 ```
 
 Test for Ethnicity
-
 ```{r}
-table(tab2_dt$ethnicity)
+ethnicity_xtab <- 
+  xtabs(~factor(tab2_dt$ethnicity)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+ethnicity_xtab
+chisq.test(ethnicity_xtab)
 ```
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+ethnicity_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, ethnicity) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(ethnicity_summary)
+```
+
 
 ```{r}
 # Generate cross-tabulations
@@ -205,6 +285,22 @@ print(paste("Some college: ", chi2_test_result_2$p.value))
 print(paste("College graduate: ", chi2_test_result_3$p.value))
 print(paste("Other: ", chi2_test_result_4$p.value))
 ```
+
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+education_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, education) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(education_summary)
+```
+
 
 ```{r}
 education_xtab <- 
@@ -268,6 +364,21 @@ print(paste("Income 9 p-value: ", chi2_test_result_income_9$p.value))
 ```
 
 ```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+income_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, income) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(income_summary)
+```
+
+```{r}
 income_xtab <- 
   xtabs(~factor(tab2_dt$income)+factor(tab2_dt$FUSNCONSENT_numeric))
 
@@ -277,22 +388,51 @@ chisq.test(income_xtab)
 
 Test for household
 ```{r}
-tab2_dt$household_size = as.numeric(tab2_dt$household_size)
-t.test(tab2_dt$household_size[tab2_dt$FUSNCONSENT_numeric == 7],
-       tab2_dt$household_size[tab2_dt$FUSNCONSENT_numeric == 0]
-       )
+library(dplyr)
+
+
+stats_household_size <- tab2_dt %>%
+  mutate(household_size_numeric = as.numeric(as.character(household_size))) %>%  # Convert household_size to numeric
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(
+    mean_household_size = mean(household_size_numeric, na.rm = TRUE),
+    sd_household_size = sd(household_size_numeric, na.rm = TRUE)
+  )
+
+print(stats_household_size)
+
 ```
 
-Test for ownership
 ```{r}
-dwelling_ownership_xtab <- 
-  xtabs(~factor(tab2_dt$dwelling_ownership)+factor(tab2_dt$FUSNCONSENT_numeric))
+# Convert to numeric
+tab2_dt$household_numeric <- as.numeric(as.character(tab2_dt$household_size))
 
-dwelling_ownership_xtab
-chisq.test(dwelling_ownership_xtab)
+# Split data based on FUSNCONSENT_numeric
+group1 <- tab2_dt$household_numeric [tab2_dt$FUSNCONSENT_numeric == 0]
+group2 <- tab2_dt$household_numeric[tab2_dt$FUSNCONSENT_numeric == 7]
+
+# Perform t-test
+t_test_result <- t.test(group1, group2)
+
+print(t_test_result)
 ```
 
 test for essential_worker
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+essential_worker_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, essential_worker) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(essential_worker_summary)
+```
+
 ```{r}
 essential_worker_xtab <- 
   xtabs(~factor(tab2_dt$essential_worker)+factor(tab2_dt$FUSNCONSENT_numeric))
@@ -307,7 +447,25 @@ test for cdc average guideline
 data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
 eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
 cdc_scores <- eda_env$cdc_scores
-cdc_scores
+
+# Extract the cdc_scores for participants with FUSNCONSENT_numeric values of 7 and 0
+eda_env$cdc_scores = as.numeric(unlist(eda_env$cdc_scores))
+scores_7 <- eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 7]
+scores_0 <- eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 0]
+
+# Compute mean for each group
+mean_scores_7 <- mean(scores_7, na.rm = TRUE)
+mean_scores_0 <- mean(scores_0, na.rm = TRUE)
+
+sd_scores_7 <- sd(scores_7, na.rm = TRUE)
+sd_scores_0 <- sd(scores_0, na.rm = TRUE)
+
+
+cat("Mean CDC Score for FUSNCONSENT_numeric == 7:", mean_scores_7, "\n")
+cat("Mean CDC Score for FUSNCONSENT_numeric == 0:", mean_scores_0, "\n")
+
+cat("SD CDC Score for FUSNCONSENT_numeric == 7:", sd_scores_7, "\n")
+cat("SD CDC Score for FUSNCONSENT_numeric == 0:", sd_scores_0, "\n")
 ```
 
 ```{r}
@@ -317,9 +475,21 @@ t.test(eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 7],
       eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 0]
        )
 ```
+
 Test for covid_test
 ```{r}
-table(tab2_dt$covid_test)
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+covid_test_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, covid_test) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(covid_test_summary)
 ```
 
 ```{r}
@@ -332,21 +502,26 @@ chisq.test(covid_test_xtab)
 
 
 Test for positive covid -- tab2_dt$covid_test == 1
+
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7) & covid_test == 1)
+
+# Determine the counts and percentages
+covid_test_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, covid_test) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(covid_test_summary)
+
+```
+
 ```{r}
 positive_covid_xtab <- xtabs(~covid_test + FUSNCONSENT_numeric, data = filter(tab2_dt, covid_test == "1"))
 chisq.test(positive_covid_xtab)
-```
-Test for sub_last7days
-```{r}
-tab2_dt <- 
-  tab2_dt %>% mutate(sub_last7days = 
-                     ifelse(is.na(sub_last7days), 0, sub_last7days))
-sub_last7days_xtab <- 
-  xtabs(~factor(tab2_dt$sub_last7days, exclude = NULL)+
-          factor(tab2_dt$FUSNCONSENT_numeric))
-
-sub_last7days_xtab
-chisq.test(sub_last7days_xtab)
 ```
 
 ```{r}
@@ -390,26 +565,64 @@ cdc_scores <- eda_env$cdc_scores
 Quartiles for age
 
 ```{r}
-# Convert cdc_scores to numeric and create a data frame
-cdc_df <- data.frame(cdc_scores = as.numeric(unlist(eda_env$cdc_scores)))
+# Check lengths
+length_of_filtered_cdc_scores <- length(cdc_scores_numeric[tab2_dt$FUSNCONSENT_numeric == 7])
+length_of_filtered_age <- nrow(tab2_dt[tab2_dt$FUSNCONSENT_numeric == 7, ])
 
-# Apply the ntile function to create quartiles
-cdc_df <- cdc_df %>%
+cat("Length of filtered cdc_scores:", length_of_filtered_cdc_scores, "\n")
+cat("Length of filtered age:", length_of_filtered_age, "\n")
+
+# If they are different, we'll need to investigate further
+if(length_of_filtered_cdc_scores != length_of_filtered_age) {
+  cat("Discrepancy found! Investigating...\n")
+
+  # Check for NAs
+  na_in_cdc_scores <- sum(is.na(cdc_scores_numeric[tab2_dt$FUSNCONSENT_numeric == 7]))
+  na_in_FUSNCONSENT_numeric <- sum(is.na(tab2_dt$FUSNCONSENT_numeric))
+
+  cat("Number of NAs in filtered cdc_scores:", na_in_cdc_scores, "\n")
+  cat("Number of NAs in FUSNCONSENT_numeric:", na_in_FUSNCONSENT_numeric, "\n")
+}
+
+```
+
+```{r}
+# Filter cdc_scores based on FUSNCONSENT_numeric from tab2_dt
+filtered_cdc_scores <- data.frame(cdc_scores = cdc_scores_numeric[tab2_dt$FUSNCONSENT_numeric == 7])
+
+# Remove NAs from filtered cdc_scores
+filtered_cdc_scores <- filtered_cdc_scores %>% filter(!is.na(cdc_scores))
+
+# Compute quartiles for these filtered scores
+filtered_cdc_scores <- filtered_cdc_scores %>%
   mutate(cdc_quartiles = ntile(cdc_scores, 4))
 
-# Create a data frame from the age list in the environment
-age_df <- data.frame(age = as.numeric(unlist(tab2_dt$age)))
+# Create a data frame from the age list in the environment and convert to numeric
+age_df <- tab2_dt %>%
+  filter(FUSNCONSENT_numeric == 7) %>%
+  mutate(age_numeric = as.numeric(as.character(age))) %>%
+  select(age_numeric)
 
-# Combine cdc_scores and age into one data frame
-combined_df <- cbind(cdc_df, age_df)
+# Check lengths again
+cat("Length of cleaned filtered cdc_scores:", nrow(filtered_cdc_scores), "\n")
+cat("Length of filtered age:", nrow(age_df), "\n")
 
-# Compute summary statistics for age within each quartile
-age_summary <- combined_df %>%
-  group_by(cdc_quartiles) %>%
-  summarise(age_mean = mean(age, na.rm = TRUE),
-            age_sd = sd(age, na.rm = TRUE))
+# Assuming the lengths match, combine cdc_scores and age into one data frame
+if (nrow(filtered_cdc_scores) == nrow(age_df)) {
+  combined_df <- cbind(filtered_cdc_scores, age_df)
   
-print(age_summary)
+  # Compute summary statistics for age within each quartile
+  age_summary <- combined_df %>%
+    group_by(cdc_quartiles) %>%
+    summarise(age_mean = mean(age_numeric, na.rm = TRUE),
+              age_sd = sd(age_numeric, na.rm = TRUE))
+    
+  print(age_summary)
+} else {
+  cat("The lengths do not match! Further investigation is required.")
+}
+
+
 ```
 
 Quartiles for Gender
