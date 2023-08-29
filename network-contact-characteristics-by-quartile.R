@@ -752,4 +752,209 @@ hospitalized_for_covid_test <- chisq.test(hospitalized_for_covid_contingency_tab
 print(hospitalized_for_covid_test)
 
 
+# Summarize for knows_anyone_hospitalized_for_covid -------------
+## Summary 
+knows_anyone_hospitalized_for_covid_distribution <- combined_data %>%
+  group_by(quartile, SN28) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+knows_anyone_hospitalized_for_covid_wide <- knows_anyone_hospitalized_for_covid_distribution %>%
+  pivot_wider(names_from = SN28, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(knows_anyone_hospitalized_for_covid_wide)
+
+## Test
+knows_anyone_hospitalized_for_covid_contingency_table <- table(combined_data$quartile, combined_data$SN28)
+print(knows_anyone_hospitalized_for_covid_contingency_table)
+
+knows_anyone_hospitalized_for_covid_test <- chisq.test(knows_anyone_hospitalized_for_covid_contingency_table)
+print(knows_anyone_hospitalized_for_covid_test)
+
+
+# Summarize for encouraged_testing_for_covid -------------
+## Summary 
+encouraged_testing_for_covid_distribution <- combined_data %>%
+  group_by(quartile, SN32) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+encouraged_testing_for_covid_wide <- encouraged_testing_for_covid_distribution %>%
+  pivot_wider(names_from = SN32, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(encouraged_testing_for_covid_wide)
+
+## Test
+encouraged_testing_for_covid_contingency_table <- table(combined_data$quartile, combined_data$SN32)
+print(encouraged_testing_for_covid_contingency_table)
+
+encouraged_testing_for_covid_test <- chisq.test(encouraged_testing_for_covid_contingency_table)
+print(encouraged_testing_for_covid_test)
+
+# Summarize for follows_social_distancing -------------
+## Summary 
+follows_social_distancing_distribution <- combined_data %>%
+  group_by(quartile, SN33) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+follows_social_distancing_wide <- follows_social_distancing_distribution %>%
+  pivot_wider(names_from = SN33, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(follows_social_distancing_wide)
+
+## Test
+follows_social_distancing_contingency_table <- table(combined_data$quartile, combined_data$SN33)
+print(follows_social_distancing_contingency_table)
+
+follows_social_distancing_test <- chisq.test(follows_social_distancing_contingency_table)
+print(follows_social_distancing_test)
+
+
+# Summarize for encouraged_social_distancing -------------
+## Summary 
+encouraged_social_distancing_distribution <- combined_data %>%
+  group_by(quartile, SN34) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+encouraged_social_distancing_wide <- encouraged_social_distancing_distribution %>%
+  pivot_wider(names_from = SN34, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(encouraged_social_distancing_wide)
+
+## Test
+encouraged_social_distancing_contingency_table <- table(combined_data$quartile, combined_data$SN34)
+print(encouraged_social_distancing_contingency_table)
+
+encouraged_social_distancing_test <- chisq.test(encouraged_social_distancing_contingency_table)
+print(encouraged_social_distancing_test)
+
+# Summarize for received_covid_vaccine -------------
+## Summary 
+received_covid_vaccine_distribution <- combined_data %>%
+  group_by(quartile, SN37) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+received_covid_vaccine_wide <- received_covid_vaccine_distribution %>%
+  pivot_wider(names_from = SN37, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(received_covid_vaccine_wide)
+
+## Test
+received_covid_vaccine_contingency_table <- table(combined_data$quartile, combined_data$SN37)
+print(received_covid_vaccine_contingency_table)
+
+received_covid_vaccine_test <- chisq.test(received_covid_vaccine_contingency_table)
+print(received_covid_vaccine_test)
+
+# Summarize for vaccine_side_effects -------------
+## Summary 
+vaccine_side_effects_distribution <- combined_data %>%
+  group_by(quartile, SN37a) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+vaccine_side_effects_wide <- vaccine_side_effects_distribution %>%
+  pivot_wider(names_from = SN37a, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(vaccine_side_effects_wide)
+
+## Test
+vaccine_side_effects_contingency_table <- table(combined_data$quartile, combined_data$SN37a)
+print(vaccine_side_effects_contingency_table)
+
+vaccine_side_effects_test <- chisq.test(vaccine_side_effects_contingency_table)
+print(vaccine_side_effects_test)
+
+
+# Summarize for open_to_vaccine -------------
+## Summary 
+open_to_vaccine_distribution <- combined_data %>%
+  group_by(quartile, SN37b) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+open_to_vaccine_wide <- open_to_vaccine_distribution %>%
+  pivot_wider(names_from = SN37b, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(open_to_vaccine_wide)
+
+## Test
+open_to_vaccine_contingency_table <- table(combined_data$quartile, combined_data$SN37b)
+print(open_to_vaccine_contingency_table)
+
+open_to_vaccine_test <- chisq.test(open_to_vaccine_contingency_table)
+print(open_to_vaccine_test)
+
+
+# Summarize for encouraged_vaccine -------------
+## Summary 
+encouraged_vaccine_distribution <- combined_data %>%
+  group_by(quartile, SN38) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+encouraged_vaccine_wide <- encouraged_vaccine_distribution %>%
+  pivot_wider(names_from = SN38, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(encouraged_vaccine_wide)
+
+## Test
+encouraged_vaccine_contingency_table <- table(combined_data$quartile, combined_data$SN38)
+print(encouraged_vaccine_contingency_table)
+
+encouraged_vaccine_test <- chisq.test(encouraged_vaccine_contingency_table)
+print(encouraged_vaccine_test)
+
+
+
+# Summarize for discouraged_vaccine -------------
+## Summary 
+discouraged_vaccine_distribution <- combined_data %>%
+  group_by(quartile, SN39) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+discouraged_vaccine_wide <- discouraged_vaccine_distribution %>%
+  pivot_wider(names_from = SN39, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(discouraged_vaccine_wide)
+
+## Test
+discouraged_vaccine_contingency_table <- table(combined_data$quartile, combined_data$SN39)
+print(discouraged_vaccine_contingency_table)
+
+discouraged_vaccine_test <- chisq.test(discouraged_vaccine_contingency_table)
+print(discouraged_vaccine_test)
+
+
 
