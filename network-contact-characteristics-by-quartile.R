@@ -1,13 +1,6 @@
 # Compute characteristics of network participants when the egos are split into 
 # quartiles by average CDC score.
 
-rm(list=ls())
-knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
-
-
-rm(list=ls())
-library(dplyr)
-
 
 # Top matter ----------
 
@@ -16,9 +9,6 @@ rm(list=ls())
 
 library(haven)
 library(dplyr)
-library(data.table)
-library(tidyverse)
-
 
 
 # Read data ----------
@@ -32,6 +22,8 @@ sns_dt_long_wide_no_minors <- readRDS(paste0(data_loc, "sns_dt_long_wide_no_mino
 dim(sns_dt_long_wide_no_minors)
 
 sns_dt_long_wide_no_minors
+
+
 # Classify egos into quartiles based on their CDC score ----------
 
 sns_consenting_dt <- sns_consenting_dt %>%
@@ -46,7 +38,7 @@ combined_data <- left_join(sns_dt_long_wide_no_minors, sns_consenting_dt,
 
 combined_data
 
-table(combined_data$quartile)
+table(combined_data$quartile, exclude = NULL)
 
 
 # Sumarize age ---------
@@ -76,7 +68,7 @@ gender_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 gender_wide <- gender_distribution %>%
-  pivot_wider(names_from = SN4, values_from = proportion, values_fill = 0) %>%
+  tidyr :: pivot_wider(names_from = SN4, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -91,60 +83,6 @@ print(gender_contingency_table)
 gender_test <- chisq.test(gender_contingency_table)
 print(gender_test)
 
-# Summarize race -----------
-
-combined_data_long <- combined_data %>%
-  pivot_longer(cols = starts_with("SN3_"), 
-               names_to = "SN3_type", 
-               values_to = "value")
-# Summary
-race_distribution <- combined_data_long %>%
-  group_by(quartile, SN3_type, value) %>%
-  tally() %>%
-  group_by(quartile, SN3_type) %>%
-  mutate(proportion = n/sum(n))
-
-race_wide <- race_distribution %>%
-  pivot_wider(names_from = value, values_from = proportion, values_fill = 0) %>%
-  group_by(quartile, SN3_type) %>%
-  summarise(across(everything(), sum))  
-
-race_wide <- race_wide %>%
-  arrange(SN3_type, quartile)
-
-print(race_wide, n = Inf)
-
-#test
-
-library(dplyr)
-library(tidyr)
-library(purrr)
-
-
-# Convert the data into long format
-combined_data_long <- combined_data %>%
-  pivot_longer(
-    cols = starts_with("SN3_"), 
-    names_to = "SN3_type", 
-    values_to = "value"
-  )
-
-# Sum across the SN3_type columns for each quartile
-# Sum across the SN3_type columns for each quartile
-combined_counts <- combined_data_long %>%
-  group_by(quartile) %>%
-  summarise(across(starts_with("SN3_"), sum))
-
-
-# Create a contingency table with quartile as rows and sum of values across all SN3_types
-contingency_table <- with(combined_data_long, table(quartile, value))
-
-# Perform chi-square test
-test_result <- chisq.test(contingency_table)
-
-# Print p-value
-print(test_result$p.value)
-
 #Summarize for ethnicity
 
 ## summary 
@@ -155,7 +93,7 @@ ethnicity_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 ethnicity_wide <- ethnicity_distribution %>%
-  pivot_wider(names_from = SN5, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN5, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -179,7 +117,7 @@ education_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 education_wide <- education_distribution %>%
-  pivot_wider(names_from = SN6, values_from = proportion, values_fill = 0) %>%
+  tidyr :: pivot_wider(names_from = SN6, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -203,7 +141,7 @@ covid_test_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 covid_test_wide <- covid_test_distribution %>%
-  pivot_wider(names_from = SN27, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN27, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -226,7 +164,7 @@ annual_household_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 annual_household_wide <- annual_household_distribution %>%
-  pivot_wider(names_from = DEMO20, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = DEMO20, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -250,7 +188,7 @@ essential_worker_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 essential_worker_wide <- essential_worker_distribution %>%
-  pivot_wider(names_from = LSQ3, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = LSQ3, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -301,7 +239,7 @@ summary(positive_test)
 
 # Convert the data into long format
 combined_data_long <- combined_data %>%
-  pivot_longer(
+  tidyr :: pivot_longer(
     cols = starts_with("SN10_"), 
     names_to = "SN10_type", 
     values_to = "value"
@@ -315,7 +253,7 @@ communication_distribution <- combined_data_long %>%
   mutate(proportion = n/sum(n))
 
 communication_wide <- communication_distribution %>%
-  pivot_wider(names_from = SN10_type, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN10_type, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -340,7 +278,7 @@ mode_of_communication_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 mode_of_communication_wide <- mode_of_communication_distribution %>%
-  pivot_wider(names_from = SN11, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN11, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -362,7 +300,7 @@ length_of_friendship_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 length_of_friendship_wide <- length_of_friendship_distribution %>%
-  pivot_wider(names_from = SN12, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN12, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -384,7 +322,7 @@ frequency_of_communication_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 frequency_of_communication_wide <- frequency_of_communication_distribution %>%
-  pivot_wider(names_from = SN13, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN13, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -406,7 +344,7 @@ discuss_personal_matters_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 discuss_personal_matters_wide <- discuss_personal_matters_distribution %>%
-  pivot_wider(names_from = SN14, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN14, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -428,7 +366,7 @@ ask_for_advice_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 ask_for_advice_wide <- ask_for_advice_distribution %>%
-  pivot_wider(names_from = SN15, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN15, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -450,7 +388,7 @@ spouse_or_partner_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 spouse_or_partner_wide <- spouse_or_partner_distribution %>%
-  pivot_wider(names_from = SN16, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN16, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -472,7 +410,7 @@ close_relative_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 close_relative_wide <- close_relative_distribution %>%
-  pivot_wider(names_from = SN17, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN17, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -494,7 +432,7 @@ sexual_relationship_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 sexual_relationship_wide <- sexual_relationship_distribution %>%
-  pivot_wider(names_from = SN18, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN18, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -516,7 +454,7 @@ cohabiting_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 cohabiting_wide <- cohabiting_distribution %>%
-  pivot_wider(names_from = SN19, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN19, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -538,7 +476,7 @@ smokes_tobacco_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 smokes_tobacco_wide <- smokes_tobacco_distribution %>%
-  pivot_wider(names_from = SN20, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN20, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -560,7 +498,7 @@ encouraged_to_smoke_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 encouraged_to_smoke_wide <- encouraged_to_smoke_distribution %>%
-  pivot_wider(names_from = SN21, values_from = proportion, values_fill = 0) %>%
+  tidyr :: pivot_wider(names_from = SN21, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -582,7 +520,7 @@ drinks_alcohol_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 drinks_alcohol_wide <- drinks_alcohol_distribution %>%
-  pivot_wider(names_from = SN22, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN22, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -604,7 +542,7 @@ how_often_drinks_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 how_often_drinks_wide <- how_often_drinks_distribution %>%
-  pivot_wider(names_from = SN22a, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN22a, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -626,7 +564,7 @@ encouraged_to_drink_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 encouraged_to_drink_wide <- encouraged_to_drink_distribution %>%
-  pivot_wider(names_from = SN23, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN23, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -648,7 +586,7 @@ uses_drugs_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 uses_drugs_wide <- uses_drugs_distribution %>%
-  pivot_wider(names_from = SN25, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN25, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -671,7 +609,7 @@ encouraged_to_use_drugs_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 encouraged_to_use_drugs_wide <- encouraged_to_use_drugs_distribution %>%
-  pivot_wider(names_from = SN26, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN26, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -693,7 +631,7 @@ tested_for_covid_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 tested_for_covid_wide <- tested_for_covid_distribution %>%
-  pivot_wider(names_from = SN27, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN27, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -715,7 +653,7 @@ tested_positive_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 tested_positive_wide <- tested_positive_distribution %>%
-  pivot_wider(names_from = SN27a, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN27a, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -738,7 +676,7 @@ hospitalized_for_covid_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 hospitalized_for_covid_wide <- hospitalized_for_covid_distribution %>%
-  pivot_wider(names_from = SN27a1, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN27a1, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -761,7 +699,7 @@ knows_anyone_hospitalized_for_covid_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 knows_anyone_hospitalized_for_covid_wide <- knows_anyone_hospitalized_for_covid_distribution %>%
-  pivot_wider(names_from = SN28, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN28, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -784,7 +722,7 @@ encouraged_testing_for_covid_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 encouraged_testing_for_covid_wide <- encouraged_testing_for_covid_distribution %>%
-  pivot_wider(names_from = SN32, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN32, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -806,7 +744,7 @@ follows_social_distancing_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 follows_social_distancing_wide <- follows_social_distancing_distribution %>%
-  pivot_wider(names_from = SN33, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN33, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -829,7 +767,7 @@ encouraged_social_distancing_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 encouraged_social_distancing_wide <- encouraged_social_distancing_distribution %>%
-  pivot_wider(names_from = SN34, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN34, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -851,7 +789,7 @@ received_covid_vaccine_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 received_covid_vaccine_wide <- received_covid_vaccine_distribution %>%
-  pivot_wider(names_from = SN37, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN37, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -873,7 +811,7 @@ vaccine_side_effects_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 vaccine_side_effects_wide <- vaccine_side_effects_distribution %>%
-  pivot_wider(names_from = SN37a, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN37a, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -896,7 +834,7 @@ open_to_vaccine_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 open_to_vaccine_wide <- open_to_vaccine_distribution %>%
-  pivot_wider(names_from = SN37b, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN37b, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -919,7 +857,7 @@ encouraged_vaccine_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 encouraged_vaccine_wide <- encouraged_vaccine_distribution %>%
-  pivot_wider(names_from = SN38, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN38, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
@@ -943,7 +881,7 @@ discouraged_vaccine_distribution <- combined_data %>%
   mutate(proportion = n/sum(n))
 
 discouraged_vaccine_wide <- discouraged_vaccine_distribution %>%
-  pivot_wider(names_from = SN39, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN39, values_from = proportion, values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
