@@ -602,6 +602,153 @@ vh_info_avg_out <- apply(v_hesitancy_info, 1, mean)
 vh_info_scores <- cbind.data.frame(v_hesitancy_info, vh_info_avg_out, MTURKID=dt$MTURK1)
 
 
+# Vaccine access---------------------------
+
+# VA1 Where do you get your news or information about the CORONAVIRUS VACCINE? Please check all that apply.
+# ▢	Television news  (1) 
+# ▢	Radio broadcast  (2) 
+# ▢	Print or online newspaper  (3) 
+# ▢	Social media  (4) 
+# ▢	State or local government (including press briefings or official websites)  (5) 
+# ▢	Centers for Disease Control and Prevention  (6) 
+# ▢	White House Press Briefing  (7) 
+# ▢	Other (please specify):  (8) ________________________________________________
+# ▢	None of the above  (9) 
+
+ 
+# VA2 What social media apps do you use?
+#   ▢	Facebook  (1) 
+# ▢	Youtube  (2) 
+# ▢	Twitter  (3) 
+# ▢	WhatsApp  (4) 
+# ▢	Instagram  (5) 
+# ▢	Parler  (6) 
+# ▢	Gab  (7) 
+# ▢	TikTok  (8) 
+# ▢	WeChat  (9) 
+# ▢	Other:  (10) ________________________________________________
+# ▢	None  (11) 
+# 
+
+# VA3 Have you gotten at least one dose of the coronavirus vaccine?
+#   o	Yes  (1) 
+# o	No  (2) 
+# o	Unsure  (3) 
+
+# Display This Question:
+#   If Have you gotten at least one dose of the coronavirus vaccine? = No
+# 
+# 
+# VA4 Have you been offered the vaccine?
+#   o	Yes  (1) 
+# o	No  (2) 
+# o	Unsure  (3) 
+# 
+
+# 
+# VA5 Was the vaccine offered through your workplace?
+#   o	Yes  (1) 
+# o	No  (2) 
+# o	Unsure  (3) 
+# 
+# 
+# Page Break	
+# 
+# Display This Question:
+#   If Have you been offered the vaccine? = No
+# 
+# 
+# VA6 If you have not been offered the vaccine, are you eligible based on state guidelines?
+#   o	Yes  (1) 
+# o	No  (2) 
+# o	Not sure  (3) 
+# 
+
+# 
+# Display This Question:
+#   If If you have not been offered the vaccine, are you eligible based on state guidelines? = Yes
+# 
+# 
+# VA7 If you are eligible and have not been able to get the vaccine, what are the reasons why not? Please select all that apply:
+#   ▢	Did not have transportation  (1) 
+# ▢	Unable to obtain an appointment  (2) 
+# ▢	Did not have childcare  (3) 
+# ▢	Schedule conflicts or did not have time  (5) 
+# ▢	Unwilling or hesitant to get the vaccine  (6) 
+# ▢	Other reason  (7) 
+# 
+
+# 
+# Display This Question:
+#   If Have you gotten at least one dose of the coronavirus vaccine? = Yes
+# 
+# 
+# VA8 Which month did you get the COVID-19 vaccine? If two does were required, which month did you get your first dose?
+#   o	Before December 2020 - I participated in a clinical trial  (1) 
+# o	December 2021  (2) 
+# o	January 2021  (3) 
+# o	February 2021  (4) 
+# o	March 2021  (5) 
+# o	April 2021  (6) 
+# o	May 2021  (7) 
+# 
+#
+# Display This Question:
+#   If Have you gotten at least one dose of the coronavirus vaccine? = Yes
+# 
+# 
+# VA9 Which brand of the COVID vaccine did you receive?
+#   o	Moderna  (1) 
+# o	Pfizer  (2) 
+# o	Johnson & Johnson  (4) 
+# o	Don't know  (5) 
+# 
+	
+#  
+# Display This Question:
+# If Which brand of the COVID vaccine did you receive? = Moderna
+# Or Which brand of the COVID vaccine did you receive? = Pfizer
+# Or Which brand of the COVID vaccine did you receive? = Johnson & Johnson
+#  
+# 
+# VA10 Was this the brand of vaccine that you preferred?
+# o	Yes  (1) 
+# o	No  (2) 
+# o	Unsure or no preference  (3) 
+# 
+# 
+# Page Break	
+#  
+# Display This Question:
+# If Was this the brand of vaccine that you preferred? = No
+#  
+# 
+# VA11 Which brand of vaccine would you rather have gotten?
+# o	Moderna  (1) 
+# o	Pfizer  (2) 
+# o	Johnson & Johnson  (3) 
+# o	Don't know  (4) 
+# 
+# 
+
+
+v_access_info <- 
+  as.data.frame(
+    cbind(va1=dt$FUVA3, va4=dt$FUVA4)
+  )
+
+dim(v_access_info)
+head(v_access_info)
+which(is.na(v_hesitancy_info))
+which(!is.na(v_hesitancy_info))
+
+# va_info_avg_out <- apply(v_hesitancy_info, 1, mean)
+
+vaccess_info_scores <- cbind.data.frame(v_access_info,
+                                   MTURKID=dt$MTURK1)
+head(vaccess_info_scores)
+
+
 # Save RDS object ---------------------------
 
 eda_env <- new.env()
@@ -609,6 +756,7 @@ eda_env$dt <- dt
 eda_env$tab2_dt <- tab2_dt
 eda_env$cdc_scores <- cdc_scores
 eda_env$vh_info_scores <- vh_info_scores
+eda_env$vaccess_info_scores <- vaccess_info_scores
 
 #saveRDS(object = tab2_dt, file = "tab2_comparison_data.RDS")
 saveRDS(eda_env, paste0(data_loc, "eda_objects.rds"))
