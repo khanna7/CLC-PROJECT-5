@@ -603,6 +603,7 @@ summary(model_vh3_SN38)
 
 ```
 
+### Check clustering
 
 Query the `sns_dt_long_merged_ego_characteristics` object to confirm that 
 it only contains information on alter attributes. This can be done by looking at
@@ -625,6 +626,8 @@ by MTURKID.
 
 
 Create a merged network member participant environment that can be used in analysis later:
+
+### Save Data Objects
 
 ```{r}
 merged_network_participant_env <- new.env()
