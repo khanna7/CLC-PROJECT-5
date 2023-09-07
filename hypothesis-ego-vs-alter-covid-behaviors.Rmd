@@ -568,10 +568,6 @@ summary(model_vh3_SN38)
 # summary(model_vh3_SN39)
 ```
 
-```{r}
-library(ergm)
-```
-
 
 ```{r}
 # # Load the dataset
