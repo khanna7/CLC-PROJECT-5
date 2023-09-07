@@ -734,7 +734,7 @@ vh_info_scores <- cbind.data.frame(v_hesitancy_info, vh_info_avg_out, MTURKID=dt
 
 v_access_info <- 
   as.data.frame(
-    cbind(va1=dt$FUVA3, va4=dt$FUVA4)
+    cbind(va3=dt$FUVA3, va4=dt$FUVA4)
   )
 
 dim(v_access_info)
@@ -758,10 +758,8 @@ eda_env$cdc_scores <- cdc_scores
 eda_env$vh_info_scores <- vh_info_scores
 eda_env$vaccess_info_scores <- vaccess_info_scores
 
-#saveRDS(object = tab2_dt, file = "tab2_comparison_data.RDS")
 saveRDS(eda_env, paste0(data_loc, "eda_objects.rds"))
 
 
-# Save image ---------------------------
 
 
