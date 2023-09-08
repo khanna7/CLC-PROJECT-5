@@ -22,6 +22,9 @@ tab2_dt <- as.data.frame(readRDS(paste0(data_loc, "tab2_comparison_data.RDS")))
 class(tab2_dt)
 dim(tab2_dt)
 colnames(tab2_dt)
+
+eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+cdc_scores <- eda_env$cdc_scores
 ```
 
 Compare `FUSNCONSENT == 7` vs not. 
@@ -190,8 +193,7 @@ print(chi_squared_result)
 
 ```{r}
 table(tab2_dt$income)
-```
-```{r}
+
 # Generate cross-tabulations
 income_10_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "10"))
 print(income_10_xtab)
@@ -216,26 +218,6 @@ print(income_8_xtab)
 
 income_9_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "9"))
 print(income_9_xtab)
-
-# Run the chi-squared tests
-chi2_test_result_income_10 <- chisq.test(income_10_xtab)
-chi2_test_result_income_11 <- chisq.test(income_11_xtab)
-chi2_test_result_income_4 <- chisq.test(income_4_xtab)
-chi2_test_result_income_5 <- chisq.test(income_5_xtab)
-chi2_test_result_income_6 <- chisq.test(income_6_xtab)
-chi2_test_result_income_7 <- chisq.test(income_7_xtab)
-chi2_test_result_income_8 <- chisq.test(income_8_xtab)
-chi2_test_result_income_9 <- chisq.test(income_9_xtab)
-
-# Print the p-values from the chi-squared tests
-print(paste("Income 10 p-value: ", chi2_test_result_income_10$p.value))
-print(paste("Income 11 p-value: ", chi2_test_result_income_11$p.value))
-print(paste("Income 4 p-value: ", chi2_test_result_income_4$p.value))
-print(paste("Income 5 p-value: ", chi2_test_result_income_5$p.value))
-print(paste("Income 6 p-value: ", chi2_test_result_income_6$p.value))
-print(paste("Income 7 p-value: ", chi2_test_result_income_7$p.value))
-print(paste("Income 8 p-value: ", chi2_test_result_income_8$p.value))
-print(paste("Income 9 p-value: ", chi2_test_result_income_9$p.value))
 
 ```
 
@@ -262,11 +244,8 @@ income_xtab
 chisq.test(income_xtab)
 ```
 
-Test for household
+### Household size
 ```{r}
-library(dplyr)
-
-
 stats_household_size <- tab2_dt %>%
   mutate(household_size_numeric = as.numeric(as.character(household_size))) %>%  # Convert household_size to numeric
   group_by(FUSNCONSENT_numeric) %>%
@@ -293,7 +272,7 @@ t_test_result <- t.test(group1, group2)
 print(t_test_result)
 ```
 
-test for essential_worker
+### Essential_worker
 ```{r}
 # Filter the data for relevant FUSNCONSENT_numeric values
 filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
@@ -317,40 +296,30 @@ essential_worker_xtab
 chisq.test(essential_worker_xtab)
 ```
 
-test for cdc average guideline 
+### Average CDC score 
 
 ```{r}
-data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
-eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
-cdc_scores <- eda_env$cdc_scores
+cdc_scores <- cdc_scores %>% filter(MTURKID != "")
+tab2_dt <- tab2_dt %>% filter(MTURK1 != "") # to prevent a many-to-one join issue
+
+# Left join cdc_scores with the relevant columns from tab2_dt
+cdc_scores <- cdc_scores %>%
+  left_join(select(tab2_dt, MTURK1, FUSNCONSENT_numeric), 
+            by = c("MTURKID" = "MTURK1"))
 
 # Extract the cdc_scores for participants with FUSNCONSENT_numeric values of 7 and 0
-eda_env$cdc_scores = as.numeric(unlist(eda_env$cdc_scores))
-scores_7 <- eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 7]
-scores_0 <- eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 0]
+cdc_avg_out_summary <- cdc_scores %>%
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(mean = mean(cdc_avg_out),
+            sd = sd(cdc_avg_out)) d
 
-# Compute mean for each group
-mean_scores_7 <- mean(scores_7, na.rm = TRUE)
-mean_scores_0 <- mean(scores_0, na.rm = TRUE)
+group1 <- cdc_scores$cdc_avg_out[cdc_scores$FUSNCONSENT_numeric == 7]
+group2 <- cdc_scores$cdc_avg_out[cdc_scores$FUSNCONSENT_numeric == 0]
 
-sd_scores_7 <- sd(scores_7, na.rm = TRUE)
-sd_scores_0 <- sd(scores_0, na.rm = TRUE)
-
-
-cat("Mean CDC Score for FUSNCONSENT_numeric == 7:", mean_scores_7, "\n")
-cat("Mean CDC Score for FUSNCONSENT_numeric == 0:", mean_scores_0, "\n")
-
-cat("SD CDC Score for FUSNCONSENT_numeric == 7:", sd_scores_7, "\n")
-cat("SD CDC Score for FUSNCONSENT_numeric == 0:", sd_scores_0, "\n")
+t.test(group1, group2)
 ```
 
-```{r}
-eda_env$cdc_scores = as.numeric(unlist(eda_env$cdc_scores))
 
-t.test(eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 7],
-      eda_env$cdc_scores[tab2_dt$FUSNCONSENT_numeric == 0]
-       )
-```
 
 Test for covid_test
 ```{r}
