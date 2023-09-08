@@ -102,11 +102,6 @@ xtabs(~factor(va4, exclude = NULL)+factor(FUSNCONSENT, exclude = NULL),
 ```
 
 
-
-```{r}
-
-```
-
 ### Test associations
 
 ```{r}
@@ -117,61 +112,68 @@ corstr <- "exchangeable"
 VA3: Taken at least one dose of the vaccine
 
 ```{r}
-sns_dt_long_merged_ego_characteristics$vh1_adequate <- 
-  ifelse(sns_dt_long_merged_ego_characteristics$vh1 < 2, 1, 0)
+#sns_dt_long_merged_ego_characteristics$vh1_adequate <- 
+#  ifelse(sns_dt_long_merged_ego_characteristics$vh1 < 2, 1, 0)
 
-model_vh1 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ 
+# Recode the binary outcome
+sns_dt_long_merged_ego_characteristics$va3 <- 
+  ifelse(sns_dt_long_merged_ego_characteristics$va3 == 2, 0, 1)
+
+# Check the recoded table
+table(sns_dt_long_merged_ego_characteristics$va3, exclude = NULL)
+
+model_va3 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  va3 ~ 
                  SN27_reversed + SN28_reversed + SN29_reversed +
                    SN34_reversed + SN38_reversed,
                  #+ SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
                  family="binomial", corstr = corstr)
-summary(model_vh1)
+summary(model_va3)
 
-model_vh1_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN27_reversed,
+model_va3_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  va3_adequate ~ SN27_reversed,
                  family="binomial", corstr = corstr)
-summary(model_vh1_sn27)
+summary(model_va3_sn27)
 
-model_vh1_SN9 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN9,
+model_va3_SN9 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  va3_adequate ~ SN9,
                  family="binomial", corstr = corstr)
-summary(model_vh1_SN9)
+summary(model_va3_SN9)
 
-model_vh1_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN28_reversed,
+model_va3_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  va3_adequate ~ SN28_reversed,
                  family="binomial", corstr = corstr)
-summary(model_vh1_SN28)
+summary(model_va3_SN28)
 
-model_vh1_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN29_reversed,
+model_va3_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  va3_adequate ~ SN29_reversed,
                  family="binomial", corstr = corstr)
-summary(model_vh1_SN29)
+summary(model_va3_SN29)
 
-# model_vh1_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-#                   vh1_adequate ~ SN33_reversed,
+# model_va3_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   va3_adequate ~ SN33_reversed,
 #                  family="binomial", corstr = corstr)
-# summary(model_vh1)
+# summary(model_va3)
 
-model_vh1_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN28_reversed,
+model_va3_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  va3_adequate ~ SN28_reversed,
                  family="binomial", corstr = corstr)
-summary(model_vh1_SN28)
+summary(model_va3_SN28)
 
-model_vh1_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN37_reversed,
+model_va3_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  va3_adequate ~ SN37_reversed,
                  family="binomial", corstr = corstr)
-summary(model_vh1_sn37)
+summary(model_va3_sn37)
 
-model_vh1_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN38_reversed,
+model_va3_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+                  va3_adequate ~ SN38_reversed,
                  family="binomial", corstr = corstr)
-summary(model_vh1_SN38)
+summary(model_va3_SN38)
 
-#model_vh1_SN39 <- geem(data=sns_dt_long_merged_ego_characteristics, 
- #                 vh1_adequate ~ SN39_reversed,
+#model_va3_SN39 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+ #                 va3_adequate ~ SN39_reversed,
   #               family="binomial", corstr = corstr)
-#summary(model_vh1_SN39)
+#summary(model_va3_SN39)
 ```
 
 VH3: attitude towards receiving a COVID-19 
