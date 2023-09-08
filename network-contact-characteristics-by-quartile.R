@@ -69,13 +69,27 @@ gender_distribution <- combined_data %>%
   group_by(quartile) %>%
   mutate(proportion = n/sum(n))
 
+gender_distribution_counts <- combined_data %>%
+  group_by(quartile, SN4) %>%
+  tally() %>%
+  tidyr::pivot_wider(names_from = SN4, values_from = n, values_fill = 0, names_prefix = "count_")
+
+# Proportions by quartile and gender
+gender_distribution_prop <- gender_distribution %>%
+  tidyr::pivot_wider(names_from = SN4, 
+                     values_from = proportion, 
+                     values_fill = 0, names_prefix = "prop_")
+
 gender_wide <- gender_distribution %>%
-  tidyr :: pivot_wider(names_from = SN4, values_from = proportion, values_fill = 0) %>%
+  tidyr::pivot_wider(names_from = SN4, 
+                       values_from = c(proportion), values_fill = 0) %>%
   group_by(quartile) %>%
   summarise(across(everything(), sum))
 
-print(gender_wide)
+gender_wide <- inner_join(gender_distribution_counts, 
+                          gender_distribution_prop, by = "quartile")
 
+print(gender_wide)
   
 ## test
 
@@ -94,12 +108,21 @@ ethnicity_distribution <- combined_data %>%
   group_by(quartile) %>%
   mutate(proportion = n/sum(n))
 
-ethnicity_wide <- ethnicity_distribution %>%
-  tidyr::pivot_wider(names_from = SN5, values_from = proportion, values_fill = 0) %>%
-  group_by(quartile) %>%
-  summarise(across(everything(), sum))
+# Raw counts by quartile and ethnicity
+ethnicity_distribution_counts <- combined_data %>%
+  group_by(quartile, SN5) %>%
+  tally() %>%
+  tidyr::pivot_wider(names_from = SN5, values_from = n, values_fill = 0, names_prefix = "count_")
+
+# Proportions by quartile and ethnicity
+ethnicity_distribution_prop <- ethnicity_distribution %>%
+  tidyr::pivot_wider(names_from = SN5, values_from = proportion, values_fill = 0, names_prefix = "prop_")
+
+# Join counts and proportions
+ethnicity_wide <- inner_join(ethnicity_distribution_counts, ethnicity_distribution_prop, by = "quartile")
 
 print(ethnicity_wide)
+
 
 ## test
 
@@ -111,23 +134,40 @@ print(ethnicity_test)
 
 #Summarize for education ---------------
 
-## summary 
-education_distribution <- combined_data %>%
-  group_by(quartile, SN6) %>%
+## recode
+combined_data <- combined_data %>%
+  mutate(
+    SN6_recode = case_when(
+      SN6 %in% c(1, 2, 3) ~ 1,
+      SN6 == 4 ~ 4,
+      SN6 %in% c(5, 6) ~ 5,
+      TRUE ~ NA_integer_ # This captures all other values, including NAs. Adjust if needed.
+    )
+  )
+
+
+# Raw counts by quartile and education
+education_distribution_counts <- combined_data %>%
+  group_by(quartile, SN6_recode) %>%
+  tally() %>%
+  tidyr::pivot_wider(names_from = SN6_recode, values_from = n, values_fill = 0, names_prefix = "count_")
+
+# Proportions by quartile and education
+education_distribution_prop <- combined_data %>%
+  group_by(quartile, SN6_recode) %>%
   tally() %>%
   group_by(quartile) %>%
-  mutate(proportion = n/sum(n))
+  mutate(proportion = n/sum(n)) %>%
+  tidyr::pivot_wider(names_from = SN6_recode, values_from = proportion, values_fill = 0, names_prefix = "prop_")
 
-education_wide <- education_distribution %>%
-  tidyr :: pivot_wider(names_from = SN6, values_from = proportion, values_fill = 0) %>%
-  group_by(quartile) %>%
-  summarise(across(everything(), sum))
+# Join counts and proportions
+education_wide <- inner_join(education_distribution_counts, education_distribution_prop, by = "quartile")
 
 print(education_wide)
 
 ## test
 
-education_contingency_table <- table(combined_data$quartile, combined_data$SN6)
+education_contingency_table <- table(combined_data$quartile, combined_data$SN6_recode)
 print(education_contingency_table)
 
 education_test <- chisq.test(education_contingency_table)
