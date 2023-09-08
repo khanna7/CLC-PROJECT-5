@@ -123,15 +123,14 @@ chisq.test(race_xtab)
 chisq.test(race_xtab[c(1, 2, 4),])
 ```
 
-Test for Ethnicity
+### Ethnicity
 ```{r}
 ethnicity_xtab <- 
   xtabs(~factor(tab2_dt$ethnicity)+factor(tab2_dt$FUSNCONSENT_numeric))
 
 ethnicity_xtab
 chisq.test(ethnicity_xtab)
-```
-```{r}
+
 # Filter the data for relevant FUSNCONSENT_numeric values
 filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
 
@@ -147,88 +146,47 @@ print(ethnicity_summary)
 ```
 
 
-```{r}
-# Generate cross-tabulations
-Hispanic_xtab <- xtabs(~ethnicity + FUSNCONSENT_numeric, data = filter(tab2_dt, ethnicity == "1"))
-print(Hispanic_xtab)
+### Education
 
-Non_Hispanic_xtab <- xtabs(~ethnicity + FUSNCONSENT_numeric, data = filter(tab2_dt, ethnicity == "2"))
-print(Non_Hispanic_xtab)
-
-# Run the chi-squared tests
-chi2_test_result_hispanic <- chisq.test(Hispanic_xtab)
-chi2_test_result_non_hispanic <- chisq.test(Non_Hispanic_xtab)
-
-
-# Print the p-values from the chi-squared tests
-print(paste("Hispanic p-value: ", chi2_test_result_hispanic$p.value))
-print(paste("Non_hispanic p-value: ", chi2_test_result_non_hispanic$p.value))
-```
-```{r}
-ethnicity_xtab <- 
-  xtabs(~factor(tab2_dt$ethnicity)+factor(tab2_dt$FUSNCONSENT_numeric))
-
-ethnicity_xtab
-chisq.test(ethnicity_xtab)
-```
-
-Test for education
-
-```{r}
-table(tab2_dt$education)
-```
-```{r}
-# Generate cross-tabulations
-high_school_xtab <- xtabs(~education + FUSNCONSENT_numeric, data = filter(tab2_dt, education == "1"))
-print(high_school_xtab)
-
-some_college_xtab <- xtabs(~education + FUSNCONSENT_numeric, data = filter(tab2_dt, education == "2"))
-print(some_college_xtab)
-
-college_graduate_xtab <- xtabs(~education + FUSNCONSENT_numeric, data = filter(tab2_dt, education == "3"))
-print(college_graduate_xtab)
-
-other_xtab <- xtabs(~education+ FUSNCONSENT_numeric, data = filter(tab2_dt, education == "4"))
-print(white_xtab)
-
-# Run the chi-squared tests
-chi2_test_result_1 <- chisq.test(high_school_xtab)
-chi2_test_result_2 <- chisq.test(some_college_xtab)
-chi2_test_result_3 <- chisq.test(college_graduate_xtab)
-chi2_test_result_4 <- chisq.test(other_xtab)
-
-# Print the p-values from the chi-squared tests
-print(paste("High school p-value: ", chi2_test_result_1$p.value))
-print(paste("Some college: ", chi2_test_result_2$p.value))
-print(paste("College graduate: ", chi2_test_result_3$p.value))
-print(paste("Other: ", chi2_test_result_4$p.value))
-```
-
-```{r}
-# Filter the data for relevant FUSNCONSENT_numeric values
-filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
-
-# Determine the counts and percentages
-education_summary <- filtered_data %>%
-  group_by(FUSNCONSENT_numeric, education) %>%
-  summarise(count = n()) %>%
-  mutate(total = sum(count),
-         percentage = (count / total) * 100) %>%
-  ungroup()
-
-print(education_summary)
-```
 
 
 ```{r}
 education_xtab <- 
-  xtabs(~factor(tab2_dt$education)+factor(tab2_dt$FUSNCONSENT_numeric))
+  xtabs(~factor(tab2_dt$education, exclude = NULL)+
+          factor(tab2_dt$FUSNCONSENT_numeric, exclude = NULL))
 
 education_xtab
 chisq.test(education_xtab)
 ```
+Recode education:
 
-Test for income
+```{r}
+tab2_dt <- tab2_dt %>%
+  mutate(recoded_education = case_when(
+    education %in% c(1, 2) ~ "Some High School or Lower",
+    education == 3 ~ "High School Completed",
+    education == 4 ~ "Some College",
+    TRUE ~ as.character(education)  # to capture other possible values
+  ))
+
+education_xtab <- tab2_dt %>%
+  group_by(recoded_education, FUSNCONSENT_numeric) %>%
+  summarise(count = n()) %>%
+  group_by(FUSNCONSENT_numeric) %>%
+  mutate(percentage = (count / sum(count)) * 100) %>%
+  ungroup()
+
+# Create a contingency table
+contingency_table <- table(tab2_dt$recoded_education, tab2_dt$FUSNCONSENT_numeric)
+
+# Chi-squared test
+chi_squared_result <- chisq.test(contingency_table)
+
+# Print the result
+print(chi_squared_result)
+```
+
+### Income
 
 ```{r}
 table(tab2_dt$income)
