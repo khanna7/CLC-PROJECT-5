@@ -47,6 +47,8 @@ table(combined_data$quartile, exclude = NULL)
 age_summary <- combined_data %>%
   group_by(quartile) %>%
   summarise(
+    n = n(),
+    n_missing = sum(is.na(SN2)),
     mean_age = mean(SN2, na.rm = TRUE), 
     sd_age = sd(SN2, na.rm = TRUE)
   )
