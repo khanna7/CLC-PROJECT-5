@@ -321,7 +321,8 @@ t.test(group1, group2)
 
 
 
-Test for covid_test
+### COVID testing
+
 ```{r}
 # Filter the data for relevant FUSNCONSENT_numeric values
 filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
@@ -364,9 +365,12 @@ print(covid_test_summary)
 
 ```
 
+### Positive test result
+
+TBD
+
 ```{r}
-positive_covid_xtab <- xtabs(~covid_test + FUSNCONSENT_numeric, data = filter(tab2_dt, covid_test == "1"))
-chisq.test(positive_covid_xtab)
+
 ```
 
 ```{r}
@@ -396,105 +400,4 @@ daily_stimulant_xtab <-
 
 daily_stimulant_xtab
 chisq.test(daily_stimulant_xtab)
-```
-
-read the cdc_score data
-
-```{r}
-data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
-eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
-cdc_scores <- eda_env$cdc_scores
-```
-
-
-Quartiles for age
-
-```{r}
-# Check lengths
-length_of_filtered_cdc_scores <- length(cdc_scores_numeric[tab2_dt$FUSNCONSENT_numeric == 7])
-length_of_filtered_age <- nrow(tab2_dt[tab2_dt$FUSNCONSENT_numeric == 7, ])
-
-cat("Length of filtered cdc_scores:", length_of_filtered_cdc_scores, "\n")
-cat("Length of filtered age:", length_of_filtered_age, "\n")
-
-# If they are different, we'll need to investigate further
-if(length_of_filtered_cdc_scores != length_of_filtered_age) {
-  cat("Discrepancy found! Investigating...\n")
-
-  # Check for NAs
-  na_in_cdc_scores <- sum(is.na(cdc_scores_numeric[tab2_dt$FUSNCONSENT_numeric == 7]))
-  na_in_FUSNCONSENT_numeric <- sum(is.na(tab2_dt$FUSNCONSENT_numeric))
-
-  cat("Number of NAs in filtered cdc_scores:", na_in_cdc_scores, "\n")
-  cat("Number of NAs in FUSNCONSENT_numeric:", na_in_FUSNCONSENT_numeric, "\n")
-}
-
-```
-
-```{r}
-# Filter cdc_scores based on FUSNCONSENT_numeric from tab2_dt
-filtered_cdc_scores <- data.frame(cdc_scores = cdc_scores_numeric[tab2_dt$FUSNCONSENT_numeric == 7])
-
-# Remove NAs from filtered cdc_scores
-filtered_cdc_scores <- filtered_cdc_scores %>% filter(!is.na(cdc_scores))
-
-# Compute quartiles for these filtered scores
-filtered_cdc_scores <- filtered_cdc_scores %>%
-  mutate(cdc_quartiles = ntile(cdc_scores, 4))
-
-# Create a data frame from the age list in the environment and convert to numeric
-age_df <- tab2_dt %>%
-  filter(FUSNCONSENT_numeric == 7) %>%
-  mutate(age_numeric = as.numeric(as.character(age))) %>%
-  select(age_numeric)
-
-# Check lengths again
-cat("Length of cleaned filtered cdc_scores:", nrow(filtered_cdc_scores), "\n")
-cat("Length of filtered age:", nrow(age_df), "\n")
-
-# Assuming the lengths match, combine cdc_scores and age into one data frame
-if (nrow(filtered_cdc_scores) == nrow(age_df)) {
-  combined_df <- cbind(filtered_cdc_scores, age_df)
-  
-  # Compute summary statistics for age within each quartile
-  age_summary <- combined_df %>%
-    group_by(cdc_quartiles) %>%
-    summarise(age_mean = mean(age_numeric, na.rm = TRUE),
-              age_sd = sd(age_numeric, na.rm = TRUE))
-    
-  print(age_summary)
-} else {
-  cat("The lengths do not match! Further investigation is required.")
-}
-
-
-```
-
-Quartiles for Gender
-
-```{r}
-# Convert cdc_scores to numeric and create a data frame
-cdc_df <- data.frame(cdc_scores = as.numeric(unlist(eda_env$cdc_scores)))
-
-# Apply the ntile function to create quartiles
-cdc_df <- cdc_df %>%
-  mutate(cdc_quartiles = ntile(cdc_scores, 4))
-
-# Create a data frame from the gender list in the environment
-gender_df <- data.frame(gender = unlist(tab2_dt$gender))
-
-# Combine cdc_scores and gender into one data frame
-combined_df <- cbind(cdc_df, gender_df)
-
-# Compute quartiles for cdc_scores within each gender category
-gender_summary <- combined_df %>%
-  group_by(gender) %>%
-  summarise(
-    Q1 = quantile(cdc_scores, 0.25, na.rm = TRUE),
-    Q2 = quantile(cdc_scores, 0.5, na.rm = TRUE),
-    Q3 = quantile(cdc_scores, 0.75, na.rm = TRUE),
-    Q4 = quantile(cdc_scores, 1, na.rm = TRUE)
-  )
-  
-print(gender_summary)
 ```
