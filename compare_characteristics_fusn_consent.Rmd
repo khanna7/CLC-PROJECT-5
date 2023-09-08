@@ -9,16 +9,16 @@ editor_options:
 
 ```{r, setup, include=FALSE}
 rm(list=ls())
-knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
-```
-
-```{r, echo=FALSE, message=FALSE}
-rm(list=ls())
 library(dplyr)
 ```
 
+```{r, data_loc, include=FALSE}
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
+```
+
+
 ```{r}
-tab2_dt <- as.data.frame(readRDS("tab2_comparison_data.RDS"))
+tab2_dt <- as.data.frame(readRDS(paste0(data_loc, "tab2_comparison_data.RDS")))
 class(tab2_dt)
 dim(tab2_dt)
 colnames(tab2_dt)
@@ -66,9 +66,6 @@ chisq.test(gender_xtab[1:2, 1:2])
 
 Test for age
 ```{r}
-
-library(dplyr)
-
 stats_age <- tab2_dt %>%
   mutate(age_numeric = as.numeric(as.character(age))) %>%  # Convert age to numeric
   group_by(FUSNCONSENT_numeric) %>%
@@ -85,8 +82,6 @@ print(stats_age)
 
 
 ```{r}
-library(dplyr)
-
 # Convert age to numeric
 tab2_dt$age_numeric <- as.numeric(as.character(tab2_dt$age))
 
@@ -109,14 +104,12 @@ tab2_dt %>%
   filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "1") %>%
   group_by(FUSNCONSENT_numeric) %>%
   summarise(male_count = n())
-```
-```{r}
+
 tab2_dt %>%
   filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "2") %>%
   group_by(FUSNCONSENT_numeric) %>%
   summarise(female_count = n())
-```
-```{r}
+
 tab2_dt %>%
   filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "3") %>%
   group_by(FUSNCONSENT_numeric) %>%
@@ -124,9 +117,6 @@ tab2_dt %>%
 ```
 
 ```{r}
-# Load the necessary libraries
-library(dplyr)
-
 # Create the contingency tables for each gender category
 male_xtab <- xtabs(~gender_3cat + FUSNCONSENT_numeric, data = filter(tab2_dt, gender_3cat == "1"))
 print(male_xtab)
