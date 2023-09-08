@@ -52,19 +52,9 @@ table(tab2_dt$gender_3cat)
 
 ```
 
-```{r}
-  tab2_dt %>%  
-  select(gender_3cat, FUSNCONSENT_numeric) %>%
-  group_by(FUSNCONSENT_numeric)
+## Test Differences
 
-gender_xtab <- 
-  xtabs(~factor(tab2_dt$gender_3cat)+factor(tab2_dt$FUSNCONSENT_numeric))
-
-chisq.test(gender_xtab)
-chisq.test(gender_xtab[1:2, 1:2])
-```
-
-Test for age
+### Age
 ```{r}
 stats_age <- tab2_dt %>%
   mutate(age_numeric = as.numeric(as.character(age))) %>%  # Convert age to numeric
@@ -76,10 +66,7 @@ stats_age <- tab2_dt %>%
 
 print(stats_age)
 
-
-
 ```
-
 
 ```{r}
 # Convert age to numeric
@@ -96,51 +83,23 @@ print(t_test_result)
 
 ```
 
-Test for Gender
-
+### Gender
 ```{r}
-#male_count
-tab2_dt %>%
-  filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "1") %>%
-  group_by(FUSNCONSENT_numeric) %>%
-  summarise(male_count = n())
+  tab2_dt %>%  
+  select(gender_3cat, FUSNCONSENT_numeric) %>%
+  group_by(FUSNCONSENT_numeric)
 
-tab2_dt %>%
-  filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "2") %>%
-  group_by(FUSNCONSENT_numeric) %>%
-  summarise(female_count = n())
+gender_xtab <- 
+  xtabs(~factor(tab2_dt$gender_3cat)+factor(tab2_dt$FUSNCONSENT_numeric))
 
-tab2_dt %>%
-  filter(FUSNCONSENT_numeric %in% c(0, 7), gender_3cat == "3") %>%
-  group_by(FUSNCONSENT_numeric) %>%
-  summarise(not_reported_count = n())
+chisq.test(gender_xtab)
+chisq.test(gender_xtab[1:2, 1:2])
 ```
 
-```{r}
-# Create the contingency tables for each gender category
-male_xtab <- xtabs(~gender_3cat + FUSNCONSENT_numeric, data = filter(tab2_dt, gender_3cat == "1"))
-print(male_xtab)
-female_xtab <- xtabs(~gender_3cat + FUSNCONSENT_numeric, data = filter(tab2_dt, gender_3cat == "2"))
-print(female_xtab)
-nonbinary_xtab <- xtabs(~gender_3cat + FUSNCONSENT_numeric, data = filter(tab2_dt, gender_3cat == "3"))
-print(nonbinary_xtab)
 
-# Run the chi-squared tests
-chi2_test_result_male <- chisq.test(male_xtab)
-chi2_test_result_female <- chisq.test(female_xtab)
-#chi2_test_result_not_reported <- chisq.test(not_reported_xtab)
-
-# Print the p-values from the chi-squared tests
-print(paste("Male p-value: ", chi2_test_result_male$p.value))
-print(paste("Female p-value: ", chi2_test_result_female$p.value))
-#print(paste("Not reported p-value: ", chi2_test_result_not_reported$p.value))
-```
-
-Test for race
+### Race
 
 ```{r}
-library(dplyr)
-
 # Filter the data for relevant FUSNCONSENT_numeric values
 filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
 
@@ -153,37 +112,6 @@ race_summary <- filtered_data %>%
   ungroup()
 
 print(race_summary)
-
-```
-
-```{r}
-table(tab2_dt$race_4cat)
-```
-```{r}
-# Generate cross-tabulations
-asian_xtab <- xtabs(~race_4cat + FUSNCONSENT_numeric, data = filter(tab2_dt, race_4cat == "Asian"))
-print(asian_xtab)
-
-black_xtab <- xtabs(~race_4cat + FUSNCONSENT_numeric, data = filter(tab2_dt, race_4cat == "Black"))
-print(black_xtab)
-
-other_multiple_race_xtab <- xtabs(~race_4cat + FUSNCONSENT_numeric, data = filter(tab2_dt, race_4cat == "Other/Multiple Race"))
-print(other_multiple_race_xtab)
-
-white_xtab <- xtabs(~race_4cat + FUSNCONSENT_numeric, data = filter(tab2_dt, race_4cat == "White"))
-print(white_xtab)
-
-# Run the chi-squared tests
-chi2_test_result_asian <- chisq.test(asian_xtab)
-chi2_test_result_black <- chisq.test(black_xtab)
-chi2_test_result_other_multiple_race <- chisq.test(other_multiple_race_xtab)
-chi2_test_result_white <- chisq.test(white_xtab)
-
-# Print the p-values from the chi-squared tests
-print(paste("Asian p-value: ", chi2_test_result_asian$p.value))
-print(paste("Black p-value: ", chi2_test_result_black$p.value))
-print(paste("Other/Multiple Race p-value: ", chi2_test_result_other_multiple_race$p.value))
-print(paste("White p-value: ", chi2_test_result_white$p.value))
 ```
 
 ```{r}
