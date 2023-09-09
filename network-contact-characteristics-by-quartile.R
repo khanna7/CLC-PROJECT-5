@@ -198,23 +198,41 @@ covid_test_chi_test <- chisq.test(covid_test_contingency_table)
 print(covid_test_chi_test)
 
 #Summarize for annual household income-------------------
+
+## recode
+combined_data <- combined_data %>%
+  mutate(
+    income_category = case_when(
+      DEMO20 == 4 ~ "Up to $25,000",
+      DEMO20 %in% c(5, 6) ~ "$25,000 - $50,000",
+      DEMO20 %in% c(7, 8, 9, 10, 11) ~ "Above $50,000",
+      TRUE ~ as.character(DEMO20) # This will keep any other categories or NAs as they are. Adjust if needed.
+    )
+  )
+
+table(combined_data$income_category, exclude = NULL)
+
 ## summary 
 annual_household_distribution <- combined_data %>%
-  group_by(quartile, DEMO20) %>%
+  group_by(quartile, income_category) %>%
   tally() %>%
   group_by(quartile) %>%
-  mutate(proportion = n/sum(n))
+  mutate(proportion = n/sum(n),
+         n_missing = sum(is.na(income_category)))
 
-annual_household_wide <- annual_household_distribution %>%
-  tidyr::pivot_wider(names_from = DEMO20, values_from = proportion, values_fill = 0) %>%
-  group_by(quartile) %>%
-  summarise(across(everything(), sum))
+annual_household_wide <- annual_household_wide %>%
+  select(quartile, `Up to $25,000`, `$25,000 - $50,000`, `Above $50,000`)
 
 print(annual_household_wide)
 
 ## test
 
-annual_household_contingency_table <- table(combined_data$quartile, combined_data$DEMO20)
+annual_household_contingency_table <- table(combined_data$quartile, 
+                                            combined_data$income_category)
+annual_household_contingency_table <- annual_household_contingency_table[ , 
+                                                                          c("Up to $25,000", 
+                                                                            "$25,000 - $50,000", 
+                                                                            "Above $50,000")]
 print(annual_household_contingency_table)
 
 annual_household_chi_test <- chisq.test(annual_household_contingency_table)
