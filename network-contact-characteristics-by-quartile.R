@@ -271,7 +271,8 @@ household_size_summary <- combined_data %>%
   group_by(quartile) %>%
   summarise(
     mean_household = mean(DEMO8, na.rm = TRUE), 
-    sd_household = sd(DEMO8, na.rm = TRUE)
+    sd_household = sd(DEMO8, na.rm = TRUE),
+    n_missing = sum(is.na(DEMO8))
   )
 
 household_size_summary
