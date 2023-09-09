@@ -220,10 +220,6 @@ annual_household_distribution <- combined_data %>%
   mutate(proportion = n/sum(n),
          n_missing = sum(is.na(income_category)))
 
-annual_household_wide <- annual_household_wide %>%
-  select(quartile, `Up to $25,000`, `$25,000 - $50,000`, `Above $50,000`)
-
-print(annual_household_wide)
 
 ## test
 
