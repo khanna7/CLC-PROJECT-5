@@ -106,6 +106,8 @@ table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL)/sum(
 
 ## Homophily on vaccination status 
 
+Computation:
+
 ```{r}
 # Compute homophily
 
@@ -153,6 +155,58 @@ print(proportion_table)
 
 ```
 
+Plotting:
+
+```{r}
+
+# create unique identifiers for egos and alters
+
+## copy original MTURK Ids
+ego_snconsenting_dt$original_MTurk <- ego_snconsenting_dt$MTURK1
+sns_dt_long_merged_ego_characteristics$original_MTurk <- sns_dt_long_merged_ego_characteristics$MTURK1
+
+## ego ID
+ego_snconsenting_dt$MTURK1 <- paste0("E_", ego_snconsenting_dt$MTURK1) 
+
+
+## alter ID
+sns_dt_long_merged_ego_characteristics <- sns_dt_long_merged_ego_characteristics %>%
+  group_by(original_MTurk) %>%
+  mutate(seq = row_number())
+sns_dt_long_merged_ego_characteristics$MTURK1 <- paste0("A_", sns_dt_long_merged_ego_characteristics$original_MTurk, "_", 
+                                                        sns_dt_long_merged_ego_characteristics$seq)
+
+## merge
+ego_alter_paring_merge_dt <- merge(ego_snconsenting_dt, sns_dt_long_merged_ego_characteristics, by = "original_MTurk", all.x = TRUE)
+
+## create graph
+g <- graph_from_data_frame(d=ego_alter_paring_merge_dt[, c("MTURK1.x", "MTURK1.y")], directed=FALSE)
+
+#print(g)
+vcount(g)
+ecount(g)
+
+#colors
+V(g)$color <- ifelse(V(g)$name %in% ego_snconsenting_dt$MTURK1, 
+                    ifelse(ego_snconsenting_dt$FUVA3 == 1, "green", "red"), 
+                    ifelse(sns_dt_long_merged_ego_characteristics$SN37 == 1, "green", "red")
+)
+                    #red=unvaccinated, green=vaccinated
+
+#layout
+layout <- layout_with_kk(g)
+
+# Plot the network
+plot(g, 
+     layout = layout, 
+     vertex.size = 7, 
+     vertex.label = NA, 
+     edge.arrow.size = 0.5, 
+     edge.color = "gray50", 
+     main = "Network Diagram")
+
+
+```
 
 ## Association of Vaccine Access among Egos with Alter Attitudes/Behaviors
 
