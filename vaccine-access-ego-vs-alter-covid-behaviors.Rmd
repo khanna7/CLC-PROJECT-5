@@ -21,6 +21,7 @@ library(dplyr)
 library(data.table)
 library(lme4)
 library(geeM)
+library(igraph)
 ```
 
 Set the working directory:
