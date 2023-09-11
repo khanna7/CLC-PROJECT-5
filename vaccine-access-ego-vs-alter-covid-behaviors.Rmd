@@ -33,14 +33,13 @@ Read the datasets:
 
 ```{r, include=FALSE}
 
-## environments
 eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+full_ego_dt <- eda_env[["dt"]]
 
 merged_network_participant_env <- 
   readRDS(paste0(data_loc, "merged_network_participant_objects.rds"))
 
 
-## datasets
 sns_dt_long_merged_ego_characteristics <- 
   merged_network_participant_env$sns_dt_long_merged_ego_characteristics
 
@@ -67,21 +66,93 @@ Variable VA3: summary of whether one shot has been taken for 851 network contact
 Variable VA4: summary of whether vaccine was offered for 851 network contacts
 
 ```{r}
+(full_dt$FUVA3)
 table(full_dt$FUVA3, exclude = NULL)
 table(full_dt$FUVA4, exclude = NULL)
 
 xtabs(~factor(FUVA3, exclude = NULL)+factor(FUVA4, exclude = NULL), 
       data = full_dt)
 
-xtabs(~factor(FUVA3, exclude = NULL)+
-        factor(FUSNCONSENT, exclude = NULL), 
-      data = full_dt)
+va3_fusnconsent_xtabs <- 
+  as.matrix(
+    xtabs(~factor(FUVA3, exclude = NULL)+
+          factor(FUSNCONSENT, exclude = NULL), 
+        data = full_dt)
+  )
+
+sweep(va3_fusnconsent_xtabs, 2, colSums(va3_fusnconsent_xtabs), "/")
+# straightforward division as va3_fusnconsent_xtabs/colSums...gives the wrong answer
+# can be done correctly using apply: 
+# `apply(va3_fusnconsent_xtabs, 2, function(column) column/sum(column))`
+
+
+
+va3_fusnconsent_xtabs/colSums(va3_fusnconsent_xtabs)
 
 xtabs(~factor(FUVA4, exclude = NULL)+
         factor(FUSNCONSENT, exclude = NULL), 
       data = full_dt)
 
 ```
+
+## Vaccination rates among alters/social network contacts
+
+```{r}
+table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL)
+table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL)/sum(
+  table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL))
+```
+
+
+## Homophily on vaccination status 
+
+```{r}
+# Compute homophily
+
+## prep data
+ego_snconsenting_dt <- full_dt %>%
+  filter(FUSNCONSENT == 7)
+dim(ego_snconsentding_dt)  
+
+head(ego_snconsenting_dt$MTURK1, 25)
+table(ego_snconsenting_dt$FUVA3, exclude = NULL) #egos
+table(ego_snconsenting_dt$FUSNCONSENT, exclude = NULL) #egos
+
+head(sns_dt_long_merged_ego_characteristics$MTURK1, 25) #alters
+table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL)
+
+## merge data
+ego_alter_paring_merge_dt <-
+  #create dataset that merges ego and network information to give unique ego-alter pairs 
+  merge(ego_snconsenting_dt, sns_dt_long_merged_ego_characteristics, by = "MTURK1", all.x = TRUE)
+
+dim(ego_alter_paring_merge_dt) #851 rows as expected, since there are 851 ego-alter pairings
+colnames(ego_alter_paring_merge_dt)
+
+head(ego_alter_paring_merge_dt) 
+
+### check results of merge
+length(unique(ego_alter_paring_merge_dt$MTURK1)) == nrow(ego_snconsenting_dt)
+ego_alter_paring_merge_dt[ego_alter_paring_merge_dt$MTURK1 == ego_alter_paring_merge_dt$MTURK1[[1]],]
+
+## compute homophily measure:
+### egos vaccination status represented by FUVA3 and alters' represented by SN37
+
+### create a column to indicate if ego and alter share the same vaccination state
+ego_alter_paring_merge_dt$same_vaccination_state <- ifelse(
+  ego_alter_paring_merge_dt$FUVA3 == ego_alter_paring_merge_dt$SN37, 1, 0)
+
+### create a frequency table
+frequency_table <- table(ego_alter_paring_merge_dt$same_vaccination_state, exclude = NULL)
+print(frequency_table)
+
+### compute proportions 
+proportion_table <- frequency_table / sum(frequency_table)
+print(proportion_table)
+
+
+```
+
 
 ## Association of Vaccine Access among Egos with Alter Attitudes/Behaviors
 
@@ -131,47 +202,47 @@ model_va3 <- geem(data=sns_dt_long_merged_ego_characteristics,
 summary(model_va3)
 
 model_va3_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3_adequate ~ SN27_reversed,
+                  va3 ~ SN27_reversed,
                  family="binomial", corstr = corstr)
 summary(model_va3_sn27)
 
 model_va3_SN9 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3_adequate ~ SN9,
+                  va3 ~ SN9,
                  family="binomial", corstr = corstr)
 summary(model_va3_SN9)
 
 model_va3_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3_adequate ~ SN28_reversed,
+                  va3 ~ SN28_reversed,
                  family="binomial", corstr = corstr)
 summary(model_va3_SN28)
 
 model_va3_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3_adequate ~ SN29_reversed,
+                  va3 ~ SN29_reversed,
                  family="binomial", corstr = corstr)
 summary(model_va3_SN29)
 
 # model_va3_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-#                   va3_adequate ~ SN33_reversed,
+#                   va3 ~ SN33_reversed,
 #                  family="binomial", corstr = corstr)
 # summary(model_va3)
 
 model_va3_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3_adequate ~ SN28_reversed,
+                  va3 ~ SN28_reversed,
                  family="binomial", corstr = corstr)
 summary(model_va3_SN28)
 
 model_va3_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3_adequate ~ SN37_reversed,
+                  va3 ~ SN37_reversed,
                  family="binomial", corstr = corstr)
 summary(model_va3_sn37)
 
 model_va3_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3_adequate ~ SN38_reversed,
+                  va3 ~ SN38_reversed,
                  family="binomial", corstr = corstr)
 summary(model_va3_SN38)
 
 #model_va3_SN39 <- geem(data=sns_dt_long_merged_ego_characteristics, 
- #                 va3_adequate ~ SN39_reversed,
+ #                 va3 ~ SN39_reversed,
   #               family="binomial", corstr = corstr)
 #summary(model_va3_SN39)
 ```
