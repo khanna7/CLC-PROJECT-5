@@ -112,7 +112,7 @@ table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL)/sum(
 ## prep data
 ego_snconsenting_dt <- full_dt %>%
   filter(FUSNCONSENT == 7)
-dim(ego_snconsentding_dt)  
+dim(ego_snconsenting_dt)  
 
 head(ego_snconsenting_dt$MTURK1, 25)
 table(ego_snconsenting_dt$FUVA3, exclude = NULL) #egos
