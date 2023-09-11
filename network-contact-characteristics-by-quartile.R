@@ -26,10 +26,55 @@ sns_dt_long_wide_no_minors
 
 # Classify egos into quartiles based on their CDC score ----------
 
+
+
 sns_consenting_dt <- sns_consenting_dt %>%
-  mutate(quartile = ntile(cdc_avg_out, 4))
+  #Divides the dataset is divided into 4 roughly equal-sized groups,
+  #and computes quartiles based on the max value of each group
+  # some overlap between categories is possible
+  # what we were doing previously
+  mutate(quartile_old = ntile(cdc_avg_out, 4))
 
+sns_consenting_dt <- sns_consenting_dt %>%
+  # assign quartile values based on the distribution of cdc_avg_out,
+  # uses data percentiles to categorize each value into its respective quartile,
+  # leading to distinct but potentially unequal groups.
+  mutate(
+    quartile = case_when(
+      cdc_avg_out <= quantile(cdc_avg_out, 0.25) ~ 1,
+      cdc_avg_out <= quantile(cdc_avg_out, 0.50) ~ 2,
+      cdc_avg_out <= quantile(cdc_avg_out, 0.75) ~ 3,
+      TRUE ~ 4
+    )
+  )
 
+cutoffs <- sns_consenting_dt %>%
+  group_by(quartile) %>%
+  summarize(
+    min_value = min(cdc_avg_out),
+    max_value = max(cdc_avg_out)
+  )
+
+print(cutoffs)
+
+cutoffs_old <- sns_consenting_dt %>%
+  group_by(quartile_old) %>%
+  summarize(
+    min_value = min(cdc_avg_out),
+    max_value = max(cdc_avg_out)
+  )
+print(cutoffs_old)
+
+quantile(sns_consenting_dt$cdc_avg_out, probs=c(0.25, 0.5, 0.75, 1))
+
+table(sns_consenting_dt$quartile, exclude = NULL)
+table(sns_consenting_dt$quartile_old, exclude = NULL)
+
+# Conclusion:
+## There will be more overlaps in the categories with the ntile function.
+## The categorizations will not overlap with the quartile function. 
+## Given that we are interested in classifying the egos into 4 clearly distinct
+## groups, we will use the `quartile` method. 
 
 # Join the ego and alter datasets using the MTURK1 and MTURKID columns: ----------
 
@@ -218,7 +263,14 @@ annual_household_distribution <- combined_data %>%
   tally() %>%
   group_by(quartile) %>%
   mutate(proportion = n/sum(n),
-         n_missing = sum(is.na(income_category)))
+         n_missing = sum(is.na(income_category))) %>%
+  arrange(quartile, 
+          factor(income_category, levels=c("Up to $25,000", 
+                                           "$25,000 - $50,000",
+                                           "Above $50,000"))
+          )
+
+print(annual_household_distribution)
 
 
 ## test
@@ -277,20 +329,52 @@ household_size_summary
 household_size_test <- aov(DEMO8 ~ quartile, data = combined_data)
 summary(household_size_test)
 
-#Summarize for covid_test positive-----------------
+#Summarize for Political Party ------------------------------
 
-positive_test_summary <- combined_data %>%
-  group_by(quartile) %>%
-  summarise(
-    mean_positive_test = mean(SN27a1, na.rm = TRUE), 
-    sd_positive_test = sd(SN27a1, na.rm = TRUE)
+head(combined_data$SN9)
+table(combined_data$SN9, exclude = NULL)
+
+## Recode
+combined_data <- combined_data %>%
+  mutate(
+    SN9_recoded = case_when(
+      SN9 == 1 ~ "Republican",
+      SN9 == 2 ~ "Democrat",
+      SN9 %in% c(3, 4, 5, 6, 7) ~ "Independent/Other",
+      # Grouping Libertarian, Green, Other, and Prefer not to answer into "Other"
+      is.na(SN9) ~ NA_character_          # Preserving NAs
+    ),
+    SN9_recoded = factor(SN9_recoded, 
+                         levels = c("Democrat", "Republican", "Independent/Other"))
   )
 
-positive_test_summary
+table(combined_data$SN9_recoded, exclude = NULL)
+table(combined_data$SN9_recoded, exclude = NULL)/sum(table(combined_data$SN9_recoded, exclude = NULL)
+)
 
-## test
-positive_test <- aov(SN27a1 ~ quartile, data = combined_data)
-summary(positive_test)
+## Summary 
+political_party_distribution <- combined_data %>%
+  group_by(quartile, SN9_recoded) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+
+political_party_wide <- political_party_distribution %>%
+  tidyr::pivot_wider(names_from = SN9_recoded, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+print(political_party_wide)
+
+## Test
+political_party_contingency_table <- table(combined_data$quartile, 
+                                           combined_data$SN9_recoded, 
+                                           exclude = NULL)
+print(political_party_contingency_table)
+
+political_party_test <- chisq.test(political_party_contingency_table)
+print(political_party_test)
 
 #Summarize for modes of communication -----------------------
 
@@ -452,7 +536,8 @@ spouse_or_partner_wide <- spouse_or_partner_distribution %>%
 print(spouse_or_partner_wide)
 
 ## Test
-spouse_or_partner_contingency_table <- table(combined_data$quartile, combined_data$SN16)
+spouse_or_partner_contingency_table <- 
+  table(combined_data$quartile, combined_data$SN16, exclude = NULL)
 print(spouse_or_partner_contingency_table)
 
 spouse_or_partner_test <- chisq.test(spouse_or_partner_contingency_table)
@@ -680,6 +765,10 @@ encouraged_to_use_drugs_test <- chisq.test(encouraged_to_use_drugs_contingency_t
 print(encouraged_to_use_drugs_test)
 
 # Summarize for tested_for_covid -------------
+
+head(combined_data$SN27)
+table(combined_data$SN27, exclude = NULL)
+
 ## Summary 
 tested_for_covid_distribution <- combined_data %>%
   group_by(quartile, SN27) %>%
@@ -695,29 +784,34 @@ tested_for_covid_wide <- tested_for_covid_distribution %>%
 print(tested_for_covid_wide)
 
 ## Test
-tested_for_covid_contingency_table <- table(combined_data$quartile, combined_data$SN27)
+tested_for_covid_contingency_table <- 
+  table(combined_data$quartile, combined_data$SN27, exclude = NULL)
 print(tested_for_covid_contingency_table)
 
 tested_for_covid_test <- chisq.test(tested_for_covid_contingency_table)
 print(tested_for_covid_test)
 
 # Summarize for tested_positive_for_covid -------------
+head(combined_data$SN27a)
+table(combined_data$SN27a, exclude = NULL)
+
 ## Summary 
 tested_positive_distribution <- combined_data %>%
+  filter(!is.na(SN27a)) %>% # ignore NAs because skip pattern imposed by SN27
   group_by(quartile, SN27a) %>%
   tally() %>%
   group_by(quartile) %>%
   mutate(proportion = n/sum(n))
 
 tested_positive_wide <- tested_positive_distribution %>%
-  tidyr::pivot_wider(names_from = SN27a, values_from = proportion, values_fill = 0) %>%
-  group_by(quartile) %>%
-  summarise(across(everything(), sum))
+  tidyr::pivot_wider(names_from = SN27a, 
+                     values_from = proportion, values_fill = 0)
 
 print(tested_positive_wide)
 
 ## Test
-tested_positive_contingency_table <- table(combined_data$quartile, combined_data$SN27a)
+tested_positive_contingency_table <- 
+  table(combined_data$quartile, combined_data$SN27a)
 print(tested_positive_contingency_table)
 
 tested_positive_test <- chisq.test(tested_positive_contingency_table)
@@ -725,22 +819,25 @@ print(tested_positive_test)
 
 
 # Summarize for hospitalized_for_covid -------------
+table(combined_data$SN27a1, exclude = NULL)
+head(combined_data$SN27a1)
+
 ## Summary 
 hospitalized_for_covid_distribution <- combined_data %>%
+  filter(!is.na(SN27a)) %>% # ignore NAs because skip pattern imposed by SN27
   group_by(quartile, SN27a1) %>%
   tally() %>%
   group_by(quartile) %>%
   mutate(proportion = n/sum(n))
 
 hospitalized_for_covid_wide <- hospitalized_for_covid_distribution %>%
-  tidyr::pivot_wider(names_from = SN27a1, values_from = proportion, values_fill = 0) %>%
-  group_by(quartile) %>%
-  summarise(across(everything(), sum))
+  tidyr::pivot_wider(names_from = SN27a1, values_from = proportion, values_fill = 0)
 
 print(hospitalized_for_covid_wide)
 
 ## Test
-hospitalized_for_covid_contingency_table <- table(combined_data$quartile, combined_data$SN27a1)
+hospitalized_for_covid_contingency_table <- table(combined_data$quartile, 
+                                                  combined_data$SN27a1)
 print(hospitalized_for_covid_contingency_table)
 
 hospitalized_for_covid_test <- chisq.test(hospitalized_for_covid_contingency_table)
@@ -748,6 +845,9 @@ print(hospitalized_for_covid_test)
 
 
 # Summarize for knows_anyone_hospitalized_for_covid -------------
+table(combined_data$SN28, exclude = NULL)
+head(combined_data$SN28)
+
 ## Summary 
 knows_anyone_hospitalized_for_covid_distribution <- combined_data %>%
   group_by(quartile, SN28) %>%
@@ -763,7 +863,8 @@ knows_anyone_hospitalized_for_covid_wide <- knows_anyone_hospitalized_for_covid_
 print(knows_anyone_hospitalized_for_covid_wide)
 
 ## Test
-knows_anyone_hospitalized_for_covid_contingency_table <- table(combined_data$quartile, combined_data$SN28)
+knows_anyone_hospitalized_for_covid_contingency_table <- 
+  table(combined_data$quartile, combined_data$SN28, exclude = NULL)
 print(knows_anyone_hospitalized_for_covid_contingency_table)
 
 knows_anyone_hospitalized_for_covid_test <- chisq.test(knows_anyone_hospitalized_for_covid_contingency_table)
@@ -771,6 +872,9 @@ print(knows_anyone_hospitalized_for_covid_test)
 
 
 # Summarize for encouraged_testing_for_covid -------------
+head(combined_data$SN32)
+table(combined_data$SN32, exclude = NULL)
+
 ## Summary 
 encouraged_testing_for_covid_distribution <- combined_data %>%
   group_by(quartile, SN32) %>%
@@ -786,13 +890,18 @@ encouraged_testing_for_covid_wide <- encouraged_testing_for_covid_distribution %
 print(encouraged_testing_for_covid_wide)
 
 ## Test
-encouraged_testing_for_covid_contingency_table <- table(combined_data$quartile, combined_data$SN32)
+encouraged_testing_for_covid_contingency_table <- 
+  table(combined_data$quartile, combined_data$SN32, exclude = NULL)
 print(encouraged_testing_for_covid_contingency_table)
 
 encouraged_testing_for_covid_test <- chisq.test(encouraged_testing_for_covid_contingency_table)
 print(encouraged_testing_for_covid_test)
 
 # Summarize for follows_social_distancing -------------
+head(combined_data$SN33)
+table(combined_data$SN33, exclude = NULL)
+
+
 ## Summary 
 follows_social_distancing_distribution <- combined_data %>%
   group_by(quartile, SN33) %>%
@@ -808,7 +917,8 @@ follows_social_distancing_wide <- follows_social_distancing_distribution %>%
 print(follows_social_distancing_wide)
 
 ## Test
-follows_social_distancing_contingency_table <- table(combined_data$quartile, combined_data$SN33)
+follows_social_distancing_contingency_table <- 
+  table(combined_data$quartile, combined_data$SN33, exclude = NULL)
 print(follows_social_distancing_contingency_table)
 
 follows_social_distancing_test <- chisq.test(follows_social_distancing_contingency_table)
@@ -816,6 +926,9 @@ print(follows_social_distancing_test)
 
 
 # Summarize for encouraged_social_distancing -------------
+head(combined_data$SN34)
+table(combined_data$SN34, exclude = NULL)
+
 ## Summary 
 encouraged_social_distancing_distribution <- combined_data %>%
   group_by(quartile, SN34) %>%
@@ -838,6 +951,9 @@ encouraged_social_distancing_test <- chisq.test(encouraged_social_distancing_con
 print(encouraged_social_distancing_test)
 
 # Summarize for received_covid_vaccine -------------
+head(combined_data$SN37)
+table(combined_data$SN37, exclude = NULL)
+
 ## Summary 
 received_covid_vaccine_distribution <- combined_data %>%
   group_by(quartile, SN37) %>%
@@ -853,7 +969,8 @@ received_covid_vaccine_wide <- received_covid_vaccine_distribution %>%
 print(received_covid_vaccine_wide)
 
 ## Test
-received_covid_vaccine_contingency_table <- table(combined_data$quartile, combined_data$SN37)
+received_covid_vaccine_contingency_table <- 
+  table(combined_data$quartile, combined_data$SN37, exclude = NULL)
 print(received_covid_vaccine_contingency_table)
 
 received_covid_vaccine_test <- chisq.test(received_covid_vaccine_contingency_table)
@@ -861,8 +978,12 @@ print(received_covid_vaccine_test)
 
 # Summarize for vaccine_side_effects -------------
 ## Summary 
+head(combined_data$SN37a)
+table(combined_data$SN37a, exclude = NULL)
+
 vaccine_side_effects_distribution <- combined_data %>%
   group_by(quartile, SN37a) %>%
+  filter(!is.na(SN37a)) %>%
   tally() %>%
   group_by(quartile) %>%
   mutate(proportion = n/sum(n))
@@ -945,6 +1066,7 @@ discouraged_vaccine_wide <- discouraged_vaccine_distribution %>%
 print(discouraged_vaccine_wide)
 
 ## Test
+head(combined_data$SN39)
 discouraged_vaccine_contingency_table <- table(combined_data$quartile, combined_data$SN39)
 print(discouraged_vaccine_contingency_table)
 
