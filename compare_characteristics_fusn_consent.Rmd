@@ -311,7 +311,7 @@ cdc_scores <- cdc_scores %>%
 cdc_avg_out_summary <- cdc_scores %>%
   group_by(FUSNCONSENT_numeric) %>%
   summarise(mean = mean(cdc_avg_out),
-            sd = sd(cdc_avg_out)) d
+            sd = sd(cdc_avg_out)) 
 
 group1 <- cdc_scores$cdc_avg_out[cdc_scores$FUSNCONSENT_numeric == 7]
 group2 <- cdc_scores$cdc_avg_out[cdc_scores$FUSNCONSENT_numeric == 0]

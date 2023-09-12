@@ -19,7 +19,6 @@ rm(list=ls())
 library(haven)
 library(dplyr)
 library(data.table)
-library(lme4)
 library(geeM)
 ```
 
@@ -32,17 +31,17 @@ data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROU
 Read the datasets:
 
 ```{r, include=FALSE}
-merged_network_participant_env <- 
-  readRDS(paste0(data_loc, "merged_network_participant_objects.rds"))
+vaccine_access_env <- 
+  readRDS(paste0(data_loc, "vaccine_access_env.rds"))
 
-sns_dt_long_merged_ego_characteristics <- merged_network_participant_env$sns_dt_long_merged_ego_characteristics
+regression_dt <- vaccine_access_env$regression_dt
 
 ```
 
 Query the dataset:
 
 ```{r}
-head(colnames(sns_dt_long_merged_ego_characteristics), 10)
+head(colnames(regression_dt), 10)
 ```
 
 
@@ -60,10 +59,19 @@ corstr <- "exchangeable"
 VH1: Plans to take COVID vaccine 
 
 ```{r}
-sns_dt_long_merged_ego_characteristics$vh1_adequate <- 
-  ifelse(sns_dt_long_merged_ego_characteristics$vh1 < 2, 1, 0)
 
-model_vh1 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+table(regression_dt$vh1, exclude = NULL)
+# o	Definitely  (1) 
+# o	Probably  (2) 
+# o	I may or I may not  (3) 
+# o	Probably not  (4) 
+# o	Definitely not  (5) 
+# o	Don't know  (6) 
+
+regression_dt$vh1_adequate <- 
+  ifelse(regression_dt$vh1 < 2, 1, 0) # only definitely is coded 1, else 0
+
+model_vh1 <- geem(data=regression_dt, 
                   vh1_adequate ~ 
                  SN27_reversed + SN28_reversed + SN29_reversed +
                    SN34_reversed + SN38_reversed,
@@ -71,59 +79,75 @@ model_vh1 <- geem(data=sns_dt_long_merged_ego_characteristics,
                  family="binomial", corstr = corstr)
 summary(model_vh1)
 
-model_vh1_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh1_sn27 <- geem(data=regression_dt, 
                   vh1_adequate ~ SN27_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh1_sn27)
 
-model_vh1_SN9 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN9,
+model_vh1_SN9 <- geem(data=regression_dt, 
+                  vh1_adequate ~ SN9_recoded,
                  family="binomial", corstr = corstr)
 summary(model_vh1_SN9)
 
-model_vh1_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh1_SN28 <- geem(data=regression_dt, 
                   vh1_adequate ~ SN28_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh1_SN28)
 
-model_vh1_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh1_SN29 <- geem(data=regression_dt, 
                   vh1_adequate ~ SN29_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh1_SN29)
 
-# model_vh1_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh1_SN32 <- geem(data=regression_dt, 
+                  vh1_adequate ~ SN32_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh1_SN32)
+
+sum(is.na(regression_dt$vh1_adequate))
+sum(is.na(regression_dt$SN32_reversed))
+# model_vh1_sn33 <- geem(data=regression_dt, 
 #                   vh1_adequate ~ SN33_reversed,
 #                  family="binomial", corstr = corstr)
 # summary(model_vh1)
 
-model_vh1_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh1_adequate ~ SN28_reversed,
+model_vh1_SN34 <- geem(data=regression_dt, 
+                  vh1_adequate ~ SN34_reversed,
                  family="binomial", corstr = corstr)
-summary(model_vh1_SN28)
+summary(model_vh1_SN34)
 
-model_vh1_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh1_sn37 <- geem(data=regression_dt, 
                   vh1_adequate ~ SN37_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh1_sn37)
 
-model_vh1_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh1_SN38 <- geem(data=regression_dt, 
                   vh1_adequate ~ SN38_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh1_SN38)
 
-#model_vh1_SN39 <- geem(data=sns_dt_long_merged_ego_characteristics, 
- #                 vh1_adequate ~ SN39_reversed,
-  #               family="binomial", corstr = corstr)
-#summary(model_vh1_SN39)
+# model_vh1_SN39 <- geem(data=regression_dt,
+#                 vh1_adequate ~ SN39_reversed,
+#               family="binomial", corstr = corstr)
+# summary(model_vh1_SN39)
 ```
 
 VH3: attitude towards receiving a COVID-19 
 
 ```{r}
-sns_dt_long_merged_ego_characteristics$vh3_adequate <- 
-  ifelse(sns_dt_long_merged_ego_characteristics$vh3 <= 2, 1, 0)
 
-model_vh3 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+# VH3 I would describe my attitude towards receiving a COVID-19 vaccine as:
+# o	Very positive  (1) 
+# o	Pretty positive  (2) 
+# o	Neutral  (3) 
+# o	Pretty Negative  (4) 
+# o	Very Negative  (5) 
+# o	Don't know  (6) 
+
+regression_dt$vh3_adequate <- 
+  ifelse(regression_dt$vh3 <= 2, 1, 0) #very/pretty positive = 1, else 0
+
+model_vh3 <- geem(data=regression_dt, 
                   vh3_adequate ~ 
                  SN27_reversed + SN28_reversed + SN29_reversed +
                    SN33_reversed+
@@ -132,47 +156,63 @@ model_vh3 <- geem(data=sns_dt_long_merged_ego_characteristics,
                  family="binomial", corstr = corstr)
 summary(model_vh3)
 
-model_vh3_SN9 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  vh3_adequate ~ SN9,
+model_vh3_age <- geem(data=regression_dt, 
+                  vh3_adequate ~ age,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_age)
+
+# model_vh3_income_category <- geem(data=regression_dt, 
+#                   vh3_adequate ~ income_category, #does not converge
+#                  family="binomial", corstr = corstr)
+# summary(model_vh3_income_category)
+
+model_vh3_SN9 <- geem(data=regression_dt, 
+                  vh3_adequate ~ SN9_recoded,
                  family="binomial", corstr = corstr)
 summary(model_vh3_SN9)
 
-model_vh3_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+
+model_vh3_sn27 <- geem(data=regression_dt, 
                   vh3_adequate ~ SN27_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh3_sn27)
 
-model_vh3_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh3_SN28 <- geem(data=regression_dt, 
                   vh3_adequate ~ SN28_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh3_SN28)
 
-model_vh3_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh3_SN29 <- geem(data=regression_dt, 
                   vh3_adequate ~ SN29_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh3_SN29)
 
-model_vh3_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh3_SN32 <- geem(data=regression_dt, 
+                  vh3_adequate ~ SN32_reversed,
+                 family="binomial", corstr = corstr)
+summary(model_vh3_SN32)
+
+model_vh3_sn33 <- geem(data=regression_dt, 
                   vh3_adequate ~ SN33_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh3_sn33)
 
-model_vh3_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh3_SN34 <- geem(data=regression_dt, 
                   vh3_adequate ~ SN34_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh3_SN34)
 
-model_vh3_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh3_sn37 <- geem(data=regression_dt, 
                   vh3_adequate ~ SN37_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh3_sn37)
 
-model_vh3_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+model_vh3_SN38 <- geem(data=regression_dt, 
                   vh3_adequate ~ SN38_reversed,
                  family="binomial", corstr = corstr)
 summary(model_vh3_SN38)
 
-#model_vh3_SN39 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+# model_vh3_SN39 <- geem(data=regression_dt,
 #                  vh3_adequate ~ SN39_reversed,
 #                   family="binomial", corstr = corstr)
 # summary(model_vh3_SN39)

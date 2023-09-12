@@ -19,9 +19,9 @@ rm(list=ls())
 library(haven)
 library(dplyr)
 library(data.table)
-library(lme4)
 library(geeM)
 library(igraph)
+library(huxtable)
 ```
 
 Set the working directory:
@@ -242,62 +242,126 @@ corstr <- "exchangeable"
 
 VA3: Taken at least one dose of the vaccine
 
+
+Create a dataset for the regression analysis
+
 ```{r}
-regression_dataset <- merge()
+identical(sns_dt_long_merged_ego_characteristics$MTURKID, 
+          combined_data$MTURKID)
+
+selected_sns_dt_long_merged_ego_characteristics <- 
+ sns_dt_long_merged_ego_characteristics %>%
+  select(MTURKID, 
+         va3, 
+         age,
+         vh1,
+         vh3,
+         SN27_reversed, 
+         SN28_reversed, 
+         SN29_reversed, 
+         SN32_reversed,
+         SN33_reversed,
+         SN34_reversed,
+         SN37_reversed,
+         SN38_reversed,
+         SN39_reversed)
+
+selected_sns_dt_long_merged_ego_characteristics$row_id <- 
+  1:nrow(selected_sns_dt_long_merged_ego_characteristics)
+
+selected_combined_data <- 
+  combined_data %>%
+  select(MTURKID, 
+         income_category,
+         SN9_recoded)
+
+selected_combined_data$row_id <- 
+  1:nrow(selected_combined_data)
+
+regression_dt <- left_join(
+    selected_sns_dt_long_merged_ego_characteristics,
+    selected_combined_data,
+    by="row_id"
+)
+
+
+```
+
+
+```{r}
 # Recode the binary outcome
-sns_dt_long_merged_ego_characteristics$va3 <- 
-  ifelse(sns_dt_long_merged_ego_characteristics$va3 == 2, 0, 1)
+regression_dt$va3 <- 
+  ifelse(regression_dt$va3 == 2, 0, 1)
 
-# Check the recoded table
-table(sns_dt_long_merged_ego_characteristics$va3, exclude = NULL)
+# ref level for income_category
+regression_dt$income_category <- as.factor(regression_dt$income_category)
+regression_dt$income_category <- 
+  relevel(regression_dt$income_category, ref="Up to $25,000")
 
-model_va3 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3 ~ 
-                 SN27_reversed + SN28_reversed + SN29_reversed +
-                   SN34_reversed + SN38_reversed,
-                 #+ SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
-                 family="binomial", corstr = corstr)
+# Refit the model
+model_va3 <- geem(data=regression_dt, 
+                  va3 ~ age + income_category +
+                    SN9_recoded + 
+                    SN27_reversed + 
+                    SN28_reversed + SN29_reversed + 
+                    SN32_reversed + SN33_reversed +
+                  SN34_reversed + SN37_reversed + SN38_reversed + SN39_reversed,
+                  family="binomial", corstr = corstr)
+
+# Check the model summary
 summary(model_va3)
 
-model_va3_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3 ~ SN27_reversed,
-                 family="binomial", corstr = corstr)
-summary(model_va3_sn27)
-
-model_va3_SN9 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3 ~ SN9,
-                 family="binomial", corstr = corstr)
-summary(model_va3_SN9)
-
-model_va3_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3 ~ SN28_reversed,
-                 family="binomial", corstr = corstr)
-summary(model_va3_SN28)
-
-model_va3_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3 ~ SN29_reversed,
-                 family="binomial", corstr = corstr)
-summary(model_va3_SN29)
-
-# model_va3_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-#                   va3 ~ SN33_reversed,
+# # Check the recoded table
+# table(regression_dt$va3, exclude = NULL)
+# 
+# model_va3 <- geem(data=regression_dt, 
+#                   va3 ~ 
+#                     age + income_category +
+#                     SN27_reversed + SN28_reversed + SN29_reversed +
+#                    SN34_reversed + SN38_reversed,
+#                  #+ SN29 + SN33 + SN34 + SN37 + SN38, id = MTURKID, 
 #                  family="binomial", corstr = corstr)
 # summary(model_va3)
-
-model_va3_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3 ~ SN28_reversed,
-                 family="binomial", corstr = corstr)
-summary(model_va3_SN28)
-
-model_va3_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3 ~ SN37_reversed,
-                 family="binomial", corstr = corstr)
-summary(model_va3_sn37)
-
-model_va3_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
-                  va3 ~ SN38_reversed,
-                 family="binomial", corstr = corstr)
-summary(model_va3_SN38)
+# 
+# model_va3_sn27 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   va3 ~ SN27_reversed,
+#                  family="binomial", corstr = corstr)
+# summary(model_va3_sn27)
+# 
+# model_va3_SN9 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   va3 ~ SN9,
+#                  family="binomial", corstr = corstr)
+# summary(model_va3_SN9)
+# 
+# model_va3_SN28 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   va3 ~ SN28_reversed,
+#                  family="binomial", corstr = corstr)
+# summary(model_va3_SN28)
+# 
+# model_va3_SN29 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   va3 ~ SN29_reversed,
+#                  family="binomial", corstr = corstr)
+# summary(model_va3_SN29)
+# 
+# # model_va3_sn33 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+# #                   va3 ~ SN33_reversed,
+# #                  family="binomial", corstr = corstr)
+# # summary(model_va3)
+# 
+# model_va3_SN34 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   va3 ~ SN28_reversed,
+#                  family="binomial", corstr = corstr)
+# summary(model_va3_SN28)
+# 
+# model_va3_sn37 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   va3 ~ SN37_reversed,
+#                  family="binomial", corstr = corstr)
+# summary(model_va3_sn37)
+# 
+# model_va3_SN38 <- geem(data=sns_dt_long_merged_ego_characteristics, 
+#                   va3 ~ SN38_reversed,
+#                  family="binomial", corstr = corstr)
+# summary(model_va3_SN38)
 
 #model_va3_SN39 <- geem(data=sns_dt_long_merged_ego_characteristics, 
  #                 va3 ~ SN39_reversed,
@@ -305,9 +369,12 @@ summary(model_va3_SN38)
 #summary(model_va3_SN39)
 ```
 
-VH3: attitude towards receiving a COVID-19 
+Save Objects
 
 ```{r}
+vaccine_access_env <- new.env()
+vaccine_access_env$regression_dt <- regression_dt
 
+saveRDS(vaccine_access_env, paste0(data_loc, "vaccine_access_env.rds"))
 ```
 
