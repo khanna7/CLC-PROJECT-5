@@ -1073,5 +1073,11 @@ print(discouraged_vaccine_contingency_table)
 discouraged_vaccine_test <- chisq.test(discouraged_vaccine_contingency_table)
 print(discouraged_vaccine_test)
 
+# Save data
 
+network_contact_data_env <- new.env()
+network_contact_data_env$combined_data <- combined_data
+
+saveRDS(network_contact_data_env, paste0(data_loc, 
+                                         "network_contact_data_objects.rds"))
 
