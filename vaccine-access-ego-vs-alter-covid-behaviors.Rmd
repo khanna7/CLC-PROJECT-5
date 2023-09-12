@@ -33,19 +33,24 @@ Read the datasets:
 
 ```{r, include=FALSE}
 
+## environments
 eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
-full_ego_dt <- eda_env[["dt"]]
 
 merged_network_participant_env <- 
   readRDS(paste0(data_loc, "merged_network_participant_objects.rds"))
 
+network_contact_data_objects <- 
+  readRDS(paste0(data_loc, "network_contact_data_objects.rds"))
+
+## data sets
+full_ego_dt <- eda_env[["dt"]]
 
 sns_dt_long_merged_ego_characteristics <- 
   merged_network_participant_env$sns_dt_long_merged_ego_characteristics
 
 vacces_info_scores <- eda_env$vaccess_info_scores
 
-full_dt <- eda_env$dt
+combined_data <- network_contact_data_objects$combined_data #for regression
 
 ## merging
 sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_merged_ego_characteristics,
@@ -56,7 +61,7 @@ sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_merged_ego_character
 Query the dataset:
 
 ```{r}
-head(colnames(full_dt), 10)
+head(colnames(full_ego_dt), 10)
 head(colnames(sns_dt_long_merged_ego_characteristics), 10)
 ```
 
@@ -66,18 +71,18 @@ Variable VA3: summary of whether one shot has been taken for 851 network contact
 Variable VA4: summary of whether vaccine was offered for 851 network contacts
 
 ```{r}
-(full_dt$FUVA3)
-table(full_dt$FUVA3, exclude = NULL)
-table(full_dt$FUVA4, exclude = NULL)
+(full_ego_dt$FUVA3)
+table(full_ego_dt$FUVA3, exclude = NULL)
+table(full_ego_dt$FUVA4, exclude = NULL)
 
 xtabs(~factor(FUVA3, exclude = NULL)+factor(FUVA4, exclude = NULL), 
-      data = full_dt)
+      data = full_ego_dt)
 
 va3_fusnconsent_xtabs <- 
   as.matrix(
     xtabs(~factor(FUVA3, exclude = NULL)+
           factor(FUSNCONSENT, exclude = NULL), 
-        data = full_dt)
+        data = full_ego_dt)
   )
 
 sweep(va3_fusnconsent_xtabs, 2, colSums(va3_fusnconsent_xtabs), "/")
@@ -91,7 +96,7 @@ va3_fusnconsent_xtabs/colSums(va3_fusnconsent_xtabs)
 
 xtabs(~factor(FUVA4, exclude = NULL)+
         factor(FUSNCONSENT, exclude = NULL), 
-      data = full_dt)
+      data = full_ego_dt)
 
 ```
 
@@ -112,7 +117,7 @@ Computation:
 # Compute homophily
 
 ## prep data
-ego_snconsenting_dt <- full_dt %>%
+ego_snconsenting_dt <- full_ego_dt %>%
   filter(FUSNCONSENT == 7)
 dim(ego_snconsenting_dt)  
 
@@ -237,9 +242,7 @@ corstr <- "exchangeable"
 VA3: Taken at least one dose of the vaccine
 
 ```{r}
-#sns_dt_long_merged_ego_characteristics$vh1_adequate <- 
-#  ifelse(sns_dt_long_merged_ego_characteristics$vh1 < 2, 1, 0)
-
+regression_dataset <- merge()
 # Recode the binary outcome
 sns_dt_long_merged_ego_characteristics$va3 <- 
   ifelse(sns_dt_long_merged_ego_characteristics$va3 == 2, 0, 1)
@@ -302,4 +305,8 @@ summary(model_va3_SN38)
 ```
 
 VH3: attitude towards receiving a COVID-19 
+
+```{r}
+
+```
 
