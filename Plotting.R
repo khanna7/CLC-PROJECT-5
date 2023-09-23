@@ -244,6 +244,55 @@ my_color_scale <- 'd3.scaleOrdinal().domain(["0", "1"]).range(["red", "green"])'
 forceNetwork(Links = edge_df, Nodes = nodes, Source = "source", Target = "target",
              NodeID = "name", Group = "group", zoom = TRUE, colourScale = my_color_scale)
 
+---------------------------subsetting the group-------------------------------------
+# Detect communities using the Louvain method
+communities <- cluster_louvain(g)
+
+# For each community, get the node with the highest degree
+representative_nodes <- sapply(membership(communities), function(community) {
+  nodes_in_community <- which(membership(communities) == community)
+  degrees <- degree(g, v = nodes_in_community)
+  return(names(degrees[which.max(degrees)]))
+})
+
+# Subset edges that connect the representative nodes
+edge_df <- as_data_frame(g, what = "edges")
+edge_df <- edge_df %>%
+  filter(from %in% representative_nodes & to %in% representative_nodes)
+
+# Convert to data frame
+edge_df <- as_data_frame(g, what = "edges")
+
+# Get unique nodes
+nodes <- data.frame(name = unique(c(edge_df$from, edge_df$to)))
+
+# Add index column to nodes
+nodes <- nodes %>% mutate(index = row_number() - 1)
+
+# Convert node names in edge_df to index
+edge_df$from <- match(edge_df$from, nodes$name) - 1
+edge_df$to <- match(edge_df$to, nodes$name) - 1
+
+# Rename columns for networkD3
+colnames(edge_df) <- c("source", "target")
+
+
+#Customize the group and color
+
+nodes$group <- ifelse(nodes$name %in% ego_snconsenting_dt$MTURK1, 
+                      ifelse(ego_snconsenting_dt$FUVA3 == 1, 1, 0), 
+                      ifelse(sns_dt_long_merged_ego_characteristics$SN37 == 1, 1, 0))
+
+
+my_color_scale <- 'd3.scaleOrdinal().domain(["0", "1"]).range(["#FF0000", "#006400"])'
+
+
+#graph
+p <- forceNetwork(Links = edge_df, Nodes = nodes, Source = "source", Target = "target",
+             NodeID = "name", Group = "group", zoom = TRUE, colourScale = my_color_scale)
+
+saveNetwork(p, file = "my_network.html")
+
 
 
 
