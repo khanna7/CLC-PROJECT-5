@@ -1,0 +1,298 @@
+---
+  title: "R Notebook"
+output:
+  html_document:
+  df_print: paged
+pdf_document: default
+editor_options: 
+  markdown: 
+  wrap: 72
+---
+  
+Test hypothesis that Vaccine acceptance/hesitancy scores (continuously or dummy coded) for the egos are significantly correlated with 
+COVID behaviors among the social network contacts. 
+
+## Load libraries, set working directory, and dataset used in descriptive analysis
+
+```{r, echo=FALSE, message=FALSE}
+rm(list=ls())
+
+library(haven)
+library(dplyr)
+library(data.table)
+library(lme4)
+install.packages("geeM")
+library(geeM)
+install.packages("igraph")
+library(igraph)
+install.packages("ggraph")
+library(ggraph)
+library(ggplot2)
+
+```
+
+Set the working directory:
+  
+```{r, setup, include=FALSE}
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
+
+```
+
+Read the datasets:
+  
+```{r, include=FALSE}
+
+eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+full_ego_dt <- eda_env[["dt"]]
+
+merged_network_participant_env <- 
+  readRDS(paste0(data_loc, "merged_network_participant_objects.rds"))
+
+
+sns_dt_long_merged_ego_characteristics <- 
+  merged_network_participant_env$sns_dt_long_merged_ego_characteristics
+
+vacces_info_scores <- eda_env$vaccess_info_scores
+
+full_dt <- eda_env$dt
+
+## merging
+sns_dt_long_merged_ego_characteristics <- merge(sns_dt_long_merged_ego_characteristics,
+                                                vacces_info_scores,
+                                                by = "MTURKID")
+
+```
+
+Query the dataset:
+  
+  ```{r}
+head(colnames(full_dt), 10)
+head(colnames(sns_dt_long_merged_ego_characteristics), 10)
+```
+
+## Vaccine acceptance reporting among the egos
+
+Variable VA3: summary of whether one shot has been taken for 851 network contacts
+Variable VA4: summary of whether vaccine was offered for 851 network contacts
+
+```{r}
+(full_dt$FUVA3)
+table(full_dt$FUVA3, exclude = NULL)
+table(full_dt$FUVA4, exclude = NULL)
+
+xtabs(~factor(FUVA3, exclude = NULL)+factor(FUVA4, exclude = NULL), 
+      data = full_dt)
+
+va3_fusnconsent_xtabs <- 
+  as.matrix(
+    xtabs(~factor(FUVA3, exclude = NULL)+
+            factor(FUSNCONSENT, exclude = NULL), 
+          data = full_dt)
+  )
+
+sweep(va3_fusnconsent_xtabs, 2, colSums(va3_fusnconsent_xtabs), "/")
+
+# straightforward division as va3_fusnconsent_xtabs/colSums...gives the wrong answer
+# can be done correctly using apply: 
+# `apply(va3_fusnconsent_xtabs, 2, function(column) column/sum(column))`
+
+
+
+va3_fusnconsent_xtabs/colSums(va3_fusnconsent_xtabs)
+
+xtabs(~factor(FUVA4, exclude = NULL)+
+        factor(FUSNCONSENT, exclude = NULL), 
+      data = full_dt)
+
+```
+
+table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL)
+table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL)/sum(
+table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL))
+## Homophily on vaccination status 
+
+Computation:
+  
+  ```{r}
+# Compute homophily
+
+## prep data
+ego_snconsenting_dt <- full_dt %>%
+  filter(FUSNCONSENT == 7)
+dim(ego_snconsenting_dt)  
+
+head(ego_snconsenting_dt$MTURK1, 25)
+table(ego_snconsenting_dt$FUVA3, exclude = NULL) #egos
+table(ego_snconsenting_dt$FUSNCONSENT, exclude = NULL) #egos
+
+head(sns_dt_long_merged_ego_characteristics$MTURK1, 25) #alters
+table(sns_dt_long_merged_ego_characteristics$SN37, exclude = NULL)
+
+## merge data
+ego_alter_paring_merge_dt <-
+  #create dataset that merges ego and network information to give unique ego-alter pairs 
+  merge(ego_snconsenting_dt, sns_dt_long_merged_ego_characteristics, by = "MTURK1", all.x = TRUE)
+
+dim(ego_alter_paring_merge_dt) #851 rows as expected, since there are 851 ego-alter pairings
+colnames(ego_alter_paring_merge_dt)
+
+head(ego_alter_paring_merge_dt) 
+
+### check results of merge
+length(unique(ego_alter_paring_merge_dt$MTURK1)) == nrow(ego_snconsenting_dt)
+ego_alter_paring_merge_dt[ego_alter_paring_merge_dt$MTURK1 == ego_alter_paring_merge_dt$MTURK1[[1]],]
+
+## compute homophily measure:
+### egos vaccination status represented by FUVA3 and alters' represented by SN37
+
+### create a column to indicate if ego and alter share the same vaccination state
+ego_alter_paring_merge_dt$same_vaccination_state <- ifelse(
+  ego_alter_paring_merge_dt$FUVA3 == ego_alter_paring_merge_dt$SN37, 1, 0)
+
+### create a frequency table
+frequency_table <- table(ego_alter_paring_merge_dt$same_vaccination_state, exclude = NULL)
+print(frequency_table)
+
+### compute proportions 
+proportion_table <- frequency_table / sum(frequency_table)
+print(proportion_table)
+
+
+
+
+----------------------------------Plotting:
+```{r}
+
+# create unique identifiers for egos and alters
+
+## copy original MTURK Ids
+ego_snconsenting_dt$original_MTurk <- ego_snconsenting_dt$MTURK1
+sns_dt_long_merged_ego_characteristics$original_MTurk <- sns_dt_long_merged_ego_characteristics$MTURK1
+
+## ego ID
+ego_snconsenting_dt$MTURK1 <- paste0("E_", ego_snconsenting_dt$MTURK1) 
+
+
+## alter ID
+sns_dt_long_merged_ego_characteristics <- sns_dt_long_merged_ego_characteristics %>%
+  group_by(original_MTurk) %>%
+  mutate(seq = row_number())
+sns_dt_long_merged_ego_characteristics$MTURK1 <- paste0("A_", sns_dt_long_merged_ego_characteristics$original_MTurk, "_", 
+                                                        sns_dt_long_merged_ego_characteristics$seq)
+
+## merge
+ego_alter_paring_merge_dt <- merge(ego_snconsenting_dt, sns_dt_long_merged_ego_characteristics, by = "original_MTurk", all.x = TRUE)
+
+head(ego_alter_paring_merge_dt[, c("MTURK1.x", "MTURK1.y")])
+
+## create graph
+g <- graph_from_data_frame(d=ego_alter_paring_merge_dt[, c("MTURK1.x", "MTURK1.y")], directed=FALSE)
+
+#print(g)
+vcount(g)
+ecount(g)
+
+#colors
+V(g)$color <- ifelse(V(g)$name %in% ego_snconsenting_dt$MTURK1, 
+                     ifelse(ego_snconsenting_dt$FUVA3 == 1, "green", "red"), 
+                     ifelse(sns_dt_long_merged_ego_characteristics$SN37 == 1, "green", "red")
+)
+#red=unvaccinated, green=vaccinated
+
+#layout
+layout <- layout_with_kk(g)
+
+# Plot the network
+plot(g, 
+     layout = layout, 
+     vertex.size = 7, 
+     vertex.label = NA, 
+     edge.arrow.size = 0.5, 
+     edge.color = "gray50", 
+     main = "Network Diagram")
+
+
+
+--------D3 plot--------------------------
+# Convert to data frame
+edge_df <- as_data_frame(g, what = "edges")
+
+# Get unique nodes
+nodes <- data.frame(name = unique(c(edge_df$from, edge_df$to)))
+
+# Add index column to nodes
+nodes <- nodes %>% mutate(index = row_number() - 1)
+
+# Convert node names in edge_df to index
+edge_df$from <- match(edge_df$from, nodes$name) - 1
+edge_df$to <- match(edge_df$to, nodes$name) - 1
+
+# Rename columns for networkD3
+colnames(edge_df) <- c("source", "target")
+
+
+#Customize the group and color
+
+nodes$group <- ifelse(nodes$name %in% ego_snconsenting_dt$MTURK1, 
+                      ifelse(ego_snconsenting_dt$FUVA3 == 1, 1, 0), 
+                      ifelse(sns_dt_long_merged_ego_characteristics$SN37 == 1, 1, 0))
+
+
+my_color_scale <- 'd3.scaleOrdinal().domain(["0", "1"]).range(["red", "green"])'
+
+#graph
+forceNetwork(Links = edge_df, Nodes = nodes, Source = "source", Target = "target",
+             NodeID = "name", Group = "group", zoom = TRUE, colourScale = my_color_scale)
+
+---------------------------subsetting the group-------------------------------------
+# Detect communities using the Louvain method
+communities <- cluster_louvain(g)
+
+# For each community, get the node with the highest degree
+representative_nodes <- sapply(membership(communities), function(community) {
+  nodes_in_community <- which(membership(communities) == community)
+  degrees <- degree(g, v = nodes_in_community)
+  return(names(degrees[which.max(degrees)]))
+})
+
+# Subset edges that connect the representative nodes
+edge_df <- as_data_frame(g, what = "edges")
+edge_df <- edge_df %>%
+  filter(from %in% representative_nodes & to %in% representative_nodes)
+
+# Convert to data frame
+edge_df <- as_data_frame(g, what = "edges")
+
+# Get unique nodes
+nodes <- data.frame(name = unique(c(edge_df$from, edge_df$to)))
+
+# Add index column to nodes
+nodes <- nodes %>% mutate(index = row_number() - 1)
+
+# Convert node names in edge_df to index
+edge_df$from <- match(edge_df$from, nodes$name) - 1
+edge_df$to <- match(edge_df$to, nodes$name) - 1
+
+# Rename columns for networkD3
+colnames(edge_df) <- c("source", "target")
+
+
+#Customize the group and color
+
+nodes$group <- ifelse(nodes$name %in% ego_snconsenting_dt$MTURK1, 
+                      ifelse(ego_snconsenting_dt$FUVA3 == 1, 1, 0), 
+                      ifelse(sns_dt_long_merged_ego_characteristics$SN37 == 1, 1, 0))
+
+
+my_color_scale <- 'd3.scaleOrdinal().domain(["0", "1"]).range(["#FF0000", "#006400"])'
+
+
+#graph
+p <- forceNetwork(Links = edge_df, Nodes = nodes, Source = "source", Target = "target",
+             NodeID = "name", Group = "group", zoom = TRUE, colourScale = my_color_scale)
+
+saveNetwork(p, file = "my_network.html")
+
+
+
+

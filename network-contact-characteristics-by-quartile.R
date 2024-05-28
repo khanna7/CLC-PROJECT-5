@@ -4,9 +4,10 @@
 
 # Top matter ----------
 
-
 rm(list=ls())
 
+install.packages("tidyverse")
+library(tidyverse)
 library(haven)
 library(dplyr)
 
@@ -86,7 +87,7 @@ combined_data
 table(combined_data$quartile, exclude = NULL)
 
 
-# Sumarize age ---------
+# Sumarize age --------------------------------------
 
 ## summary
 age_summary <- combined_data %>%
@@ -105,7 +106,7 @@ age_test <- aov(SN2 ~ quartile, data = combined_data)
 summary(age_test)
 
 
-# Summarize gender ---------
+# Summarize gender ------------------------------------
 
 ## summary 
 gender_distribution <- combined_data %>%
@@ -144,7 +145,7 @@ print(gender_contingency_table)
 gender_test <- chisq.test(gender_contingency_table)
 print(gender_test)
 
-#Summarize for ethnicity
+#Summarize for ethnicity---------------------------
 
 ## summary 
 ethnicity_distribution <- combined_data %>%
@@ -241,6 +242,46 @@ print(covid_test_contingency_table)
 
 covid_test_chi_test <- chisq.test(covid_test_contingency_table)
 print(covid_test_chi_test)
+
+
+#Summarize for Covid test (positive) -----------------------------------------------
+
+# Create summary statistics by quartile and SN27
+covid_test_distribution <- combined_data %>%
+  group_by(quartile, SN27) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+# Pivot data to a wide format
+covid_test_wide <- covid_test_distribution %>%
+  tidyr::pivot_wider(names_from = SN27, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+# Print the wide-format table
+print(covid_test_wide)
+
+# Filter data for SN27 = 1 from the original distribution
+filtered_SN27_1_distribution <- covid_test_distribution %>%
+  filter(SN27 == 1)
+
+# Print the filtered distribution summary
+print(filtered_SN27_1_distribution)
+
+# Filter the data for SN27 = 1 and SN27 != 1
+filtered_data <- combined_data %>%
+  mutate(SN27_filtered = if_else(SN27 == 1, "1", "not 1"))
+
+# Create a new contingency table for the filtered data
+filtered_covid_test_contingency_table <- table(filtered_data$quartile, filtered_data$SN27_filtered)
+print(filtered_covid_test_contingency_table)
+
+# Perform Chi-square test on the new contingency table
+filtered_covid_test_chi_test <- chisq.test(filtered_covid_test_contingency_table)
+print(filtered_covid_test_chi_test)
+
+
 
 #Summarize for annual household income-------------------
 
@@ -375,6 +416,9 @@ print(political_party_contingency_table)
 
 political_party_test <- chisq.test(political_party_contingency_table)
 print(political_party_test)
+
+combined_data$SN27a1
+
 
 #Summarize for modes of communication -----------------------
 
@@ -1073,10 +1117,69 @@ print(discouraged_vaccine_contingency_table)
 discouraged_vaccine_test <- chisq.test(discouraged_vaccine_contingency_table)
 print(discouraged_vaccine_test)
 
+<<<<<<< HEAD
 # Save data
 
 network_contact_data_env <- new.env()
 network_contact_data_env$combined_data <- combined_data
+=======
+##summary statistics political affilation ------------------------------
+SN9_distribution <- combined_data %>%
+  group_by(quartile, SN9) %>%
+  tally() %>%
+  group_by(quartile) %>%
+  mutate(proportion = n/sum(n))
+
+# Pivot data to a wide format for SN9
+SN9_wide <- SN9_distribution %>%
+  tidyr::pivot_wider(names_from = SN9, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile) %>%
+  summarise(across(everything(), sum))
+
+# Print the wide-format table for SN9
+print(SN9_wide)
+
+# Create a contingency table for SN9
+SN9_contingency_table <- table(combined_data$quartile, combined_data$SN9)
+print(SN9_contingency_table)
+
+# Perform a Chi-square test for SN9
+SN9_chi_test <- chisq.test(SN9_contingency_table)
+print(SN9_chi_test)
+
+##Summarize for race ----------------------------------------
+combined_data_long <- combined_data %>%
+  pivot_longer(cols = starts_with("SN3_"), 
+               names_to = "SN3_type", 
+               values_to = "value")
+# Summary
+race_distribution <- combined_data_long %>%
+  group_by(quartile, SN3_type, value) %>%
+  tally() %>%
+  group_by(quartile, SN3_type) %>%
+  mutate(proportion = n/sum(n))
+
+race_wide <- race_distribution %>%
+  pivot_wider(names_from = value, values_from = proportion, values_fill = 0) %>%
+  group_by(quartile, SN3_type) %>%
+  summarise(across(everything(), sum))  
+
+race_wide <- race_wide %>%
+  arrange(SN3_type, quartile)
+
+print(race_wide, n = Inf)
+
+# Create a contingency table with quartile as rows and sum of values across all SN3_types
+contingency_table <- with(combined_data_long, table(quartile, value))
+
+# Perform chi-square test
+test_result <- chisq.test(contingency_table)
+
+# Print p-value
+print(test_result$p.value)
+
+
+>>>>>>> origin/mockups
 
 saveRDS(network_contact_data_env, paste0(data_loc, 
                                          "network_contact_data_objects.rds"))
