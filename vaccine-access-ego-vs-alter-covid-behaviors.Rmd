@@ -161,6 +161,8 @@ print(proportion_table)
 
 ```
 
+## Noah's Plotting Code
+
 Plotting:
 
 ```{r}
