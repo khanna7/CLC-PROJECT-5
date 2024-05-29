@@ -93,7 +93,7 @@ vaccine (SN38),
 COVID-19 vaccine (SN39).
 
 
-## Association of COVID Behaviors among Egos with Alter Attitudes/Behaviors 
+## Association of COVID Behaviors among Egos (dichotomized) with Alter Attitudes/Behaviors 
 
 
 ```{r}
@@ -102,6 +102,7 @@ COVID-19 vaccine (SN39).
 sns_dt_long_merged_ego_characteristics$SN27_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN27 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN28_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN28 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN29_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN29 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN32_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN32 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN33_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN33 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN34_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN34 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN37_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN37 == 1, 1, 0)
@@ -213,6 +214,7 @@ model_disc_gee_reversed <- geem(data=sns_dt_long_merged_ego_characteristics, cdc
 (summary(model_disc_gee_reversed))
 
 ```
+
 
 Component Outcomes of CDC Score:
 
@@ -333,6 +335,115 @@ summary(model_cdc13)
 # 
 # summary(model_cont_gee)
 # ```
+
+## Association between continuous CDC scores and network attitudes
+
+```{r}
+
+
+
+
+# Specify correlation structure
+corstr <- "exchangeable"
+
+## SN27
+m1_gee_cont <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN27, id = MTURKID,corstr = corstr)
+summary(m1_gee_cont)
+
+m1_gee_cont_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN27_reversed, id = MTURKID,  corstr = corstr)
+summary(m1_gee_cont_reversed)
+
+## SN28
+m2_gee_cont <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN28, id = MTURKID, corstr = corstr)
+summary(m2_gee_cont)
+
+m2_gee_cont_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN28_reversed, id = MTURKID, corstr = corstr)
+summary(m2_gee_cont_reversed)
+
+## SN29
+m2a_gee_cont <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN29, id = MTURKID, corstr = corstr)
+summary(m2a_gee_cont)
+
+m2a_gee_cont_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN29_reversed, id = MTURKID, corstr = corstr)
+summary(m2a_gee_cont_reversed)
+
+
+## SN33
+m3_gee_cont <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN33, id = MTURKID, corstr = corstr)
+summary(m3_gee_cont)
+
+m3_gee_cont_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN33_reversed, id = MTURKID, corstr = corstr)
+summary(m3_gee_cont_reversed)
+
+## SN34
+m4_gee_cont <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN34, id = MTURKID, corstr = corstr)
+summary(m4_gee_cont)
+
+m4_gee_cont_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN34_reversed, id = MTURKID, corstr = corstr)
+summary(m4_gee_cont_reversed)
+
+## m5
+m5_gee_cont <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN37, id = MTURKID, corstr = corstr)
+summary(m5_gee_cont)
+
+m5_gee_cont_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN37_reversed, id = MTURKID, corstr = corstr)
+summary(m5_gee_cont_reversed)
+
+
+## m6
+m6_gee_cont <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN38, id = MTURKID,  corstr = corstr)
+summary(m6_gee_cont)
+
+m6_gee_cont_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN38_reversed, id = MTURKID, corstr = corstr)
+summary(m6_gee_cont_reversed)
+
+## m7
+m7_gee_cont <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN39, id = MTURKID, corstr = corstr)
+summary(m7_gee_cont)
+
+m7_gee_cont_reversed <- 
+  geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN39_reversed, id = MTURKID, corstr = corstr)
+summary(m7_gee_cont_reversed)
+
+## include all covariates
+model_cont_gee_reversed <- geem(data=sns_dt_long_merged_ego_characteristics, cdc_avg_out ~ 
+                 SN27_reversed + SN28_reversed + SN29_reversed + SN33_reversed + 
+                   SN34_reversed + SN37_reversed + SN38_reversed, id = MTURKID, 
+                 corstr = corstr)
+(summary(model_cont_gee_reversed))
+
+```
 
 ## Association of Vaccine Hesitance among Egos with Alter Attitudes/Behaviors
 
@@ -458,10 +569,6 @@ summary(model_vh3_SN38)
 # summary(model_vh3_SN39)
 ```
 
-```{r}
-library(ergm)
-```
-
 
 ```{r}
 # # Load the dataset
@@ -497,6 +604,7 @@ library(ergm)
 
 ```
 
+### Check clustering
 
 Query the `sns_dt_long_merged_ego_characteristics` object to confirm that 
 it only contains information on alter attributes. This can be done by looking at
@@ -519,6 +627,8 @@ by MTURKID.
 
 
 Create a merged network member participant environment that can be used in analysis later:
+
+### Save Data Objects
 
 ```{r}
 merged_network_participant_env <- new.env()

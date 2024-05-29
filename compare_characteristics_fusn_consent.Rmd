@@ -9,24 +9,30 @@ editor_options:
 
 ```{r, setup, include=FALSE}
 rm(list=ls())
-knitr::opts_knit$set(root.dir = "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT")
-```
-
-```{r, echo=FALSE, message=FALSE}
-rm(list=ls())
 library(dplyr)
 ```
 
+```{r, data_loc, include=FALSE}
+data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROUT/"
+```
+
+
 ```{r}
-tab2_dt <- as.data.frame(readRDS("tab2_comparison_data.RDS"))
+tab2_dt <- as.data.frame(readRDS(paste0(data_loc, "tab2_comparison_data.RDS")))
 class(tab2_dt)
 dim(tab2_dt)
 colnames(tab2_dt)
+
+eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
+cdc_scores <- eda_env$cdc_scores
 ```
 
 Compare `FUSNCONSENT == 7` vs not. 
 
 Recode NA is FUSNCONSENT as 0 for easier comparison
+
+'FUSNCONSENT == 7` -- consent
+'FUSNCONSENT == 0` -- not consent
 
 ```{r}
 tab2_dt <- 
@@ -34,12 +40,53 @@ tab2_dt <-
                      ifelse(is.na(FUSNCONSENT), 0, FUSNCONSENT))
 ```
 
-
 ```{r}
+total_fusconsent_7 = sum(tab2_dt$FUSNCONSENT_numeric == 7)
+total_fusconsent_7
+total_fusconsent_0 = sum(tab2_dt$FUSNCONSENT_numeric == 0)
+total_fusconsent_0
+
 t.test(as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 7]),
        as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 0])
        )
+
+
+table(tab2_dt$gender_3cat)
+
 ```
+
+## Test Differences
+
+### Age
+```{r}
+stats_age <- tab2_dt %>%
+  mutate(age_numeric = as.numeric(as.character(age))) %>%  # Convert age to numeric
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(
+    mean_age = mean(age_numeric, na.rm = TRUE),
+    sd_age = sd(age_numeric, na.rm = TRUE)
+  )
+
+print(stats_age)
+
+```
+
+```{r}
+# Convert age to numeric
+tab2_dt$age_numeric <- as.numeric(as.character(tab2_dt$age))
+
+# Split data based on FUSNCONSENT_numeric
+group1 <- tab2_dt$age_numeric[tab2_dt$FUSNCONSENT_numeric == 0]
+group2 <- tab2_dt$age_numeric[tab2_dt$FUSNCONSENT_numeric == 7]
+
+# Perform t-test
+t_test_result <- t.test(group1, group2)
+
+print(t_test_result)
+
+```
+
+### Gender
 ```{r}
   tab2_dt %>%  
   select(gender_3cat, FUSNCONSENT_numeric) %>%
@@ -51,6 +98,25 @@ gender_xtab <-
 chisq.test(gender_xtab)
 chisq.test(gender_xtab[1:2, 1:2])
 ```
+
+
+### Race
+
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+race_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, race_4cat) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(race_summary)
+```
+
 ```{r}
 race_xtab <- 
   xtabs(~factor(tab2_dt$race_4cat)+factor(tab2_dt$FUSNCONSENT_numeric))
@@ -59,22 +125,117 @@ race_xtab
 chisq.test(race_xtab)
 chisq.test(race_xtab[c(1, 2, 4),])
 ```
+
+### Ethnicity
 ```{r}
 ethnicity_xtab <- 
   xtabs(~factor(tab2_dt$ethnicity)+factor(tab2_dt$FUSNCONSENT_numeric))
 
 ethnicity_xtab
 chisq.test(ethnicity_xtab)
+
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+ethnicity_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, ethnicity) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(ethnicity_summary)
 ```
+
+
+### Education
+
 
 
 ```{r}
 education_xtab <- 
-  xtabs(~factor(tab2_dt$education)+factor(tab2_dt$FUSNCONSENT_numeric))
+  xtabs(~factor(tab2_dt$education, exclude = NULL)+
+          factor(tab2_dt$FUSNCONSENT_numeric, exclude = NULL))
 
 education_xtab
 chisq.test(education_xtab)
 ```
+Recode education:
+
+```{r}
+tab2_dt <- tab2_dt %>%
+  mutate(recoded_education = case_when(
+    education %in% c(1, 2) ~ "Some High School or Lower",
+    education == 3 ~ "High School Completed",
+    education == 4 ~ "Some College",
+    TRUE ~ as.character(education)  # to capture other possible values
+  ))
+
+education_xtab <- tab2_dt %>%
+  group_by(recoded_education, FUSNCONSENT_numeric) %>%
+  summarise(count = n()) %>%
+  group_by(FUSNCONSENT_numeric) %>%
+  mutate(percentage = (count / sum(count)) * 100) %>%
+  ungroup()
+
+# Create a contingency table
+contingency_table <- table(tab2_dt$recoded_education, tab2_dt$FUSNCONSENT_numeric)
+
+# Chi-squared test
+chi_squared_result <- chisq.test(contingency_table)
+
+# Print the result
+print(chi_squared_result)
+```
+
+### Income
+
+```{r}
+table(tab2_dt$income)
+
+# Generate cross-tabulations
+income_10_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "10"))
+print(income_10_xtab)
+
+income_11_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "11"))
+print(income_11_xtab)
+
+income_4_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "4"))
+print(income_4_xtab)
+
+income_5_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "5"))
+print(income_5_xtab)
+
+income_6_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "6"))
+print(income_6_xtab)
+
+income_7_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "7"))
+print(income_7_xtab)
+
+income_8_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "8"))
+print(income_8_xtab)
+
+income_9_xtab <- xtabs(~income + FUSNCONSENT_numeric, data = filter(tab2_dt, income == "9"))
+print(income_9_xtab)
+
+```
+
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+income_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, income) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(income_summary)
+```
+
 ```{r}
 income_xtab <- 
   xtabs(~factor(tab2_dt$income)+factor(tab2_dt$FUSNCONSENT_numeric))
@@ -83,18 +244,48 @@ income_xtab
 chisq.test(income_xtab)
 ```
 
+### Household size
 ```{r}
-tab2_dt$household_size = as.numeric(tab2_dt$household_size)
-t.test(tab2_dt$household_size[tab2_dt$FUSNCONSENT_numeric == 7],
-       tab2_dt$household_size[tab2_dt$FUSNCONSENT_numeric == 0]
-       )
-```
-```{r}
-dwelling_ownership_xtab <- 
-  xtabs(~factor(tab2_dt$dwelling_ownership)+factor(tab2_dt$FUSNCONSENT_numeric))
+stats_household_size <- tab2_dt %>%
+  mutate(household_size_numeric = as.numeric(as.character(household_size))) %>%  # Convert household_size to numeric
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(
+    mean_household_size = mean(household_size_numeric, na.rm = TRUE),
+    sd_household_size = sd(household_size_numeric, na.rm = TRUE)
+  )
 
-dwelling_ownership_xtab
-chisq.test(dwelling_ownership_xtab)
+print(stats_household_size)
+
+```
+
+```{r}
+# Convert to numeric
+tab2_dt$household_numeric <- as.numeric(as.character(tab2_dt$household_size))
+
+# Split data based on FUSNCONSENT_numeric
+group1 <- tab2_dt$household_numeric [tab2_dt$FUSNCONSENT_numeric == 0]
+group2 <- tab2_dt$household_numeric[tab2_dt$FUSNCONSENT_numeric == 7]
+
+# Perform t-test
+t_test_result <- t.test(group1, group2)
+
+print(t_test_result)
+```
+
+### Essential_worker
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+essential_worker_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, essential_worker) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(essential_worker_summary)
 ```
 
 ```{r}
@@ -105,11 +296,46 @@ essential_worker_xtab
 chisq.test(essential_worker_xtab)
 ```
 
+### Average CDC score 
+
 ```{r}
-tab2_dt$cdc_avg_out = as.numeric(tab2_dt$cdc_avg_out)
-t.test(tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 7],
-       tab2_dt$cdc_avg_out[tab2_dt$FUSNCONSENT_numeric == 0]
-       )
+cdc_scores <- cdc_scores %>% filter(MTURKID != "")
+tab2_dt <- tab2_dt %>% filter(MTURK1 != "") # to prevent a many-to-one join issue
+
+# Left join cdc_scores with the relevant columns from tab2_dt
+cdc_scores <- cdc_scores %>%
+  left_join(select(tab2_dt, MTURK1, FUSNCONSENT_numeric), 
+            by = c("MTURKID" = "MTURK1"))
+
+# Extract the cdc_scores for participants with FUSNCONSENT_numeric values of 7 and 0
+cdc_avg_out_summary <- cdc_scores %>%
+  group_by(FUSNCONSENT_numeric) %>%
+  summarise(mean = mean(cdc_avg_out),
+            sd = sd(cdc_avg_out)) 
+
+group1 <- cdc_scores$cdc_avg_out[cdc_scores$FUSNCONSENT_numeric == 7]
+group2 <- cdc_scores$cdc_avg_out[cdc_scores$FUSNCONSENT_numeric == 0]
+
+t.test(group1, group2)
+```
+
+
+
+### COVID testing
+
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+covid_test_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, covid_test) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(covid_test_summary)
 ```
 
 ```{r}
@@ -120,16 +346,31 @@ covid_test_xtab
 chisq.test(covid_test_xtab)
 ```
 
-```{r}
-tab2_dt <- 
-  tab2_dt %>% mutate(sub_last7days = 
-                     ifelse(is.na(sub_last7days), 0, sub_last7days))
-sub_last7days_xtab <- 
-  xtabs(~factor(tab2_dt$sub_last7days, exclude = NULL)+
-          factor(tab2_dt$FUSNCONSENT_numeric))
 
-sub_last7days_xtab
-chisq.test(sub_last7days_xtab)
+Test for positive covid -- tab2_dt$covid_test == 1
+
+```{r}
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7) & covid_test == 1)
+
+# Determine the counts and percentages
+covid_test_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, covid_test) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(covid_test_summary)
+
+```
+
+### Positive test result
+
+TBD
+
+```{r}
+
 ```
 
 ```{r}

@@ -1,0 +1,54 @@
+---
+title: "Chi-squared test for differences"
+output: html_document
+date: "2023-08-15"
+---
+
+
+
+
+
+## Data
+
+We have a sample of 1085 persons, of which 173 provided network data, and 912 did not. We want to test if the two samples are statistically different with regards to their composition. The first hypothesis tests if similarity of the gender distribution. The first group that did not provide network data includes 94 men (54.89%), 79 (45.67%) women, and 0 non-binary persons. The second group includes 447 men (49%), 446 women (48.90%), and 19 non-binary persons (28.9%). 
+
+## Hypothesis
+
+Null hypotheis: Gender distributions across the groups that provided 
+network data (n=173) vs those that did not provide network data (n=912)
+are the same.
+
+Alternate hypothesis: Gender distributions across the two groups are not the 
+same.
+
+
+## Code
+
+Read in data:
+
+```{r}
+gender_table <- matrix(c(94, 447,
+                         79, 446,
+                         0, 19), 
+                       ncol = 2,
+                       byrow = TRUE)
+
+rownames(gender_table) <- c("Male", "Female", "Non-Binary")
+colnames(gender_table) <- c("Provided Network Data", "Did Not Provide Network Data")
+
+gender_table
+```
+Test:
+
+```{r}
+chisq.test(gender_table)
+```
+
+Based on this result, we cannot reject the null hypothesis.
+
+Test the same hypothesis but with only men and women:
+
+```{r}
+chisq.test(gender_table[1:2,1:2])
+```
+We see that there is even less evidence against the null if we just use the first 2 categories.  
