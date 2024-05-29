@@ -1117,12 +1117,11 @@ print(discouraged_vaccine_contingency_table)
 discouraged_vaccine_test <- chisq.test(discouraged_vaccine_contingency_table)
 print(discouraged_vaccine_test)
 
-<<<<<<< HEAD
 # Save data
 
 network_contact_data_env <- new.env()
 network_contact_data_env$combined_data <- combined_data
-=======
+
 ##summary statistics political affilation ------------------------------
 SN9_distribution <- combined_data %>%
   group_by(quartile, SN9) %>%
@@ -1179,7 +1178,7 @@ test_result <- chisq.test(contingency_table)
 print(test_result$p.value)
 
 
->>>>>>> origin/mockups
+
 
 saveRDS(network_contact_data_env, paste0(data_loc, 
                                          "network_contact_data_objects.rds"))
