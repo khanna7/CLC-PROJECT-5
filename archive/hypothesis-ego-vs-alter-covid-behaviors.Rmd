@@ -102,6 +102,7 @@ COVID-19 vaccine (SN39).
 sns_dt_long_merged_ego_characteristics$SN27_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN27 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN28_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN28 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN29_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN29 == 1, 1, 0)
+sns_dt_long_merged_ego_characteristics$SN32_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN32 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN33_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN33 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN34_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN34 == 1, 1, 0)
 sns_dt_long_merged_ego_characteristics$SN37_reversed <- ifelse(sns_dt_long_merged_ego_characteristics$SN37 == 1, 1, 0)
