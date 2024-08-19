@@ -45,6 +45,8 @@ n <- nrow(dt)
 ## age
 summary(dt$DEMO2); sd(dt$DEMO2, na.rm = TRUE) #age
 table(dt$Screen1, exclude = NULL) # see CADRE CLC Data Project5/Qualtrics Codebooks/Coronavirus_Pandemic_A_Community_Survey.docx
+sum(table(dt$Screen1, exclude = NULL))
+
 age <- dt$DEMO2
 
 ## sex and gender identity
