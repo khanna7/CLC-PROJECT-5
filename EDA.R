@@ -505,12 +505,18 @@ tab2_dt <- cbind(
   )
 
 
+## Did you receive mental health or substance use treatment remotely (by computer or phone) since March 2020?
+head(dt$FUAC4)
+table(dt$FUAC4, exclude = NULL)
+sum(table(dt$FUAC4, exclude = NULL))
+
+
 # Vaccine information---------------------------
 
-## at least one does of the vaccine
+## received at least one does of the vaccine
 head(dt$FUVA3)
 table(dt$FUVA3, exclude = NULL)
-
+sum(table(dt$FUVA3, exclude = NULL))
 
 # Vaccine hesitancy ---------------------------
 
