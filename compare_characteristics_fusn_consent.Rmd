@@ -406,25 +406,41 @@ chisq.test(daily_stimulant_xtab)
 
 ```{r}
 
-colnames(tab2_dt)
+##Have you gotten at least one dose of the coronavirus vaccine?
+##o	Yes  (1) 
+## o	No  (2) 
+## o	Unsure  (3) 
 
+head(dt$FUVA3)
+table(dt$FUVA3, exclude = NULL)
+sum(table(dt$FUVA3, exclude = NULL))
+
+table(dt$FUSNCONSENT, exclude=NULL)
+
+
+## only considering respondents who answered this question (n=353)
 vaccine_xtab <- 
-  xtabs(~factor(tab2_dt$VA3)+factor(tab2_dt$FUSNCONSENT_numeric))
+  xtabs(~factor(dt$FUVA3)+
+          factor(dt$FUSNCONSENT, exclude = NULL))
 
 vaccine_xtab
 chisq.test(vaccine_xtab)
 
-# Filter the data for relevant FUSNCONSENT_numeric values
-filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+sum(vaccine_xtab)
 
-# Determine the counts and percentages
-vaccine_summary <- filtered_data %>%
-  group_by(FUSNCONSENT_numeric, vaccine) %>%
-  summarise(count = n()) %>%
-  mutate(total = sum(count),
-         percentage = (count / total) * 100) %>%
-  ungroup()
 
-print(vaccine_summary)
+
+## many respondents did not answer the question, if we include them the p-value
+## is meaningless
+vaccine_xtab_2 <- 
+  xtabs(~factor(dt$FUVA3, exclude = NULL)+
+          factor(dt$FUSNCONSENT, exclude = NULL))
+
+vaccine_xtab_2
+chisq.test(vaccine_xtab_2)
+
+sum(vaccine_xtab_2)
+
+
 ```
 
