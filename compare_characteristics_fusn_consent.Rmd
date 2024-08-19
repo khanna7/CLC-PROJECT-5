@@ -311,7 +311,7 @@ cdc_scores <- cdc_scores %>%
 cdc_avg_out_summary <- cdc_scores %>%
   group_by(FUSNCONSENT_numeric) %>%
   summarise(mean = mean(cdc_avg_out),
-            sd = sd(cdc_avg_out)) d
+            sd = sd(cdc_avg_out)) 
 
 group1 <- cdc_scores$cdc_avg_out[cdc_scores$FUSNCONSENT_numeric == 7]
 group2 <- cdc_scores$cdc_avg_out[cdc_scores$FUSNCONSENT_numeric == 0]
@@ -401,3 +401,30 @@ daily_stimulant_xtab <-
 daily_stimulant_xtab
 chisq.test(daily_stimulant_xtab)
 ```
+
+### Received at least one dose of the COVID-19 vaccine?
+
+```{r}
+
+colnames(tab2_dt)
+
+vaccine_xtab <- 
+  xtabs(~factor(tab2_dt$VA3)+factor(tab2_dt$FUSNCONSENT_numeric))
+
+vaccine_xtab
+chisq.test(vaccine_xtab)
+
+# Filter the data for relevant FUSNCONSENT_numeric values
+filtered_data <- tab2_dt %>% filter(FUSNCONSENT_numeric %in% c(0, 7))
+
+# Determine the counts and percentages
+vaccine_summary <- filtered_data %>%
+  group_by(FUSNCONSENT_numeric, vaccine) %>%
+  summarise(count = n()) %>%
+  mutate(total = sum(count),
+         percentage = (count / total) * 100) %>%
+  ungroup()
+
+print(vaccine_summary)
+```
+
