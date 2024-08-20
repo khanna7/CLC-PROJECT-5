@@ -57,7 +57,7 @@ ego_dt <- sns_consenting_dt
 network_member_dt <- sns_dt_long_wide_no_minors
 
 
-# Plot the data -----------
+# Plot homophily by vaccine status -----------
 
 # Create the edge list
 edge_list <- as.matrix(network_member_dt[, c("MTURKID", "alterID")])
@@ -158,5 +158,74 @@ p1 <- ggraph(g, layout = "graphopt") +
 
 # Print the plot
 print(p1)
+
+
+
+# Plot homophily by essential worker status ----------
+
+table(ego_dt$essential_worker, exclude = NULL)
+
+
+# Create named vectors for essential worker status
+ego_essential_status <- setNames(ego_dt$essential_worker, ego_dt$MTURK1)
+alter_essential_status <- setNames(network_member_dt$SN37, network_member_dt$alterID)
+
+# Combine the vectors
+combined_essential_status <- c(ego_essential_status, alter_essential_status)
+combined_essential_status <- combined_essential_status[!is.na(names(combined_essential_status))]
+
+# Check the names of combined_essential_status
+combined_essential_status_names <- names(combined_essential_status)
+head(combined_essential_status_names)
+
+# Extract base IDs from vertex names
+base_ids_from_vertices <- unique(sub("_\\d+$", "", V(g)$name))
+
+# Check if all base IDs exist in combined_essential_status
+missing_base_ids <- base_ids_from_vertices[!base_ids_from_vertices %in% combined_essential_status_names]
+
+# Print missing base IDs, if any
+if (length(missing_base_ids) > 0) {
+  print(missing_base_ids)
+} else {
+  print("All base IDs are present in combined_essential_status.")
+}
+
+# Create a new named vector to store the essential worker status with the correct suffixes
+essential_status_with_suffix <- setNames(vector("character", length(V(g))), V(g)$name)
+
+# Loop through each vertex name and assign the correct essential worker status
+for (vertex_name in V(g)$name) {
+  base_id <- sub("_\\d+$", "", vertex_name)
+  if (base_id %in% names(combined_essential_status)) {
+    essential_status_with_suffix[vertex_name] <- combined_essential_status[base_id]
+  } else {
+    essential_status_with_suffix[vertex_name] <- NA
+  }
+}
+
+# Assign the essential worker status to vertices
+V(g)$essential_status <- essential_status_with_suffix[V(g)$name]
+
+# Check the assignment
+table(V(g)$essential_status, exclude = NULL)
+
+# Define color palette for the essential worker status
+color_palette_essential <- c("1" = "blue", "2" = "orange", "NA" = "white")
+
+# Plot the network with essential worker status
+ggraph(g, layout = "graphopt") +  
+  geom_edge_link() +
+  geom_node_point(aes(color = factor(essential_status)), size = 3) +
+  scale_color_manual(values = color_palette_essential, 
+                     labels = c("1" = "Essential Worker", "2" = "Non-Essential Worker", "NA" = "Unknown")) +
+  theme_void() +
+  labs(color = "Essential Worker Status") +
+  theme(legend.position = "right", 
+        legend.title = element_text(size = 14, face = "bold"),
+        legend.text = element_text(size = 12))
+
+# Print the plot
+
 
 
