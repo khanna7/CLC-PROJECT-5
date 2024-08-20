@@ -10,6 +10,7 @@ editor_options:
 ```{r, setup, include=FALSE}
 rm(list=ls())
 library(dplyr)
+library(haven)
 ```
 
 ```{r, data_loc, include=FALSE}
@@ -406,12 +407,19 @@ chisq.test(daily_stimulant_xtab)
 
 ```{r}
 
+ls(eda_env)
+dt <- eda_env$dt
+class(dt)
+
 ##Have you gotten at least one dose of the coronavirus vaccine?
 ##o	Yes  (1) 
 ## o	No  (2) 
 ## o	Unsure  (3) 
 
 head(dt$FUVA3)
+dt$FUVA3 <- as_factor(dt$FUVA3)
+table(dt$FUVA3, exclude = NULL)
+
 table(dt$FUVA3, exclude = NULL)
 sum(table(dt$FUVA3, exclude = NULL))
 
@@ -428,8 +436,6 @@ chisq.test(vaccine_xtab)
 
 sum(vaccine_xtab)
 
-
-
 ## many respondents did not answer the question, if we include them the p-value
 ## is meaningless
 vaccine_xtab_2 <- 
@@ -442,5 +448,21 @@ chisq.test(vaccine_xtab_2)
 sum(vaccine_xtab_2)
 
 
+# Check how many gave longitudinal data ---------------------------
+
+table(dt$FUHASLONGDATA, exclude = NULL)
+
+xtabs(~factor(dt$FUVA3, exclude = NULL)+
+        ~factor(dt$FUHASLONGDATA, exclude = NULL))
+
+
+# 3-dim xtab
+
+vaccine_xtab_3d <- xtabs(~factor(dt$FUVA3, exclude = NULL) +
+                          factor(dt$FUSNCONSENT, exclude = NULL) +
+                          factor(dt$FUHASLONGDATA, exclude = NULL))
+
+# View the 3-dimensional table
+vaccine_xtab_3d
 ```
 

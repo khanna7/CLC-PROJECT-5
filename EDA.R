@@ -40,6 +40,13 @@ dim(dt)
 n <- nrow(dt)
 
 
+
+# Check how many gave longitudinal data ---------------------------
+
+table(dt$FUHASLONGDATA, exclude = NULL)
+
+
+
 # Sample Descriptives ---------------------------
 
 ## age
