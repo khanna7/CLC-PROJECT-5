@@ -488,6 +488,17 @@ table(daily_drinking)/sum(table(daily_drinking))
 table(daily_opioid); table(daily_opioid)/sum(table(daily_opioid))
 table(daily_stimulant); table(daily_stimulant)/sum(table(daily_stimulant))
 
+
+# Other Data to be Added in Table 2 ---------------------------
+
+
+### Political party
+### LSQ17 What is your political party or affiliation?
+
+table(dt$LSQ1)
+
+
+
 # Create dataset with Table 2 variables and MTURKD IDs ---------------------------
 # to be used in comparing the characteristics and behaviors among 
 # people providing FUSN consent vs not
@@ -495,6 +506,7 @@ table(daily_stimulant); table(daily_stimulant)/sum(table(daily_stimulant))
 tab2_dt <- cbind(
   MTURK1=dt$MTURK1,
   FUSNCONSENT=dt$FUSNCONSENT,
+  FUHASLONGDATA=dt$FUHASLONGDATA,
   age, 
   gender_3cat,
   race_4cat,  
