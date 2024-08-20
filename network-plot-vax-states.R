@@ -214,7 +214,8 @@ table(V(g)$essential_status, exclude = NULL)
 color_palette_essential <- c("1" = "blue", "2" = "orange", "NA" = "white")
 
 # Plot the network with essential worker status
-ggraph(g, layout = "graphopt") +  
+p_essential_worker <-
+  ggraph(g, layout = "graphopt") +  
   geom_edge_link() +
   geom_node_point(aes(color = factor(essential_status)), size = 3) +
   scale_color_manual(values = color_palette_essential, 
@@ -226,6 +227,10 @@ ggraph(g, layout = "graphopt") +
         legend.text = element_text(size = 12))
 
 # Print the plot
+p_essential_worker
 
 
+# Plot homophily by political party ----------
+
+table(ego_dt$SN9)
 
