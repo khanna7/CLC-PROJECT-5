@@ -19,16 +19,17 @@ data_loc <- "/Volumes/caas/CADRE CLC Data Project5/Clean Data/AK-SU-NETWORKS-ROU
 
 
 ```{r}
-tab2_dt <- as.data.frame(readRDS(paste0(data_loc, "tab2_comparison_data.RDS")))
-class(tab2_dt)
-dim(tab2_dt)
-colnames(tab2_dt)
+#tab2_dt <- as.data.frame(readRDS(paste0(data_loc, "tab2_comparison_data.RDS")))
+#class(tab2_dt)
+#dim(tab2_dt)
+#colnames(tab2_dt)
 
 eda_env <- readRDS(paste0(data_loc, "eda_objects.rds"))
 cdc_scores <- eda_env$cdc_scores
+tab2_dt <- as.data.frame(eda_env$tab2_dt)
 ```
 
-Compare `FUSNCONSENT == 7` vs not. 
+Compare `FUSNCONSENT == 7` vs not (in the group in which `FUHASLONGDATA == 1`). 
 
 Recode NA is FUSNCONSENT as 0 for easier comparison
 
@@ -39,6 +40,13 @@ Recode NA is FUSNCONSENT as 0 for easier comparison
 tab2_dt <- 
   tab2_dt %>% mutate(FUSNCONSENT_numeric = 
                      ifelse(is.na(FUSNCONSENT), 0, FUSNCONSENT))
+```
+
+
+```{r}
+tab2_dt <-
+  tab2_dt %>%
+  filter(FUHASLONGDATA == 1)
 ```
 
 ```{r}
@@ -55,6 +63,7 @@ t.test(as.numeric(tab2_dt$age[tab2_dt$FUSNCONSENT_numeric == 7]),
 table(tab2_dt$gender_3cat)
 
 ```
+
 
 ## Test Differences
 
@@ -403,6 +412,7 @@ daily_stimulant_xtab
 chisq.test(daily_stimulant_xtab)
 ```
 
+
 ### Received at least one dose of the COVID-19 vaccine?
 
 ```{r}
@@ -465,4 +475,8 @@ vaccine_xtab_3d <- xtabs(~factor(dt$FUVA3, exclude = NULL) +
 # View the 3-dimensional table
 vaccine_xtab_3d
 ```
+
+### Political party ----------
+
+
 
