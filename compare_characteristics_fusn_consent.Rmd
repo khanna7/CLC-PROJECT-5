@@ -105,6 +105,8 @@ print(t_test_result)
 gender_xtab <- 
   xtabs(~factor(tab2_dt$gender_3cat)+factor(tab2_dt$FUSNCONSENT_numeric))
 
+gender_xtab
+prop.table(gender_xtab, margin = 2) * 100
 chisq.test(gender_xtab)
 chisq.test(gender_xtab[1:2, 1:2])
 ```
@@ -142,6 +144,7 @@ ethnicity_xtab <-
   xtabs(~factor(tab2_dt$ethnicity)+factor(tab2_dt$FUSNCONSENT_numeric))
 
 ethnicity_xtab
+prop.table(ethnicity_xtab, 2)
 chisq.test(ethnicity_xtab)
 
 # Filter the data for relevant FUSNCONSENT_numeric values
@@ -164,6 +167,9 @@ print(ethnicity_summary)
 
 
 ```{r}
+head(as.factor(tab2_dt$education))
+class(tab2_dt$education)
+
 education_xtab <- 
   xtabs(~factor(tab2_dt$education, exclude = NULL)+
           factor(tab2_dt$FUSNCONSENT_numeric, exclude = NULL))
@@ -191,6 +197,10 @@ education_xtab <- tab2_dt %>%
 
 # Create a contingency table
 contingency_table <- table(tab2_dt$recoded_education, tab2_dt$FUSNCONSENT_numeric)
+prop_table <- prop.table(contingency_table, margin = 2) * 100
+
+cbind(contingency_table, prop_table)
+
 
 # Chi-squared test
 chi_squared_result <- chisq.test(contingency_table)
@@ -252,6 +262,22 @@ income_xtab <-
 
 income_xtab
 chisq.test(income_xtab)
+```
+
+Recode income:
+
+```{r}
+# Recode income into brackets
+tab2_dt$income_bracket <- cut(as.numeric(tab2_dt$income), 
+                              breaks = c(-Inf, 4, 7, Inf), 
+                              labels = c("< 25000 USD", "25000-50000 USD", "> 50000 USD"),
+                              right = TRUE)
+
+tab2_dt$income_bracket 
+income_bracket_xtab <- table(tab2_dt$income_bracket, tab2_dt$FUSNCONSENT_numeric)
+income_bracket_xtab
+prop.table(income_bracket_xtab, margin = 2) * 100
+chisq.test(income_bracket_xtab)
 ```
 
 ### Household size
@@ -319,7 +345,7 @@ cdc_scores <- cdc_scores %>%
 
 # Extract the cdc_scores for participants with FUSNCONSENT_numeric values of 7 and 0
 cdc_avg_out_summary <- cdc_scores %>%
-  group_by(FUSNCONSENT_numeric) %>%
+  group_by(FUSNCONSENT_numeric.x) %>%
   summarise(mean = mean(cdc_avg_out),
             sd = sd(cdc_avg_out)) 
 
@@ -353,6 +379,7 @@ covid_test_xtab <-
   xtabs(~factor(tab2_dt$covid_test)+factor(tab2_dt$FUSNCONSENT_numeric))
 
 covid_test_xtab
+prop.table(covid_test_xtab, 2)
 chisq.test(covid_test_xtab)
 ```
 
@@ -442,6 +469,7 @@ vaccine_xtab <-
           factor(dt$FUSNCONSENT, exclude = NULL))
 
 vaccine_xtab
+prop.table(vaccine_xtab, 2)
 chisq.test(vaccine_xtab)
 
 sum(vaccine_xtab)
@@ -453,6 +481,7 @@ vaccine_xtab_2 <-
           factor(dt$FUSNCONSENT, exclude = NULL))
 
 vaccine_xtab_2
+prop.table(vaccine_xtab_2, 2)
 chisq.test(vaccine_xtab_2)
 
 sum(vaccine_xtab_2)
