@@ -345,7 +345,7 @@ cdc_scores <- cdc_scores %>%
 
 # Extract the cdc_scores for participants with FUSNCONSENT_numeric values of 7 and 0
 cdc_avg_out_summary <- cdc_scores %>%
-  group_by(FUSNCONSENT_numeric.x) %>%
+  group_by(FUSNCONSENT_numeric) %>%
   summarise(mean = mean(cdc_avg_out),
             sd = sd(cdc_avg_out)) 
 
