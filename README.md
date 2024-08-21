@@ -1,14 +1,19 @@
 # Organization of Code
 
 
-## Table 1
+## Data Preparation 
 
-- [Compare characteristics and behaviors of the 173 participants providing data vs those that did not (n=912)](https://github.com/khanna7/CLC-PROJECT-5/blob/master/compare_characteristics_fusn_consent.Rmd)
-  * Compute the same characteristics and behaviors as reported in Monnig's [Table 2](https://github.com/khanna7/CLC-PROJECT-5/blob/master/EDA.R)
-  * Test whether these characteristics are statistically the same between two groups that provided network information and those that did not. 
-  * This is Table 1 in the working draft of the manuscript
+[Participant Data](EDA.R): Prepares ego-level datasets for use in future files. 
 
-## [Table 2](https://github.com/khanna7/CLC-PROJECT-5/blob/mockups/network-contact-characteristics-by-quartile.R): Characteristics of Reported Network Members Stratified by Participant's CDC Guideline Adherence Score Quartiles
+[Network Data](network-data-analysis.Rmd)
+
+[Table 1](compare_characteristics_fusn_consent.Rmd):
+  * Compare characteristics and behaviors of the participants providing social network data (n=173) vs those who answered the follow-up survey but did not respond to the social network questionnaire (n=180) 
+
+[Table 2](network-contact-characteristics-by-quartile.R): Characteristics of Reported Network Members Stratified by Participant's CDC Guideline Adherence Score Quartiles
+
+[Network Data Preparation](network-data-analysis.Rmd)
+
 
 - [Characteristics and behaviors of the 851 eligible network contacts](https://github.com/khanna7/CLC-PROJECT-5/blob/master/network-data-analysis.Rmd)
   * Filter by respondents (n=173) who provided network data
